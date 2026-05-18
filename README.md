@@ -5,6 +5,14 @@ Pala One — A tiny E-Ink reader project by Paul Lagier
 
 The goal of the project was to create a simple, distraction-free reading device that feels minimal, portable and easy to build while still looking and behaving more like a real product than a typical DIY electronics project.
 
+## Install (no toolchain needed)
+
+[Web Installer](https://gnatpat.github.io/pala-one-firmware/)
+
+The easiest way to flash a board is via the web installer. Plug your Heltec Wireless Paper into a desktop computer running Chrome, Edge, or Opera, then open the installer page and click **Install** for your display revision (V1.1 or V1.2).
+
+The installer keeps existing reading progress, bookmarks, and uploaded books across re-flashes.
+
 ## Contributing
 
 If you improve the firmware, add features or fix bugs, feel free to open a pull request.
@@ -79,6 +87,27 @@ The same sources build under either toolchain.
 
 Both envs share libraries and partition table via `platformio.ini`. The PIO build also runs `scripts/build_info.py` to inject the current git short hash as `BUILD_GIT_HASH`; Arduino IDE builds fall back to `"unknown"`.
 
+### Installer site (local development)
+
+The [web installer](https://gnatpat.github.io/pala-one-firmware/) is rebuilt by CI on every tag push from `install/` + the latest firmware binaries. To iterate on the page (HTML, Improv Serial provisioning flow, manifest tweaks) locally:
+
+1. Build both envs at least once so the firmware bins exist:
+   ```
+   pio run -e wireless-paper-v1_1
+   pio run -e wireless-paper-v1_2
+   ```
+2. Assemble the bundle:
+   ```
+   python scripts/assemble_site.py
+   ```
+3. Serve it. Web Serial works on `localhost` without HTTPS, so a plain static server is enough:
+   ```
+   python -m http.server 8000 --directory site
+   ```
+4. Open <http://localhost:8000> in Chrome, Edge, or Opera.
+
+Both the script and CI write the same `site/` layout — what you test locally is bit-identical to what gets deployed. Optional flags: `--version <string>` to label the manifest, `--out <dir>` to write somewhere other than `site/`.
+
 ## Codebase layout
 
 ```
@@ -100,6 +129,7 @@ docs/                    # Architecture notes + refactor journal
 scripts/                 # PlatformIO pre-build helpers
 test/                    # Host-side CMake unit tests for pure/ + storage/
 examples/                # Sample apps (click_counter, palagotchi)
+install/                 # ESP Web Tools installer page (deployed to GitHub Pages by CI)
 archive/                 # Past firmware revisions, kept for reference
 ```
 

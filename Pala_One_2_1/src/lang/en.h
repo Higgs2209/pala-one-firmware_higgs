@@ -48,6 +48,10 @@
 #define D_UPLOAD_WIFI               "Wi-Fi"
 #define D_UPLOAD_PASSWORD           "Password"
 #define D_UPLOAD_OPEN               "Open"
+#define D_UPLOAD_CONNECTING         "Connecting"
+#define D_UPLOAD_CONNECTED          "Connected"
+#define D_UPLOAD_HOTSPOT_HINT_L1    "Press button to"
+#define D_UPLOAD_HOTSPOT_HINT_L2    "use hotspot instead"
 
 // ----------------------------------------------------------------------------
 //  Apps screen (src/ui/screens/apps_screen.cpp)
