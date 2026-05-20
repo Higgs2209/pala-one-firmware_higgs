@@ -21,11 +21,81 @@ There are currently two supported Heltec Wireless Paper versions:
 
 The board version is usually printed on the back of the PCB.
 
-Both versions are built from the same source file (`Pala_One_2_1/Pala_One_2_1.ino`). Open it in Arduino IDE and uncomment the `#define` at the top that matches your hardware before compiling.
+Pick your board's revision in the build step below — either by uncommenting the matching `#define` at the top of `Pala_One_2_1/Pala_One_2_1.ino` (Arduino IDE), or by selecting the matching env (PlatformIO).
+
+## Building the firmware
+
+The same sources build under either toolchain.
+
+### Arduino IDE 2
+
+1. Install the **esp32 by Espressif Systems** board package (Boards Manager) and select the **Heltec WiFi LoRa 32 V3** board.
+2. Install these libraries via Library Manager (or by URL):
+   - [`heltec-eink-modules`](https://github.com/todd-herbert/heltec-eink-modules) (todd-herbert fork)
+   - **Adafruit GFX Library** (Adafruit)
+   - **U8g2_for_Adafruit_GFX** (olikraus)
+3. Open `Pala_One_2_1/Pala_One_2_1.ino`. Uncomment exactly one of `BOARD_V1_1` / `BOARD_V1_2` at the top.
+4. Tools → Partition Scheme → **Custom** (the sketch ships its own `partitions.csv`).
+5. Verify / Upload.
+
+### PlatformIO
+
+1. Install [PlatformIO Core](https://platformio.org/install/cli) (CLI) or the PlatformIO IDE extension for VS Code.
+2. From the repo root:
+   ```
+   pio run -e wireless-paper-v1_2 -t upload    # V1.2 panel
+   pio run -e wireless-paper-v1_1 -t upload    # V1.1 panel
+   ```
+3. Serial monitor:
+   ```
+   pio device monitor
+   ```
+
+Both envs share libraries and partition table via `platformio.ini`. The PIO build also runs `scripts/build_info.py` to inject the current git short hash as `BUILD_GIT_HASH`; Arduino IDE builds fall back to `"unknown"`.
+
+## Codebase layout
+
+```
+Pala_One_2_1/
+├── Pala_One_2_1.ino     # Sketch entry: board selection + setup()/loop()
+├── pala_api.h           # Public app API (firmware ↔ app ABI)
+├── pala_app.h           # PalaAppHeader + version constants
+├── partitions.csv       # ESP32 partition table
+└── src/                 # Firmware modules
+    ├── config.h         # Compile-time constants
+    ├── state.{h,cpp}    # Globals (display, WiFi server, prefs)
+    ├── pure/            # Pure C++, no Arduino headers — host-testable
+    ├── hal/             # Hardware adapters (display, battery, input)
+    ├── storage/         # KV store + on-disk persistence
+    ├── ui/              # Screens, fonts, sleep, toasts, widgets
+    │   └── screens/     # One file per screen
+    └── web/             # Captive-portal HTTP server (route groups)
+docs/                    # Architecture notes + refactor journal
+scripts/                 # PlatformIO pre-build helpers
+test/                    # Host-side CMake unit tests for pure/ + storage/
+examples/                # Sample apps (click_counter, palagotchi)
+archive/                 # Past firmware revisions, kept for reference
+```
+
+The intent of the layering is **pure → storage → hal → ui**: pure modules never include `Arduino.h`, so they compile into the host test build verbatim. Storage adds an on-disk persistence shim behind `KeyValueStore`, hal isolates the hardware, and the UI sits on top.
+
+### Include style
+
+Firmware sources include each other by the full path from the sketch root, e.g. `#include "src/hal/display.h"`, not the shorter `#include "hal/display.h"`.
+
+This is to stay compatible with Arduino IDE. The IDE recursively compiles files inside the `src/` subfolder of a sketch, **but does not add `src/` to the compiler's include path** — only the sketch folder root is on it. So `#include "config.h"` from a file at sketch root fails (the file actually lives at `src/config.h`), whereas `#include "src/config.h"` resolves correctly. PlatformIO is happy either way; we picked the Arduino-IDE-compatible form so the same `#include` lines work in both build systems with no extra `-I` flags.
+
+## Host-side tests
+
+Pure modules and KV-backed storage have host-side unit tests under [`test/`](test/). They build with CMake and run on your laptop — no board required.
+
+See [test/README.md](test/README.md) for prerequisites (CMake + a C++17 compiler) and per-platform setup / run instructions for Windows, Linux, and macOS.
 
 ## Apps
 
-Apps are compiled separately and uploaded to the device via the WiFi web interface — no firmware rebuild needed. The Apps menu discovers all `.bin` files in `/apps/` on the device and lists them by name.
+Pala One supports user-installable apps — self-contained position-independent C binaries that run on top of the firmware and have access to the display, button, RTC, and a per-app key-value store. Apps are uploaded over Wi-Fi through the same web UI used for books, and they appear under the **Apps** entry of the library menu. No firmware rebuild is needed to install one.
+
+See [examples/GETTING_STARTED.md](examples/GETTING_STARTED.md) for the full app-author guide — binary format, the `PalaAPI` (v3), required compiler flags, and upload steps.
 
 ### Building an app
 
@@ -138,7 +208,7 @@ https://ko-fi.com/s/e14ed892ea
 
 ## Community & Modifications
 
-Community improvements, forks and firmware modifications are welcome.  
+Community improvements, forks and firmware modifications are welcome.
 If you build your own version or improve the project, feel free to share it with the community.
 
 ## License & Copyright
