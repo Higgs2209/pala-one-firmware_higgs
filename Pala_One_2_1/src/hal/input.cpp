@@ -2,7 +2,22 @@
 
 #include <esp_timer.h>
 
-#include "src/state.h"  // prefs — used by Gestures persistence
+#include "src/pure/hold_gesture.h"  // classifyHoldRelease / classifyHoldInProgress
+#include "src/state.h"              // prefs — used by Gestures persistence
+
+// Local helper: map a HoldGestureKind decision into the matching output
+// flag. Used at both classification sites (release path + in-progress).
+// Returns true if any flag was set — caller uses that to decide whether
+// to consume the press (clear pressArmed_) and zero clickCount_.
+static bool applyHoldKindTo(ButtonState& s, HoldGestureKind k) {
+  switch (k) {
+    case HoldLong:      s.longClick_      = true; return true;
+    case HoldVeryLong:  s.veryLongClick_  = true; return true;
+    case HoldClickHold: s.clickHoldClick_ = true; return true;
+    case HoldNone:
+    default:            return false;
+  }
+}
 
 ButtonState g_btns;
 
@@ -299,56 +314,39 @@ void ButtonState::poll() {
     if (prevPressed && !stablePressed_) {
       if (pressArmed_) {
         uint32_t dur = (uint32_t)(edgeTime - pressStart_);
-        if (dur >= LONG_MS) {
-          // Three flavors of long-release, distinguished by what came before:
-          //   clickCount_ == 1, dur >= LONG_MS — click-then-hold chord
-          //   clickCount_ == 0, dur >= VERY_LONG_MS — very-long press
-          //   clickCount_ == 0, dur in [LONG_MS, VERY_LONG_MS) — long press
-          // Pending count is dropped in all cases (the chord case consumes
-          // the previous click into the chord; the others are a fresh hold).
-          if (clickCount_ == 1) {
-            clickHoldClick_ = true;
-          } else if (dur >= VERY_LONG_MS) {
-            veryLongClick_ = true;
-          } else {
-            longClick_ = true;
-          }
+        HoldGestureKind k = classifyHoldRelease(dur, clickCount_);
+        if (applyHoldKindTo(*this, k)) {
           clickCount_ = 0;
-        } else {
-          // Bump the apps-API raw counter *before* the multi-click
-          // accumulator, so apps see every short release even when the
-          // classifier later groups them into a double/triple.
+        } else if (dur < LONG_MS) {
+          // Short release — accumulate into the click sequence. Bump the
+          // apps-API raw counter *before* the multi-click accumulator so
+          // apps see every short release even when the classifier later
+          // groups them into a double/triple.
           rawPressCount_++;
           clickCount_++;
           lastRelease_ = edgeTime;
           if (clickCount_ == 1) firstClickRelease_ = edgeTime;
         }
+        // dur >= LONG_MS but classifyHoldRelease returned None (count >= 2)
+        // → pending clicks commit on their own; the hold contributes nothing.
       }
       pressArmed_ = false;
       pressStart_ = 0;
     }
   }
 
-  // Hold detection while the button is still down. Two cases emit at the
-  // threshold and consume the press (clearing pressArmed_ silently swallows
-  // the eventual release via the release path's `if (pressArmed_)` guard):
-  //
-  //   - clickCount_ == 1, held >= LONG_MS — click-then-hold chord. The
-  //     pending single is folded into the chord.
-  //   - clickCount_ == 0, held >= VERY_LONG_MS — very-long press.
-  //
-  // Plain long (clickCount_ == 0, LONG_MS <= held < VERY_LONG_MS)
-  // intentionally does NOT emit here: at LONG_MS we can't yet tell whether
-  // the user is still on their way to a very-long. The release-path
-  // classifier above handles it once the hold ends.
+  // In-progress hold detection. ClickHold and VeryLong emit at the
+  // earliest threshold the gesture is unambiguously identified, then
+  // consume the press so the eventual release is ignored (cleared
+  // pressArmed_ → release path's `if (pressArmed_)` guard skips). Plain
+  // Long is deferred to release because at LONG_MS we can't yet tell
+  // whether the user is on their way to a VeryLong — that case lives
+  // in the release classifier above.
   if (stablePressed_ && pressArmed_) {
     uint32_t held = (uint32_t)(millis() - pressStart_);
-    if (clickCount_ == 1 && held >= LONG_MS) {
-      clickHoldClick_ = true;
+    HoldGestureKind k = classifyHoldInProgress(held, clickCount_);
+    if (applyHoldKindTo(*this, k)) {
       clickCount_ = 0;
-      pressArmed_ = false;
-    } else if (clickCount_ == 0 && held >= VERY_LONG_MS) {
-      veryLongClick_ = true;
       pressArmed_ = false;
     }
   }
