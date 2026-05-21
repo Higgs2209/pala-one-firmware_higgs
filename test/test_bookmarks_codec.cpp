@@ -67,7 +67,15 @@ TEST_CASE("addBookmark refuses duplicate page") {
   addBookmark(bm, 5, 500);
   BookmarkAddResult r = addBookmark(bm, 5, 555);
   CHECK(!r.added);
+  // Compare against the language macro, not the English literal, so the
+  // test still passes if someone builds the host tests with -DLANG_ES_LA.
+  // Host default (no LANG_* flag) falls back to LANG_EN via src/lang/lang.h.
+  CHECK_EQ(String(r.message), String(D_TOAST_BOOKMARK_EXISTS));
+#ifdef LANG_EN
+  // Under the default English build, also pin the literal so a key swap
+  // (e.g. {added:false} returning the wrong toast) gets caught.
   CHECK_EQ(String(r.message), String("Bookmark exists"));
+#endif
   CHECK_EQ(bm.count, 1);
 }
 
