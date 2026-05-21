@@ -1,6 +1,7 @@
 #include "src/web/settings.h"
 
 #include "src/config.h"
+#include "src/hal/input.h"   // ButtonAction + Gestures
 #include "src/state.h"
 #include "src/pure/hashing.h"             // prefKeyForBook
 #include "src/storage/book_metadata.h"
@@ -11,6 +12,36 @@
 #include "src/ui/screens/reader_screen.h" // g_readerScreen — active-reader check
 #include "src/ui/sleep.h"
 #include "src/web/chrome.h"
+
+// ----------------------------------------------------------------------------
+//  Helpers for the remappable-button section
+// ----------------------------------------------------------------------------
+static void appendActionOption(String& out, int val, const char* label, int current) {
+  out += "<option value='";
+  out += val;
+  out += "'";
+  if (val == current) out += " selected";
+  out += ">";
+  out += label;
+  out += "</option>";
+}
+
+static void appendActionSelect(String& out, const char* nameId, const char* label, int current) {
+  out += "<div><label for='";
+  out += nameId;
+  out += "'>";
+  out += label;
+  out += "</label><select id='";
+  out += nameId;
+  out += "' name='";
+  out += nameId;
+  out += "'>";
+  appendActionOption(out, ACTION_NONE,     D_WEB_BUTTONS_ACTION_NONE,     current);
+  appendActionOption(out, ACTION_BOOKMARK, D_WEB_BUTTONS_ACTION_BOOKMARK, current);
+  appendActionOption(out, ACTION_LOCK,     D_WEB_BUTTONS_ACTION_LOCK,     current);
+  appendActionOption(out, ACTION_MENU,     D_WEB_BUTTONS_ACTION_MENU,     current);
+  out += "</select></div>";
+}
 
 static void handleSettings() {
   int curFont = Font::currentBodySize();
@@ -93,7 +124,21 @@ static void handleSettings() {
     "<input type='hidden' name='noscr_form' value='1'>"
     "<div class='actions' style='margin-top:24px'><button type='submit'>" D_WEB_SAVE_SETTINGS_BUTTON "</button>"
     "<span class='muted'>" D_WEB_SETTINGS_APPLY_HINT "</span></div>"
-    "</form></div>"
+    "</form></div>";
+
+  // Buttons card — submitted as a separate form so the gesture bindings
+  // don't share POST state with the reading-form's reader-cursor remap.
+  out += "<div class='card'><h2>" D_WEB_BUTTONS_HEADING "</h2>";
+  out += "<p class='muted'>" D_WEB_BUTTONS_HINT "</p>";
+  out += "<form method='POST' action='/settings' accept-charset='UTF-8'><div class='grid cols-2'>";
+  appendActionSelect(out, "btnL",  D_WEB_BUTTONS_LONG,       (int)Gestures::actionLong());
+  appendActionSelect(out, "btnXL", D_WEB_BUTTONS_EXTRA_LONG, (int)Gestures::actionExtraLong());
+  appendActionSelect(out, "btnCH", D_WEB_BUTTONS_CLICK_HOLD, (int)Gestures::actionClickHold());
+  out += "</div><div class='actions' style='margin-top:24px'><button type='submit'>" D_WEB_BUTTONS_SAVE "</button>";
+  out += "<span class='muted'>" D_WEB_BUTTONS_LOCK_HINT "</span>";
+  out += "</div></form></div>";
+
+  out +=
     "<div class='card'><h2>" D_WEB_SCREENSAVER_HEADING "</h2>"
     "<p class='muted'>" D_WEB_SCREENSAVER_CARD_DESC "</p>"
     "<div class='actions' style='margin-top:8px'>"
@@ -184,6 +229,19 @@ static void handleSettingsPost() {
   if (server.hasArg("noscr_form")) {
     bool ns = server.hasArg("noscr");
     if (ns != Sleep::noScreensaver()) Sleep::setNoScreensaver(ns);
+  }
+
+  // Gesture bindings — `setAction*` clamp internally, but we still check
+  // `hasArg` because the page submits this section as a separate form
+  // (so a Reading POST won't carry these keys at all).
+  if (server.hasArg("btnL")) {
+    Gestures::setActionLong((ButtonAction)server.arg("btnL").toInt());
+  }
+  if (server.hasArg("btnXL")) {
+    Gestures::setActionExtraLong((ButtonAction)server.arg("btnXL").toInt());
+  }
+  if (server.hasArg("btnCH")) {
+    Gestures::setActionClickHold((ButtonAction)server.arg("btnCH").toInt());
   }
 
   server.sendHeader("Location", "/settings");

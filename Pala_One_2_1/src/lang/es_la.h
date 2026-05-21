@@ -269,6 +269,19 @@
 #define D_WEB_SLEEP_IMAGE_LABEL     "Archivo de imagen de suspensión"
 #define D_WEB_SCREENSAVER_UPLOAD_BUTTON "Subir imagen"
 
+// Buttons / remappable hold-gestures section.
+#define D_WEB_BUTTONS_HEADING       "Botones"
+#define D_WEB_BUTTONS_HINT          "1 clic = siguiente, 2 = anterior, 3 = inicio. Las tres pulsaciones largas abajo son reasignables."
+#define D_WEB_BUTTONS_LONG          "Pulsación larga"
+#define D_WEB_BUTTONS_EXTRA_LONG    "Pulsación muy larga"
+#define D_WEB_BUTTONS_CLICK_HOLD    "Clic y mantener"
+#define D_WEB_BUTTONS_SAVE          "Guardar botones"
+#define D_WEB_BUTTONS_LOCK_HINT     "Si está bloqueado, repita cualquier pulsación larga para desbloquear."
+#define D_WEB_BUTTONS_ACTION_NONE     "Ninguna"
+#define D_WEB_BUTTONS_ACTION_BOOKMARK "Marcar página"
+#define D_WEB_BUTTONS_ACTION_LOCK     "Bloquear dispositivo"
+#define D_WEB_BUTTONS_ACTION_MENU     "Abrir menú"
+
 // ----------------------------------------------------------------------------
 //  Upload routes
 // ----------------------------------------------------------------------------
