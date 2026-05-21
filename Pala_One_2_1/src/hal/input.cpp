@@ -2,6 +2,8 @@
 
 #include <esp_timer.h>
 
+#include "src/state.h"  // prefs — used by Gestures persistence
+
 ButtonState g_btns;
 
 // Time of the last accepted user input. Used by the loop to decide when
@@ -298,8 +300,20 @@ void ButtonState::poll() {
       if (pressArmed_) {
         uint32_t dur = (uint32_t)(edgeTime - pressStart_);
         if (dur >= LONG_MS) {
+          // Three flavors of long-release, distinguished by what came before:
+          //   clickCount_ == 1, dur >= LONG_MS — click-then-hold chord
+          //   clickCount_ == 0, dur >= VERY_LONG_MS — very-long press
+          //   clickCount_ == 0, dur in [LONG_MS, VERY_LONG_MS) — long press
+          // Pending count is dropped in all cases (the chord case consumes
+          // the previous click into the chord; the others are a fresh hold).
+          if (clickCount_ == 1) {
+            clickHoldClick_ = true;
+          } else if (dur >= VERY_LONG_MS) {
+            veryLongClick_ = true;
+          } else {
+            longClick_ = true;
+          }
           clickCount_ = 0;
-          longClick_ = true;
         } else {
           // Bump the apps-API raw counter *before* the multi-click
           // accumulator, so apps see every short release even when the
@@ -315,21 +329,26 @@ void ButtonState::poll() {
     }
   }
 
-  // Long-press hold detection: while the button is still down past LONG_MS,
-  // fire the long-click now rather than waiting for release. Makes bookmark
-  // feedback feel instant — the toast appears as the user crosses 850ms
-  // instead of after they let go.
+  // Hold detection while the button is still down. Two cases emit at the
+  // threshold and consume the press (clearing pressArmed_ silently swallows
+  // the eventual release via the release path's `if (pressArmed_)` guard):
   //
-  // Clearing pressArmed_ silently swallows the eventual release: the release
-  // path's `if (pressArmed_)` guard skips classification, so the release
-  // contributes nothing. Same observable state as "we never saw the press."
-  // A genuinely stuck button stays in stablePressed_=true / pressArmed_=false
-  // until the pin actually changes — the guard here gates on pressArmed_, so
-  // no further long-clicks spam out while it's stuck.
+  //   - clickCount_ == 1, held >= LONG_MS — click-then-hold chord. The
+  //     pending single is folded into the chord.
+  //   - clickCount_ == 0, held >= VERY_LONG_MS — very-long press.
+  //
+  // Plain long (clickCount_ == 0, LONG_MS <= held < VERY_LONG_MS)
+  // intentionally does NOT emit here: at LONG_MS we can't yet tell whether
+  // the user is still on their way to a very-long. The release-path
+  // classifier above handles it once the hold ends.
   if (stablePressed_ && pressArmed_) {
-    if ((uint32_t)(millis() - pressStart_) >= LONG_MS) {
+    uint32_t held = (uint32_t)(millis() - pressStart_);
+    if (clickCount_ == 1 && held >= LONG_MS) {
+      clickHoldClick_ = true;
       clickCount_ = 0;
-      longClick_ = true;
+      pressArmed_ = false;
+    } else if (clickCount_ == 0 && held >= VERY_LONG_MS) {
+      veryLongClick_ = true;
       pressArmed_ = false;
     }
   }
@@ -411,3 +430,57 @@ void resetInputFrontend() {
   g_btns.resetState();
   markUserActivity();
 }
+
+// ============================================================================
+//  Gestures — owned NVS bindings for the three remappable hold gestures.
+// ============================================================================
+namespace Gestures {
+
+static constexpr const char* kKeyLong      = "cfg_btnL";
+static constexpr const char* kKeyExtraLong = "cfg_btnXL";
+static constexpr const char* kKeyClickHold = "cfg_btnCH";
+
+// Defaults chosen to make the device useful out of the box:
+//   long      = bookmark — the most common action while reading
+//   extralong = lock     — a deliberate "I'm putting it down" gesture
+//   clickhold = menu     — easy chord, doesn't fight short-click paging
+static ButtonAction s_long      = ACTION_BOOKMARK;
+static ButtonAction s_extraLong = ACTION_LOCK;
+static ButtonAction s_clickHold = ACTION_MENU;
+
+static ButtonAction clamp(int v) {
+  if (v < ACTION_NONE || v > ACTION_MENU) return ACTION_NONE;
+  return (ButtonAction)v;
+}
+
+void loadSettings() {
+  s_long      = clamp(prefs.getInt(kKeyLong,      ACTION_BOOKMARK));
+  s_extraLong = clamp(prefs.getInt(kKeyExtraLong, ACTION_LOCK));
+  s_clickHold = clamp(prefs.getInt(kKeyClickHold, ACTION_MENU));
+}
+
+ButtonAction actionLong()      { return s_long; }
+ButtonAction actionExtraLong() { return s_extraLong; }
+ButtonAction actionClickHold() { return s_clickHold; }
+
+static void persist(const char* key, ButtonAction& dest, ButtonAction value) {
+  ButtonAction v = clamp(value);
+  if (v == dest) return;
+  dest = v;
+  prefs.putInt(key, (int)v);
+}
+
+void setActionLong(ButtonAction a)      { persist(kKeyLong,      s_long,      a); }
+void setActionExtraLong(ButtonAction a) { persist(kKeyExtraLong, s_extraLong, a); }
+void setActionClickHold(ButtonAction a) { persist(kKeyClickHold, s_clickHold, a); }
+
+ButtonAction actionFor(ButtonEvent::Kind kind) {
+  switch (kind) {
+    case ButtonEvent::Long:      return s_long;
+    case ButtonEvent::VeryLong:  return s_extraLong;
+    case ButtonEvent::ClickHold: return s_clickHold;
+    default:                     return ACTION_NONE;
+  }
+}
+
+}  // namespace Gestures
