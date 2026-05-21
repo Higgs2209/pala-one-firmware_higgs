@@ -9,6 +9,7 @@
 
 #include "src/ui/font.h"                    // currentBodySize/currentLineGap for cache stamping
 #include "src/ui/screens/library_screen.h"  // navigateToLibraryRoot — fallback on error
+#include "src/ui/statusbar.h"               // Statusbar::mode for the per-mode statusbar render
 #include "src/ui/text.h"
 #include "src/ui/toast.h"                   // Toast::isActive / Toast::draw
 #include "src/ui/widgets.h"                 // drawCenter (error fallback)
@@ -192,8 +193,19 @@ bool openBookByIndex(int idx) {
 }
 
 static void drawStatusBar(uint32_t startOffset) {
+  if (Statusbar::mode() == Statusbar::Hidden) return;
+
   size_t total = g_bookview.book.size();
   if (total == 0) total = 1;
+
+  if (Statusbar::mode() == Statusbar::Minimal) {
+    int w = SCREEN_W - 2 * MARGIN_X;
+    int filled = (int)((startOffset * (uint32_t)w) / (uint32_t)total);
+    if (filled < 0) filled = 0;
+    if (filled > w) filled = w;
+    if (filled > 0) gfx.drawFastHLine(MARGIN_X, SCREEN_H - 1, filled, 1);
+    return;
+  }
 
   int pageTextW = 0;
   if (SHOW_PAGE_NUMBER) {

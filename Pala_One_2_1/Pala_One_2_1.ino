@@ -98,8 +98,10 @@
 #include "src/ui/screens/list_screen.h"
 #include "src/ui/screens/reader_screen.h"
 #include "src/ui/screens/upload_screen.h"
+#include "src/ui/lock.h"
 #include "src/ui/screensavers.h"
 #include "src/ui/sleep.h"
+#include "src/ui/statusbar.h"
 #include "src/ui/text.h"
 #include "src/ui/toast.h"
 #include "src/web/web.h"
@@ -130,6 +132,15 @@ void setup() {
 
   pinMode(BTN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(BTN), btnISR, CHANGE);
+
+  // If we just woke from deep sleep via ext0 and the button is still being
+  // held, the press started BEFORE the ISR was attached — its down-edge
+  // never made it into the queue. Seed the input state so the upcoming
+  // release edge is classified as a real press, not silently dropped.
+  // Required for "click-then-hold on wake" to form a single chord gesture.
+  if (digitalRead(BTN) == LOW) {
+    g_btns.seedPressOnWake(millis());
+  }
 
   u8g2.begin(gfx);
 
@@ -171,6 +182,11 @@ void setup() {
 
   Font::loadSettings();
   Screensavers::loadSettings();
+  Statusbar::loadSettings();
+  Gestures::loadSettings();
+  Lock::loadSettings();
+  // Sleep::loadSettings() already ran earlier in setup() so the no-screensaver
+  // flag was available for the boot-clear gate above — don't reload it here.
   loadBooks();
   loadListItems();
   loadApps();
@@ -180,12 +196,23 @@ void setup() {
 
   if (tryRestoreReadingSession()) {
     renderCurrentPage();      // ~300ms draw — wake-press releases during this
-    resetInputFrontend();     // then discard the wake-press only
+    if (Lock::isLocked()) {
+      // Keep the wake-press edges so a click-then-hold can wake AND unlock
+      // in one motion. resetInputFrontend would otherwise drain them and
+      // force the user to repeat the unlock gesture.
+      markUserActivity();
+    } else {
+      resetInputFrontend();   // discard the wake-press only
+    }
     g_currentScreen = &g_readerScreen;
   } else {
     g_currentScreen = &g_libraryScreen;
     g_libraryScreen.onEnter();
-    resetInputFrontend();
+    if (Lock::isLocked()) {
+      markUserActivity();
+    } else {
+      resetInputFrontend();
+    }
   }
 
   // Drop to 80 MHz for normal operation — saves significant power.
@@ -201,6 +228,36 @@ void loop() {
   maybeRecoverFromIsrOverflow();
 
   ButtonEvent ev = ButtonEvent::fromButtonState(g_btns);
+
+  // Locked: swallow all input except any hold-type gesture (which unlocks).
+  // We accept any of {Long, VeryLong, ClickHold} rather than strictly the
+  // gesture currently bound to ACTION_LOCK — after a deep-sleep wake the
+  // firmware can't reliably reconstruct a chord, so strict matching would
+  // leave the user stuck if they bound LOCK to the chord.
+  //
+  // Crucially this branch does NOT call markUserActivity for non-unlock
+  // events, so the idle deadline keeps ticking and an idle locked device
+  // re-sleeps instead of draining battery.
+  if (Lock::isLocked()) {
+    if (Lock::isUnlockGesture(ev)) {
+      Lock::disengage();
+      markUserActivity();
+      Toast::show("Unlocked");
+      // Partial refresh is enough — the underlying page is already on
+      // screen (either from before the lock, or rendered by setup() after
+      // a deep-sleep wake). The render cycle paints the toast.
+      g_currentScreen->draw();
+      return;
+    }
+    if (ENABLE_DEEP_SLEEP && g_currentScreen->allowSleep()) {
+      if (userIdleMs() > Sleep::idleTimeoutMs()) {
+        Sleep::enter();  // cfg_locked remains true; we re-sleep still locked
+        return;
+      }
+    }
+    return;
+  }
+
   if (ev.any()) markUserActivity();
 
   if (ENABLE_DEEP_SLEEP && g_currentScreen->allowSleep()) {

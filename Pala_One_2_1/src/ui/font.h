@@ -52,6 +52,11 @@ void useAppLarge();
 // Calling this leaves the active u8g2 font set to Body.
 const LayoutMetrics& bodyLayout();
 
+// Drop the cached layout. External owners of layout-affecting state call
+// this after they mutate (e.g. `Statusbar::setMode` changes the bottom
+// reserve, which changes how many text lines fit on a page).
+void invalidateLayoutCache();
+
 // ----------------------------------------------------------------------------
 //  Persistence — NVS keys live inside font.cpp; nothing else references them.
 // ----------------------------------------------------------------------------

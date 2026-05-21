@@ -6,6 +6,7 @@
 #include "src/config.h"
 #include "src/hal/display.h"  // u8g2 instance
 #include "src/state.h"        // prefs
+#include "src/ui/statusbar.h" // Statusbar::reserveH
 
 // OpenDyslexic u8g2 font tables. Vendored alongside the sketch (see
 // Pala_One_2_1/opendyslexic_u8g2_fonts.h). Only referenced from this file.
@@ -116,7 +117,7 @@ const LayoutMetrics& bodyLayout() {
     s_layout.maxWidth = w;
 
     int maxHeight = SCREEN_H - TOP_PAD - BOT_PAD;
-    if (SHOW_PROGRESS_BAR || SHOW_PAGE_NUMBER) maxHeight -= STATUS_H;
+    maxHeight -= Statusbar::reserveH();
 
     s_layout.maxLines = maxHeight / s_layout.lineH;
     if (s_layout.maxLines < 1) s_layout.maxLines = 1;
@@ -352,5 +353,7 @@ void drawBionicLine(int x, int y, const char* line) {
   });
   useBody();
 }
+
+void invalidateLayoutCache() { s_layoutValid = false; }
 
 }  // namespace Font
