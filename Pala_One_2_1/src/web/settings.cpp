@@ -30,53 +30,53 @@ static void handleSettings() {
   bool hasSleepImg = FS.exists("/sleep.bin");
 
   String out = webPageStart(
-    "Pala One Settings",
-    "Firmware " FW_BUILD " configuration page stored directly on the device.",
-    "<a href='/'>&#8592; Home</a>"
+    D_WEB_SETTINGS_TITLE,
+    D_WEB_SETTINGS_SUBTITLE_PREFIX FW_BUILD D_WEB_SETTINGS_SUBTITLE_SUFFIX,
+    "<a href='/'>" D_WEB_SETTINGS_BACK_NAV "</a>"
   );
   out.reserve(out.length() + 4000);
 
   out +=
-    "<div class='card'><h2>Reading</h2>"
+    "<div class='card'><h2>" D_WEB_READING_HEADING "</h2>"
     "<form method='POST' action='/settings' accept-charset='UTF-8'>"
     "<div class='grid cols-2'>"
-    "<div><label for='font'>Font size</label><select id='font' name='font'>"
-    "<option value='8'";  out += sel8;  out += ">8px &mdash; tiny</option>"
-    "<option value='10'"; out += sel10; out += ">10px &mdash; small</option>"
-    "<option value='12'"; out += sel12; out += ">12px &mdash; medium</option>"
-    "<option value='14'"; out += sel14; out += ">14px &mdash; large</option>"
-    "</select><div class='hint'>Controls how many lines fit on each page.</div></div>"
-    "<div><label for='sleep'>Sleep after</label><select id='sleep' name='sleep'>"
-    "<option value='30'";   out += ss30;   out += ">30 seconds</option>"
-    "<option value='60'";   out += ss60;   out += ">1 minute</option>"
-    "<option value='120'";  out += ss120;  out += ">2 minutes</option>"
-    "<option value='300'";  out += ss300;  out += ">5 minutes</option>"
-    "<option value='600'";  out += ss600;  out += ">10 minutes</option>"
-    "<option value='1800'"; out += ss1800; out += ">30 minutes</option>"
-    "</select><div class='hint'>Auto-sleep keeps battery draw low while idle.</div></div>"
-    "<div><label for='lgap'>Line spacing</label><select id='lgap' name='lgap'>"
-    "<option value='0'"; out += lg0; out += ">0 px &mdash; compact</option>"
-    "<option value='1'"; out += lg1; out += ">1 px &mdash; normal</option>"
-    "<option value='2'"; out += lg2; out += ">2 px &mdash; relaxed</option>"
-    "<option value='3'"; out += lg3; out += ">3 px &mdash; loose</option>"
-    "</select><div class='hint'>A small change here can make text much easier to scan.</div></div>"
+    "<div><label for='font'>" D_WEB_FONT_SIZE_LABEL "</label><select id='font' name='font'>"
+    "<option value='8'";  out += sel8;  out += ">" D_WEB_FONT_SIZE_8  "</option>"
+    "<option value='10'"; out += sel10; out += ">" D_WEB_FONT_SIZE_10 "</option>"
+    "<option value='12'"; out += sel12; out += ">" D_WEB_FONT_SIZE_12 "</option>"
+    "<option value='14'"; out += sel14; out += ">" D_WEB_FONT_SIZE_14 "</option>"
+    "</select><div class='hint'>" D_WEB_FONT_SIZE_HINT "</div></div>"
+    "<div><label for='sleep'>" D_WEB_SLEEP_AFTER_LABEL "</label><select id='sleep' name='sleep'>"
+    "<option value='30'";   out += ss30;   out += ">" D_WEB_SLEEP_30S "</option>"
+    "<option value='60'";   out += ss60;   out += ">" D_WEB_SLEEP_1M  "</option>"
+    "<option value='120'";  out += ss120;  out += ">" D_WEB_SLEEP_2M  "</option>"
+    "<option value='300'";  out += ss300;  out += ">" D_WEB_SLEEP_5M  "</option>"
+    "<option value='600'";  out += ss600;  out += ">" D_WEB_SLEEP_10M "</option>"
+    "<option value='1800'"; out += ss1800; out += ">" D_WEB_SLEEP_30M "</option>"
+    "</select><div class='hint'>" D_WEB_SLEEP_HINT "</div></div>"
+    "<div><label for='lgap'>" D_WEB_LINE_SPACING_LABEL "</label><select id='lgap' name='lgap'>"
+    "<option value='0'"; out += lg0; out += ">" D_WEB_LINE_SPACING_0 "</option>"
+    "<option value='1'"; out += lg1; out += ">" D_WEB_LINE_SPACING_1 "</option>"
+    "<option value='2'"; out += lg2; out += ">" D_WEB_LINE_SPACING_2 "</option>"
+    "<option value='3'"; out += lg3; out += ">" D_WEB_LINE_SPACING_3 "</option>"
+    "</select><div class='hint'>" D_WEB_LINE_SPACING_HINT "</div></div>"
     "</div>"
-    "<div class='actions' style='margin-top:24px'><button type='submit'>Save settings</button><span class='muted'>No extra files, scripts, or fonts.</span></div>"
+    "<div class='actions' style='margin-top:24px'><button type='submit'>" D_WEB_SAVE_SETTINGS_BUTTON "</button><span class='muted'>" D_WEB_SETTINGS_NO_EXTRAS "</span></div>"
     "</form></div>"
-    "<div class='card'><h2>Screensaver</h2>"
-    "<p>Upload raw XBM bytes: <b>3904 bytes</b>, 250&times;122 px, 1-bit, LSB-first, 32 bytes per row.</p>"
-    "<p class='muted'>Tip: use <a class='link' href='https://javl.github.io/image2cpp/' target='_blank'>image2cpp</a> with <b>Plain bytes</b>. Invert colors if needed.</p>";
+    "<div class='card'><h2>" D_WEB_SCREENSAVER_HEADING "</h2>"
+    "<p>" D_WEB_SCREENSAVER_SPECS "</p>"
+    "<p class='muted'>" D_WEB_SCREENSAVER_TIP "</p>";
 
   if (hasSleepImg) {
-    out += "<div class='status ok'>&#10003; Custom screensaver active. <form method='POST' action='/del-sleep' style='display:inline;margin-left:6px'><button type='submit' class='btn secondary' onclick=\"return confirm('Delete custom screensaver?')\">Delete</button></form></div>";
+    out += "<div class='status ok'>" D_WEB_SCREENSAVER_ACTIVE " <form method='POST' action='/del-sleep' style='display:inline;margin-left:6px'><button type='submit' class='btn secondary' onclick=\"return confirm('" D_WEB_CONFIRM_DEL_SCREENSAVER "')\">" D_WEB_DELETE_BUTTON "</button></form></div>";
   } else {
-    out += "<div class='status idle'>Using built-in screensaver.</div>";
+    out += "<div class='status idle'>" D_WEB_SCREENSAVER_DEFAULT "</div>";
   }
 
   out +=
     "<form method='POST' action='/upload-sleep' enctype='multipart/form-data' style='margin-top:14px'>"
-    "<div class='grid'><div><label for='file'>Sleep image file</label><input id='file' type='file' name='file' accept='.bin'></div></div>"
-    "<div class='actions'><button type='submit'>Upload image</button></div>"
+    "<div class='grid'><div><label for='file'>" D_WEB_SLEEP_IMAGE_LABEL "</label><input id='file' type='file' name='file' accept='.bin'></div></div>"
+    "<div class='actions'><button type='submit'>" D_WEB_SCREENSAVER_UPLOAD_BUTTON "</button></div>"
     "</form></div>";
 
   out += webPageEnd();
