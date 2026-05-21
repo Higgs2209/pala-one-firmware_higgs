@@ -32,7 +32,7 @@
 //   PlatformIO users pick the env in platformio.ini (-en / -es leaf envs)
 //   and can leave these defines commented out. Default if nothing is set:
 //   English (with a #pragma message warning from src/config.h).
-// #define LANG_EN
+#define LANG_EN
 // #define LANG_ES_LA
 // ────────────────────────────────────────────────────────────────────────────
 
