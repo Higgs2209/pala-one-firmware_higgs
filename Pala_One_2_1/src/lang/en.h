@@ -398,7 +398,7 @@
 #define D_WEB_SS_SINGLE_HEADING     "Single screensaver"
 #define D_WEB_SS_SINGLE_ALT         "Single screensaver"
 #define D_WEB_SS_CONFIRM_DEL_SINGLE "Delete the single screensaver?"
-#define D_WEB_SS_NO_SINGLE          "No single screensaver uploaded."
+#define D_WEB_SS_NO_SINGLE          "No single screensaver uploaded. Upload via Editor."
 #define D_WEB_SS_EDITOR_HEADING     "Editor"
 #define D_WEB_SS_EDITOR_INTRO       "Drop an image into the editor, then upload it to a rotation slot or as the single legacy screensaver. All images render as 250&times;122 1-bit (3904 bytes)."
 #define D_WEB_SS_SOURCE_IMAGE       "Source image"
