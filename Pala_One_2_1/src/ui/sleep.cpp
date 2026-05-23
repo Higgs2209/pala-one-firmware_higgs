@@ -10,6 +10,7 @@
 #include "src/state.h"
 #include "src/hal/display.h"
 #include "src/hal/input.h"          // injectButtonEdgeNow, markUserActivity
+#include "lora_driver.h"            // loraSleep
 #include "src/ui/pala_one_sleep_black_icon_v4.h"
 #include "src/ui/screen.h"
 
@@ -77,6 +78,7 @@ void enter() {
   esp_wifi_stop();
   btStop();
 
+  loraSleep();   // put LoRa radio to sleep before Platform::prepareToSleep() claims the SPI pins
   Platform::prepareToSleep();
   esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
   // INPUT_PULLUP is in the digital IO domain, which powers down in deep sleep.
