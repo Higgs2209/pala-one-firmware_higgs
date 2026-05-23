@@ -352,4 +352,22 @@
 #define D_WEB_BMEXPORT_BOOKMARK_LBL "Bookmark "
 #define D_WEB_NO_BOOKMARKS_THIS_BOOK "No bookmarks for this book"
 
+// ----------------------------------------------------------------------------
+//  In-browser reader + find/jump (src/web/find.cpp).
+// ----------------------------------------------------------------------------
+#define D_WEB_READ_TITLE            "Read"
+#define D_WEB_READ_SUBTITLE         "Browse and search the book in your browser. Use Jump to set the device's resume point."
+#define D_WEB_READ_BYTES_LABEL      "bytes"
+#define D_WEB_READ_CURRENT_PAGE_LABEL "current page:"
+#define D_WEB_READ_FIND_PLACEHOLDER "Find in book"
+#define D_WEB_READ_FIND_ALL         "Find all"
+#define D_WEB_READ_FIND_PREV        "Prev"
+#define D_WEB_READ_FIND_NEXT        "Next"
+#define D_WEB_READ_JUMP_HERE        "Jump to here"
+#define D_WEB_READ_LOADING          "Loading book text..."
+#define D_WEB_READ_PAGE_PLACEHOLDER "Page number"
+#define D_WEB_READ_JUMP_PAGE        "Jump to page"
+#define D_WEB_READ_JUMP_HINT        "Saves the next-open page directly."
+#define D_WEB_READ_AND_FIND_LINK    "Read &amp; find"
+
 #endif  // PALA_LANG_EN_H
