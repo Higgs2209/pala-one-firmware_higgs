@@ -354,4 +354,18 @@
 #define D_WEB_BMEXPORT_BOOKMARK_LBL "Bookmark "
 #define D_WEB_NO_BOOKMARKS_THIS_BOOK "No bookmarks for this book"
 
+// ----------------------------------------------------------------------------
+//  Font family + bionic reading + reading-position retention
+//  (src/web/settings.cpp). Layout-affecting settings; changes trigger the
+//  reader to remap its byte-offset cursor under the new layout.
+// ----------------------------------------------------------------------------
+#define D_WEB_READING_INTRO         "Changing the font, family, line spacing, or bionic mode keeps your place in the current book &mdash; the device re-flows pages around the byte you're reading and lands on the page that contains it."
+#define D_WEB_FONT_FAMILY_LABEL     "Font family"
+#define D_WEB_FONT_FAMILY_HELVETICA "Helvetica"
+#define D_WEB_FONT_FAMILY_DYSLEXIC  "OpenDyslexic"
+#define D_WEB_FONT_FAMILY_HINT      "OpenDyslexic uses heavier letter shapes designed for easier scanning."
+#define D_WEB_BIONIC_LABEL          "Bionic reading"
+#define D_WEB_BIONIC_HINT           "Bolds the leading characters of each word to help your eyes anchor."
+#define D_WEB_SETTINGS_APPLY_HINT   "Changes apply to the next page render."
+
 #endif  // PALA_LANG_EN_H
