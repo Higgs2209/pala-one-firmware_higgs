@@ -82,6 +82,14 @@ static void handleSettings() {
     "<input type='checkbox' name='bionic' value='1'"; out += bChecked; out += "><span>" D_WEB_BIONIC_LABEL "</span></label>"
     "<div class='hint'>" D_WEB_BIONIC_HINT "</div></div>"
     "</div>"
+    "<div style='margin-top:14px'>"
+    "<label style='display:flex;align-items:center;gap:8px;font-weight:600;cursor:pointer'>"
+    "<input type='checkbox' name='noscr' id='noscr' style='width:auto'";
+  if (Sleep::noScreensaver()) out += " checked";
+  out +=
+    "><span>" D_WEB_NO_SCREENSAVER_LABEL "</span></label>"
+    "<div class='hint'>" D_WEB_NO_SCREENSAVER_HINT "</div></div>"
+    "<input type='hidden' name='noscr_form' value='1'>"
     "<div class='actions' style='margin-top:24px'><button type='submit'>" D_WEB_SAVE_SETTINGS_BUTTON "</button>"
     "<span class='muted'>" D_WEB_SETTINGS_APPLY_HINT "</span></div>"
     "</form></div>"
@@ -176,6 +184,14 @@ static void handleSettingsPost() {
     // Offset is unchanged — no need to rewrite the canonical position.
 
     renderCurrentPage();
+  }
+
+  // noscr_form is a hidden sentinel always present when the settings form is
+  // submitted, which lets us distinguish an explicit unchecked checkbox from a
+  // POST that didn't come from the settings form at all.
+  if (server.hasArg("noscr_form")) {
+    bool ns = server.hasArg("noscr");
+    if (ns != Sleep::noScreensaver()) Sleep::setNoScreensaver(ns);
   }
 
   server.sendHeader("Location", "/settings");
