@@ -16,15 +16,18 @@
 
 namespace Sleep {
 
-// Owned setting + NVS key — file-private.
-static int s_idleSecs = 120;
-static constexpr const char* kKeyIdleSecs = "cfg_sleep";
+// Owned settings + NVS keys — file-private.
+static int  s_idleSecs      = 120;
+static bool s_noScreensaver = false;
+static constexpr const char* kKeyIdleSecs      = "cfg_sleep";
+static constexpr const char* kKeyNoScreensaver = "cfg_noscr";
 
 void loadSettings() {
   int s = prefs.getInt(kKeyIdleSecs, 120);
   if (s < 10)   s = 10;
   if (s > 3600) s = 3600;
   s_idleSecs = s;
+  s_noScreensaver = prefs.getBool(kKeyNoScreensaver, false);
 }
 
 void setIdleTimeout(int secs) {
@@ -36,6 +39,12 @@ void setIdleTimeout(int secs) {
 
 int      idleTimeoutSecs() { return s_idleSecs; }
 uint32_t idleTimeoutMs()   { return (uint32_t)s_idleSecs * 1000UL; }
+bool     noScreensaver()   { return s_noScreensaver; }
+
+void setNoScreensaver(bool val) {
+  s_noScreensaver = val;
+  prefs.putBool(kKeyNoScreensaver, val);
+}
 
 // Render the sleep image onto the e-ink before powering down. Tries the
 // user-uploaded /sleep.bin first; falls back to the built-in icon.
@@ -68,8 +77,23 @@ void enter() {
 
   delay(50);
 
-  drawSleepScreen();
-  delay(600);
+  // No-screensaver mode only applies when coming from the reader. If the user
+  // fell asleep in the library or a menu, show the screensaver as normal.
+  // ReaderScreen::onSleep() has already called armResumeOnWake() above, which
+  // writes wake_path to NVS — so checking it here tells us reliably whether
+  // we were reading without coupling sleep.cpp to any screen type.
+  bool wasReading = (prefs.getString("wake_path", "").length() > 0);
+
+  if (s_noScreensaver && wasReading) {
+    // Full refresh of the last page so it sits cleanly on the panel.
+    // The reader's framebuffer content is still intact at this point.
+    display.fastmodeOff();
+    display.update();
+    delay(600);
+  } else {
+    drawSleepScreen();
+    delay(600);
+  }
 
   WiFi.softAPdisconnect(true);
   WiFi.disconnect(true, true);

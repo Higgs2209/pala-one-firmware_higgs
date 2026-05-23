@@ -256,6 +256,8 @@
 #define D_WEB_LINE_SPACING_2        "2 px &mdash; relajado"
 #define D_WEB_LINE_SPACING_3        "3 px &mdash; suelto"
 #define D_WEB_LINE_SPACING_HINT     "Un pequeño cambio aquí puede facilitar mucho la lectura."
+#define D_WEB_NO_SCREENSAVER_LABEL  "Modo sin salvapantallas"
+#define D_WEB_NO_SCREENSAVER_HINT   "El dispositivo sigue durmiéndose según el temporizador habitual y actualiza la pantalla antes de dormirse. Luego muestra la última página del libro y omite la actualización completa al despertar, para que puedas continuar leyendo con un solo clic sin la interrupción de un refresco de pantalla."
 #define D_WEB_SAVE_SETTINGS_BUTTON  "Guardar ajustes"
 #define D_WEB_SETTINGS_NO_EXTRAS    "Sin archivos extra, scripts ni fuentes."
 #define D_WEB_SCREENSAVER_HEADING   "Salvapantallas"

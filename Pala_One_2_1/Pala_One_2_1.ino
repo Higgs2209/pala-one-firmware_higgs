@@ -128,8 +128,24 @@ void setup() {
   updateBatteryCached(true);
 #endif
 
+  // Load Sleep settings early — before display.clear() — so the no-screensaver
+  // flag is available to gate the full-refresh boot clear below.
+  prefs.begin("ereader", false);
+  Sleep::loadSettings();
+
+  // Skip the full-refresh boot clear only when all three are true:
+  //   (a) waking from deep sleep (not a fresh boot),
+  //   (b) no-screensaver mode is on, and
+  //   (c) we were reading a book (wake_path was set by armResumeOnWake during
+  //       the sleep entry — tryRestoreReadingSession() will consume it later).
+  // If the user fell asleep in a menu the screensaver was shown, so we always
+  // clear normally in that case.
+  bool wokeFromSleep = (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT0);
+  bool wereReading   = (prefs.getString("wake_path", "").length() > 0);
   display.fastmodeOff();
-  display.clear();
+  if (!wokeFromSleep || !Sleep::noScreensaver() || !wereReading) {
+    display.clear();
+  }
 
   if (!fsBegin()) {
     drawCenter(D_BOOT_STORAGE_ERROR, D_BOOT_TRY_FACTORY_RESET);
@@ -142,9 +158,8 @@ void setup() {
     snprintf(AP_SSID, sizeof(AP_SSID), "PALA-%06llX", chipId & 0xFFFFFFULL);
   }
 
-  prefs.begin("ereader", false);
   Font::loadSettings();
-  Sleep::loadSettings();
+  // Sleep::loadSettings() already called above.
   loadBooks();
   loadListItems();
   loadApps();
