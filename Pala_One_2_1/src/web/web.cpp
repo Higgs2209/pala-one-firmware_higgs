@@ -7,6 +7,7 @@
 #include "src/web/find.h"
 #include "src/web/list.h"
 #include "src/web/reset.h"
+#include "src/web/screensavers.h"
 #include "src/web/settings.h"
 #include "src/web/upload.h"
 
@@ -23,7 +24,8 @@ void registerWebRoutes() {
   registerListRoutes();        // /list, /list-clear-done
   registerSettingsRoutes();    // /settings, /del-sleep
   registerFindRoutes();        // /read, /readbook-text, /jumpoffset
-  registerUploadRoutes();      // /upload, /upload-sleep
+  registerScreensaverRoutes(); // /screensavers and subroutes
+  registerUploadRoutes();      // /upload, /upload-sleep (legacy)
   registerAppUploadRoutes();   // /upload-app
   registerResetRoutes();       // /reset
 }
