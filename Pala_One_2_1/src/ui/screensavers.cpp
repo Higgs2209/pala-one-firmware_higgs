@@ -124,7 +124,19 @@ void deleteSlot(int slot) {
 }
 
 bool drawNext() {
-  if (s_mode == Mode::Single) return false;
+  if (s_mode == Mode::Single) {
+    File sf = FS.open("/sleep.bin", "r");
+    if (sf && sf.size() >= (size_t)SCREENSAVER_BYTES) {
+      static uint8_t sleepBuf[SCREENSAVER_BYTES];
+      sf.read(sleepBuf, SCREENSAVER_BYTES);
+      sf.close();
+      gfx.fillScreen(1);
+      gfx.drawXBitmap(0, 0, sleepBuf, SCREEN_W, SCREEN_H, 0);
+      return true;
+    }
+    if (sf) sf.close();
+    return false;
+  }
 
   int slots[MAX_SLOTS];
   int count = collectSlots(slots);

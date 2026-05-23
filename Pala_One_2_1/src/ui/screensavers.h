@@ -15,7 +15,7 @@
 //  32 bytes per row — same XBitmap format the e-ink driver consumes).
 //
 //  Mode (NVS key `cfg_ss_mode`):
-//    Single   skip the rotation, defer to Sleep.cpp's legacy path
+//    Single   draw /sleep.bin if present; otherwise yield to the built-in icon
 //    Cycle    advance through populated slots in order, persisted across sleeps
 //    Shuffle  pick a random populated slot, avoiding immediate repeats
 //
@@ -38,12 +38,12 @@ void loadSettings();
 void  setMode(Mode m);
 Mode  currentMode();
 
-// Render the next screensaver according to mode + populated slots. Returns
-// true if pixels were emitted (caller should NOT also draw a fallback);
-// false if there's nothing to do at this layer.
+// Render the next screensaver image into the framebuffer (via gfx). The
+// caller must have already prepared the canvas / paged the e-ink.
+// Returns true if pixels were emitted; false means the caller should draw
+// its own fallback (typically the built-in icon).
 //
-// Caller is expected to have already prepared the canvas / paged the e-ink;
-// this function only draws bits into the framebuffer (via gfx).
+// Mode::Single tries /sleep.bin; Cycle/Shuffle walk the rotation slots.
 bool drawNext();
 
 // ---- Editor API: slot enumeration + R/W -------------------------------------
