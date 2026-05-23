@@ -61,6 +61,16 @@ static void handleSettings() {
     "<option value='3'"; out += lg3; out += ">" D_WEB_LINE_SPACING_3 "</option>"
     "</select><div class='hint'>" D_WEB_LINE_SPACING_HINT "</div></div>"
     "</div>"
+    "<div style='margin-top:14px'>"
+    "<label style='display:flex;align-items:center;gap:8px;font-weight:600;cursor:pointer'>"
+    "<input type='checkbox' name='noscr' id='noscr' style='width:auto'";
+  if (Sleep::noScreensaver()) out += " checked";
+  out +=
+    "><span>" D_WEB_NO_SCREENSAVER_LABEL "</span></label>"
+    "<div class='hint'>" D_WEB_NO_SCREENSAVER_HINT "</div></div>"
+    // Hidden sentinel — lets handleSettingsPost() distinguish an explicit
+    // unchecked state from a POST that didn't come from the settings form.
+    "<input type='hidden' name='noscr_form' value='1'>"
     "<div class='actions' style='margin-top:24px'><button type='submit'>" D_WEB_SAVE_SETTINGS_BUTTON "</button><span class='muted'>" D_WEB_SETTINGS_NO_EXTRAS "</span></div>"
     "</form></div>"
     "<div class='card'><h2>" D_WEB_SCREENSAVER_HEADING "</h2>"
@@ -97,6 +107,13 @@ static void handleSettingsPost() {
   if (server.hasArg("lgap")) {
     int lg = server.arg("lgap").toInt();
     if (lg != Font::currentLineGap()) Font::setLineGap(lg);
+  }
+  // noscr_form is a hidden sentinel always present when the settings form is
+  // submitted, which lets us distinguish an explicit unchecked checkbox from a
+  // POST that didn't come from the settings form at all.
+  if (server.hasArg("noscr_form")) {
+    bool ns = server.hasArg("noscr");
+    if (ns != Sleep::noScreensaver()) Sleep::setNoScreensaver(ns);
   }
   // On-disk page caches are layout-stamped and self-invalidate on load, so
   // a font/lineGap change needs no cross-cutting cleanup here.
