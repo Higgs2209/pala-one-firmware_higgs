@@ -133,12 +133,17 @@ void setup() {
   prefs.begin("ereader", false);
   Sleep::loadSettings();
 
-  // In no-screensaver mode, skip the full-refresh clear on deep-sleep wake so
-  // the last page is not blanked before the fast-mode redraw. On a fresh boot
-  // (or normal screensaver mode) always clear to white first.
+  // Skip the full-refresh boot clear only when all three are true:
+  //   (a) waking from deep sleep (not a fresh boot),
+  //   (b) no-screensaver mode is on, and
+  //   (c) we were reading a book (wake_path was set by armResumeOnWake during
+  //       the sleep entry — tryRestoreReadingSession() will consume it later).
+  // If the user fell asleep in a menu the screensaver was shown, so we always
+  // clear normally in that case.
   bool wokeFromSleep = (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT0);
+  bool wereReading   = (prefs.getString("wake_path", "").length() > 0);
   display.fastmodeOff();
-  if (!wokeFromSleep || !Sleep::noScreensaver()) {
+  if (!wokeFromSleep || !Sleep::noScreensaver() || !wereReading) {
     display.clear();
   }
 

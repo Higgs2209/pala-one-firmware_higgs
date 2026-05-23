@@ -76,8 +76,20 @@ void enter() {
 
   delay(50);
 
-  // In no-screensaver mode the last page stays visible; skip the sleep image.
-  if (!s_noScreensaver) {
+  // No-screensaver mode only applies when coming from the reader. If the user
+  // fell asleep in the library or a menu, show the screensaver as normal.
+  // ReaderScreen::onSleep() has already called armResumeOnWake() above, which
+  // writes wake_path to NVS — so checking it here tells us reliably whether
+  // we were reading without coupling sleep.cpp to any screen type.
+  bool wasReading = (prefs.getString("wake_path", "").length() > 0);
+
+  if (s_noScreensaver && wasReading) {
+    // Full refresh of the last page so it sits cleanly on the panel.
+    // The reader's framebuffer content is still intact at this point.
+    display.fastmodeOff();
+    display.update();
+    delay(600);
+  } else {
     drawSleepScreen();
     delay(600);
   }
