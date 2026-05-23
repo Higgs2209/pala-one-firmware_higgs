@@ -421,6 +421,9 @@ static void handleSleepEditorPage() {
   );
   out.reserve(out.length() + 8000);
 
+  // Editor.
+  out += editorCardHtml(nextFree);
+
   // Mode picker.
   out += "<div class='card'><h2>" D_WEB_SS_ROTATION_HEADING "</h2>"
          "<p class='muted'>" D_WEB_SS_ROTATION_INTRO "</p>"
@@ -458,9 +461,6 @@ static void handleSleepEditorPage() {
     out += "<p class='muted'>" D_WEB_SS_NO_SINGLE "</p>";
   }
   out += "</div>";
-
-  // Editor.
-  out += editorCardHtml(nextFree);
 
   out += webPageEnd();
   server.send(200, "text/html; charset=utf-8", out);
