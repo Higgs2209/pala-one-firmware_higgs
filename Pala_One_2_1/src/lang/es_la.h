@@ -347,4 +347,17 @@
 #define D_WEB_BMEXPORT_BOOKMARK_LBL "Marcapáginas "
 #define D_WEB_NO_BOOKMARKS_THIS_BOOK "Sin marcapáginas para este libro"
 
+// ----------------------------------------------------------------------------
+//  Familia de fuente + lectura biónica + retención de posición
+//  (src/web/settings.cpp).
+// ----------------------------------------------------------------------------
+#define D_WEB_READING_INTRO         "Cambiar la fuente, familia, espaciado de línea o modo biónico mantiene tu lugar en el libro actual &mdash; el dispositivo reorganiza las páginas alrededor del byte que estás leyendo y aterriza en la página que lo contiene."
+#define D_WEB_FONT_FAMILY_LABEL     "Familia de fuente"
+#define D_WEB_FONT_FAMILY_HELVETICA "Helvetica"
+#define D_WEB_FONT_FAMILY_DYSLEXIC  "OpenDyslexic"
+#define D_WEB_FONT_FAMILY_HINT      "OpenDyslexic usa formas de letra más gruesas diseñadas para una lectura más fácil."
+#define D_WEB_BIONIC_LABEL          "Lectura biónica"
+#define D_WEB_BIONIC_HINT           "Resalta en negrita las primeras letras de cada palabra para anclar la mirada."
+#define D_WEB_SETTINGS_APPLY_HINT   "Los cambios se aplican en la próxima página renderizada."
+
 #endif  // PALA_LANG_ES_LA_H
