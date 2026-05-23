@@ -27,8 +27,6 @@ static void handleSettings() {
   String lg2 = (curGap == 2) ? " selected" : "";
   String lg3 = (curGap == 3) ? " selected" : "";
 
-  bool hasSleepImg = FS.exists("/sleep.bin");
-
   String out = webPageStart(
     D_WEB_SETTINGS_TITLE,
     D_WEB_SETTINGS_SUBTITLE_PREFIX FW_BUILD D_WEB_SETTINGS_SUBTITLE_SUFFIX,
@@ -64,20 +62,11 @@ static void handleSettings() {
     "<div class='actions' style='margin-top:24px'><button type='submit'>" D_WEB_SAVE_SETTINGS_BUTTON "</button><span class='muted'>" D_WEB_SETTINGS_NO_EXTRAS "</span></div>"
     "</form></div>"
     "<div class='card'><h2>" D_WEB_SCREENSAVER_HEADING "</h2>"
-    "<p>" D_WEB_SCREENSAVER_SPECS "</p>"
-    "<p class='muted'>" D_WEB_SCREENSAVER_TIP "</p>";
-
-  if (hasSleepImg) {
-    out += "<div class='status ok'>" D_WEB_SCREENSAVER_ACTIVE " <form method='POST' action='/del-sleep' style='display:inline;margin-left:6px'><button type='submit' class='btn secondary' onclick=\"return confirm('" D_WEB_CONFIRM_DEL_SCREENSAVER "')\">" D_WEB_DELETE_BUTTON "</button></form></div>";
-  } else {
-    out += "<div class='status idle'>" D_WEB_SCREENSAVER_DEFAULT "</div>";
-  }
-
-  out +=
-    "<form method='POST' action='/upload-sleep' enctype='multipart/form-data' style='margin-top:14px'>"
-    "<div class='grid'><div><label for='file'>" D_WEB_SLEEP_IMAGE_LABEL "</label><input id='file' type='file' name='file' accept='.bin'></div></div>"
-    "<div class='actions'><button type='submit'>" D_WEB_SCREENSAVER_UPLOAD_BUTTON "</button></div>"
-    "</form></div>";
+    "<p class='muted'>" D_WEB_SCREENSAVER_CARD_DESC "</p>"
+    "<div class='actions' style='margin-top:8px'>"
+    "<a class='btn' href='/screensavers'>" D_WEB_SCREENSAVER_EDITOR_LINK "</a>"
+    "<span class='muted'>" D_WEB_SCREENSAVER_EDITOR_HINT "</span>"
+    "</div></div>";
 
   out += webPageEnd();
   server.send(200, "text/html; charset=utf-8", out);
