@@ -36,6 +36,16 @@
 // #define LANG_ES_LA
 // ────────────────────────────────────────────────────────────────────────────
 
+// ── Web UI default theme: uncomment exactly one ─────────────────────────────
+//   The web UI has a light and a dark palette and a per-page toggle button.
+//   Once a visitor picks one the choice is remembered in their browser's
+//   localStorage and overrides whatever's set here — this define only picks
+//   the *first-visit* default. Default if nothing is set: light.
+//   PlatformIO users can also pass -D WEB_THEME_DARK in build_flags.
+#define WEB_THEME_LIGHT
+// #define WEB_THEME_DARK
+// ────────────────────────────────────────────────────────────────────────────
+
 // When built with PlatformIO, WIRELESS_PAPER + DISPLAY_V1_x come from
 // build_flags and the BOARD_V1_x macros above stay commented out. When
 // built with Arduino IDE, the macros above drive the same defines so the
@@ -129,8 +139,24 @@ void setup() {
   updateBatteryCached(true);
 #endif
 
+  // Load Sleep settings early — before display.clear() — so the no-screensaver
+  // flag is available to gate the full-refresh boot clear below.
+  prefs.begin("ereader", false);
+  Sleep::loadSettings();
+
+  // Skip the full-refresh boot clear only when all three are true:
+  //   (a) waking from deep sleep (not a fresh boot),
+  //   (b) no-screensaver mode is on, and
+  //   (c) we were reading a book (wake_path was set by armResumeOnWake during
+  //       the sleep entry — tryRestoreReadingSession() will consume it later).
+  // If the user fell asleep in a menu the screensaver was shown, so we always
+  // clear normally in that case.
+  bool wokeFromSleep = (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT0);
+  bool wereReading   = (prefs.getString("wake_path", "").length() > 0);
   display.fastmodeOff();
-  display.clear();
+  if (!wokeFromSleep || !Sleep::noScreensaver() || !wereReading) {
+    display.clear();
+  }
 
   if (!fsBegin()) {
     drawCenter(D_BOOT_STORAGE_ERROR, D_BOOT_TRY_FACTORY_RESET);
@@ -143,9 +169,7 @@ void setup() {
     snprintf(AP_SSID, sizeof(AP_SSID), "PALA-%06llX", chipId & 0xFFFFFFULL);
   }
 
-  prefs.begin("ereader", false);
   Font::loadSettings();
-  Sleep::loadSettings();
   Screensavers::loadSettings();
   loadBooks();
   loadListItems();

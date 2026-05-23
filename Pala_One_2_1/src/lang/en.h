@@ -260,6 +260,8 @@
 #define D_WEB_LINE_SPACING_2        "2 px &mdash; relaxed"
 #define D_WEB_LINE_SPACING_3        "3 px &mdash; loose"
 #define D_WEB_LINE_SPACING_HINT     "A small change here can make text much easier to scan."
+#define D_WEB_NO_SCREENSAVER_LABEL  "No-screensaver mode"
+#define D_WEB_NO_SCREENSAVER_HINT   "Device still sleeps on the normal timer and refreshes the screen before going to sleep. Then it shows the last page of the book, and skips a full refresh on wake, so you can continue reading with a single click of the button without the interruption of a display refresh."
 #define D_WEB_SAVE_SETTINGS_BUTTON  "Save settings"
 #define D_WEB_SETTINGS_NO_EXTRAS    "No extra files, scripts, or fonts."
 #define D_WEB_SCREENSAVER_HEADING   "Screensaver"
@@ -351,6 +353,20 @@
 #define D_WEB_BMEXPORT_BOOKMARKS    "Bookmarks: "
 #define D_WEB_BMEXPORT_BOOKMARK_LBL "Bookmark "
 #define D_WEB_NO_BOOKMARKS_THIS_BOOK "No bookmarks for this book"
+
+// ----------------------------------------------------------------------------
+//  Font family + bionic reading + reading-position retention
+//  (src/web/settings.cpp). Layout-affecting settings; changes trigger the
+//  reader to remap its byte-offset cursor under the new layout.
+// ----------------------------------------------------------------------------
+#define D_WEB_READING_INTRO         "Changing the font, family, line spacing, or bionic mode keeps your place in the current book &mdash; the device re-flows pages around the byte you're reading and lands on the page that contains it."
+#define D_WEB_FONT_FAMILY_LABEL     "Font family"
+#define D_WEB_FONT_FAMILY_HELVETICA "Helvetica"
+#define D_WEB_FONT_FAMILY_DYSLEXIC  "OpenDyslexic"
+#define D_WEB_FONT_FAMILY_HINT      "OpenDyslexic uses heavier letter shapes designed for easier scanning."
+#define D_WEB_BIONIC_LABEL          "Bionic reading"
+#define D_WEB_BIONIC_HINT           "Bolds the leading characters of each word to help your eyes anchor."
+#define D_WEB_SETTINGS_APPLY_HINT   "Changes apply to the next page render."
 
 // ----------------------------------------------------------------------------
 //  Screensaver settings card link (src/web/settings.cpp).
