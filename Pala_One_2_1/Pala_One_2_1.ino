@@ -98,6 +98,7 @@
 #include "src/ui/screens/list_screen.h"
 #include "src/ui/screens/reader_screen.h"
 #include "src/ui/screens/upload_screen.h"
+#include "src/ui/screensavers.h"
 #include "src/ui/sleep.h"
 #include "src/ui/text.h"
 #include "src/ui/toast.h"
@@ -169,7 +170,7 @@ void setup() {
   }
 
   Font::loadSettings();
-  // Sleep::loadSettings() already called above.
+  Screensavers::loadSettings();
   loadBooks();
   loadListItems();
   loadApps();
