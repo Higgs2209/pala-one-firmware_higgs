@@ -68,6 +68,10 @@ bool loraReady() {
 }
 
 // Drain ISR flag into receive queue.
+// Limitation: the queue holds LORA_RX_QUEUE packets. If the app doesn't drain
+// it fast enough and another packet arrives, the new one is dropped silently
+// at the radio level (we log it but cannot recover the bytes). The app polls
+// loraRecv() each main-loop iteration so this is unlikely in practice.
 static void loraProcessRx() {
     if (!s_ready || !s_rxFlag) return;
     s_rxFlag = false;
@@ -80,6 +84,9 @@ static void loraProcessRx() {
                 s_rxQueue[s_rxHead].len = (int)rxLen;
                 s_rxHead = nextHead;
             }
+        } else {
+            Serial.printf("[LORA] RX queue full, packet dropped (%u bytes)\n",
+                          (unsigned)rxLen);
         }
     }
     s_radio.startReceive();
