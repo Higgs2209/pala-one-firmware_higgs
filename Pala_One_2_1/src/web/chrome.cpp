@@ -83,17 +83,27 @@ static const char kStyleCss[] PROGMEM =
   "@media(max-width:640px){.row,.top{flex-direction:column}.top-side{justify-content:flex-start}.wrap{padding:14px}}"
   ;
 
+// Compile-time default for the *first* visit. Toggled in Pala_One_2_1.ino
+// (Arduino IDE) or via -D WEB_THEME_DARK in platformio.ini (PlatformIO).
+// Once the visitor uses the toggle button, localStorage.palaTheme wins and
+// this default no longer matters for that browser.
+#if defined(WEB_THEME_DARK)
+  #define WEB_DEFAULT_THEME_JS "dark"
+#else
+  #define WEB_DEFAULT_THEME_JS "light"
+#endif
+
 // Inline pre-paint theme script. Runs in <head> before body renders so the
 // data-theme attribute is set before first paint and the user doesn't see a
 // flash of the wrong palette. Reads localStorage.palaTheme first; falls back
-// to prefers-color-scheme. Exposes window.palaToggleTheme() for the button.
+// to the build-time default above. Exposes window.palaToggleTheme() for the
+// button.
 static const char kThemeScript[] PROGMEM =
   "<script>(function(){"
   "var k='palaTheme',r=document.documentElement;"
   "function S(t){r.dataset.theme=(t==='dark')?'dark':'light';try{localStorage.setItem(k,r.dataset.theme)}catch(e){}}"
   "var v=null;try{v=localStorage.getItem(k)}catch(e){}"
-  "if(v==='dark'||v==='light')S(v);"
-  "else S(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');"
+  "S((v==='dark'||v==='light')?v:'" WEB_DEFAULT_THEME_JS "');"
   "window.palaToggleTheme=function(){S(r.dataset.theme==='dark'?'light':'dark')};"
   "})();</script>";
 

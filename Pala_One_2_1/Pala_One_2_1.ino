@@ -36,6 +36,16 @@
 // #define LANG_ES_LA
 // ────────────────────────────────────────────────────────────────────────────
 
+// ── Web UI default theme: uncomment exactly one ─────────────────────────────
+//   The web UI has a light and a dark palette and a per-page toggle button.
+//   Once a visitor picks one the choice is remembered in their browser's
+//   localStorage and overrides whatever's set here — this define only picks
+//   the *first-visit* default. Default if nothing is set: light.
+//   PlatformIO users can also pass -D WEB_THEME_DARK in build_flags.
+#define WEB_THEME_LIGHT
+// #define WEB_THEME_DARK
+// ────────────────────────────────────────────────────────────────────────────
+
 // When built with PlatformIO, WIRELESS_PAPER + DISPLAY_V1_x come from
 // build_flags and the BOARD_V1_x macros above stay commented out. When
 // built with Arduino IDE, the macros above drive the same defines so the
