@@ -86,17 +86,30 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Publishing channel=$CHANNEL version=$VERSION"
 
-      - name: Build firmware (V1.2)
+      # Four leaf envs: (V1.1, V1.2) x (English, Spanish-LA). One language
+      # per binary by design — see README "Language".
+      #
+      # Stable channel always builds clean (no git-hash UI). Dev keeps
+      # DEBUG_BUILD=1 from config.h so the hash stays visible.
+      - name: Build firmware (V1.2 EN)
         env:
-          # Stable channel always builds clean (no git-hash UI). Dev keeps
-          # DEBUG_BUILD=1 from config.h so the hash stays visible.
           PLATFORMIO_BUILD_FLAGS: ${{ steps.meta.outputs.channel == 'stable' && '-DDEBUG_BUILD=0' || '' }}
-        run: pio run -e wireless-paper-v1_2
+        run: pio run -e wireless-paper-v1_2-en
 
-      - name: Build firmware (V1.1)
+      - name: Build firmware (V1.2 ES)
         env:
           PLATFORMIO_BUILD_FLAGS: ${{ steps.meta.outputs.channel == 'stable' && '-DDEBUG_BUILD=0' || '' }}
-        run: pio run -e wireless-paper-v1_1
+        run: pio run -e wireless-paper-v1_2-es
+
+      - name: Build firmware (V1.1 EN)
+        env:
+          PLATFORMIO_BUILD_FLAGS: ${{ steps.meta.outputs.channel == 'stable' && '-DDEBUG_BUILD=0' || '' }}
+        run: pio run -e wireless-paper-v1_1-en
+
+      - name: Build firmware (V1.1 ES)
+        env:
+          PLATFORMIO_BUILD_FLAGS: ${{ steps.meta.outputs.channel == 'stable' && '-DDEBUG_BUILD=0' || '' }}
+        run: pio run -e wireless-paper-v1_1-es
 
       - name: Assemble site
         run: |
