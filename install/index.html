@@ -19,6 +19,32 @@
     }
     h1 { margin-bottom: 0.25rem; }
     .sub { color: #666; margin-top: 0; }
+    .channel-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+      margin: 0.5rem 0 1.5rem;
+      color: #666;
+    }
+    .channel-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.15em 0.55em;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .channel-badge.stable { background: #d8efd9; color: #1f6b25; }
+    .channel-badge.dev,
+    .channel-badge.local  { background: #fde6c8; color: #8a4a07; }
+    @media (prefers-color-scheme: dark) {
+      .channel-bar { color: #aaa; }
+      .channel-badge.stable { background: #1f3a22; color: #9bd6a1; }
+      .channel-badge.dev,
+      .channel-badge.local  { background: #3a2a14; color: #f0c089; }
+    }
     .variant {
       border: 1px solid rgba(127,127,127,0.3);
       border-radius: 8px;
@@ -49,6 +75,11 @@
 <body>
   <h1>Pala One Installer</h1>
   <p class="sub">Flash the firmware directly from your browser.</p>
+  <div class="channel-bar">
+    <span class="channel-badge {{CHANNEL}}">{{CHANNEL}}</span>
+    <span>build: <code>{{VERSION}}</code></span>
+    <a href="../">switch channel</a>
+  </div>
 
   <div class="variant">
     <h3>V1.2 board</h3>

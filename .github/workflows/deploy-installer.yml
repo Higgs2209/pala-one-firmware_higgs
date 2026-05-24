@@ -1,21 +1,44 @@
 name: Deploy installer page
 
+# Two-channel publishing model:
+#   - push to `dev`  -> publishes under  /dev/   (development installer)
+#   - push to `main` -> publishes under  /stable/ (latest stable build)
+#   - tag  `v*`      -> publishes under  /stable/ as a labelled release
+#
+# Both channels live side-by-side on the `gh-pages` branch and never
+# overwrite each other: each run deploys only its channel subdirectory
+# (keep_files: true preserves the other channel).
+#
+# A landing index.html is republished at the gh-pages root on every run.
+# It is identical regardless of channel, so the cross-write is safe.
+
 on:
   push:
+    branches: [dev, main]
     tags: ['v*']
   workflow_dispatch:
+    inputs:
+      channel:
+        description: 'Which channel to publish to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - stable
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
+# Serialise all writes to the gh-pages branch so two runs cannot race
+# the checkout/commit/push cycle. cancel-in-progress is false: each run
+# represents a different commit's artefacts, we want them all published.
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: gh-pages-deploy
+  cancel-in-progress: false
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,39 +60,57 @@ jobs:
       - name: Install PlatformIO and esptool
         run: pip install --upgrade platformio esptool
 
+      - name: Resolve channel and version
+        id: meta
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            CHANNEL="${{ inputs.channel }}"
+          elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            CHANNEL="stable"
+          elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
+            CHANNEL="stable"
+          else
+            CHANNEL="dev"
+          fi
+
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF_NAME}"
+          elif [[ "$CHANNEL" == "stable" ]]; then
+            VERSION="main-${GITHUB_SHA::7}"
+          else
+            VERSION="dev-${GITHUB_SHA::7}"
+          fi
+
+          echo "channel=$CHANNEL" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Publishing channel=$CHANNEL version=$VERSION"
+
       - name: Build firmware (V1.2)
         env:
-          # Tag pushes build a clean release (no git hash in UI). Anything
-          # else (workflow_dispatch) keeps DEBUG_BUILD=1 from config.h so the
-          # hash stays visible during iteration.
-          PLATFORMIO_BUILD_FLAGS: ${{ startsWith(github.ref, 'refs/tags/') && '-DDEBUG_BUILD=0' || '' }}
+          # Stable channel always builds clean (no git-hash UI). Dev keeps
+          # DEBUG_BUILD=1 from config.h so the hash stays visible.
+          PLATFORMIO_BUILD_FLAGS: ${{ steps.meta.outputs.channel == 'stable' && '-DDEBUG_BUILD=0' || '' }}
         run: pio run -e wireless-paper-v1_2
 
       - name: Build firmware (V1.1)
         env:
-          PLATFORMIO_BUILD_FLAGS: ${{ startsWith(github.ref, 'refs/tags/') && '-DDEBUG_BUILD=0' || '' }}
+          PLATFORMIO_BUILD_FLAGS: ${{ steps.meta.outputs.channel == 'stable' && '-DDEBUG_BUILD=0' || '' }}
         run: pio run -e wireless-paper-v1_1
 
       - name: Assemble site
         run: |
-          set -euo pipefail
-          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-            VERSION="${GITHUB_REF_NAME}"
-          else
-            VERSION="dev-${GITHUB_SHA::7}"
-          fi
-          python scripts/assemble_site.py --version "$VERSION"
+          python scripts/assemble_site.py \
+            --channel "${{ steps.meta.outputs.channel }}" \
+            --version "${{ steps.meta.outputs.version }}"
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Publish to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: site
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./site
+          keep_files: true
+          commit_message: "Deploy ${{ steps.meta.outputs.channel }} ${{ steps.meta.outputs.version }}"
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
