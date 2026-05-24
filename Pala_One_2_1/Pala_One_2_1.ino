@@ -77,8 +77,8 @@
 #include "src/state.h"
 #include "src/hal/battery.h"
 #include "src/hal/display.h"
-#include "src/hal/improv.h"
 #include "src/hal/input.h"
+#include "src/hal/wifi_provisioning.h"
 #include "src/pure/hashing.h"
 #include "src/storage/app_catalog.h"
 #include "src/storage/fs_util.h"
@@ -193,10 +193,11 @@ void setup() {
   // Upload mode will raise it back to 240 MHz temporarily.
   setCpuFrequencyMhz(80);
 
-  // Improv Serial — once registered, Improv::loop() listens for browser-side
-  // provisioning whenever a host has the USB-CDC port open. No host = no
-  // listening = no battery cost. See src/hal/improv.h for the contract.
-  Improv::begin();
+  // Browser-side Wi-Fi provisioning over USB-CDC (Improv Serial under the
+  // hood). Once registered, WifiProvisioning::loop() listens whenever a host
+  // has the USB-CDC port open. No host = no listening = no battery cost. See
+  // src/hal/wifi_provisioning.h for the contract.
+  WifiProvisioning::begin();
 }
 
 // ============================================================================
@@ -211,14 +212,14 @@ void loop() {
 
   if (ENABLE_DEEP_SLEEP
       && g_currentScreen->allowSleep()
-      && !Improv::isActive()) {
+      && !WifiProvisioning::isActive()) {
     if (userIdleMs() > Sleep::idleTimeoutMs()) {
       Sleep::enter();
       return;
     }
   }
 
-  Improv::loop();   // no-op outside the boot / upload-screen windows
+  WifiProvisioning::loop();   // no-op unless a USB host is on the bus
 
   g_currentScreen->onButton(ev);
   g_currentScreen->onIdleTick();
@@ -252,7 +253,7 @@ void loop() {
   if (g_currentScreen->allowSleep()
       && !g_btns.hasPendingClicks()
       && !buttonQueueNonEmpty()
-      && !Improv::isActive()) {
+      && !WifiProvisioning::isActive()) {
     Sleep::idleLightSleep(Toast::isActive());
   }
 }

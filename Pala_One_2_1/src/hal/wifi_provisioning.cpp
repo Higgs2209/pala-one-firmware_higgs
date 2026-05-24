@@ -1,4 +1,4 @@
-#include "src/hal/improv.h"
+#include "src/hal/wifi_provisioning.h"
 
 #include <ImprovWiFiLibrary.h>
 #include <WiFi.h>
@@ -6,7 +6,7 @@
 #include "src/config.h"
 #include "src/storage/wifi_creds.h"
 
-namespace Improv {
+namespace WifiProvisioning {
 
 namespace {
 struct State {
@@ -14,7 +14,7 @@ struct State {
   bool       uploadSession   = false;
   bool       credsReceived   = false;
   uint32_t   credsReceivedMs = 0;
-  bool       ownsWifi        = false;  // true iff Improv brought Wi-Fi up to verify creds
+  bool       ownsWifi        = false;  // true iff we brought Wi-Fi up to verify creds
   uint32_t   lastHostByteMs  = 0;      // 0 = no byte ever received this boot
 };
 
@@ -138,4 +138,4 @@ void loop() {
   s_state.lib.handleSerial();
 }
 
-}  // namespace Improv
+}  // namespace WifiProvisioning

@@ -2,9 +2,9 @@
 
 #include "src/config.h"
 #include "src/hal/display.h"
-#include "src/hal/improv.h"
 #include "src/hal/input.h"        // resetInputFrontend() — used on exit only
 #include "src/hal/wifi.h"
+#include "src/hal/wifi_provisioning.h"
 #include "src/state.h"            // server
 #include "src/storage/library.h"
 #include "src/storage/wifi_creds.h"
@@ -120,10 +120,10 @@ void UploadScreen::beginSession() {
   resetSleepUpload();
   resetAppUpload();
 
-  // Tell Improv to keep its hands off the radio for the duration of the
-  // session — set BEFORE wifiStaBegin so a same-tick Improv::loop() can't
-  // race the WiFi.begin() we're about to fire.
-  Improv::notifyUploadSession(true);
+  // Tell WifiProvisioning to keep its hands off the radio for the duration
+  // of the session — set BEFORE wifiStaBegin so a same-tick
+  // WifiProvisioning::loop() can't race the WiFi.begin() we're about to fire.
+  WifiProvisioning::notifyUploadSession(true);
 
   if (wifiStaBegin()) {
     phase_        = Phase::ConnectingSta;
@@ -153,7 +153,7 @@ void UploadScreen::fallbackToAp() {
 void UploadScreen::stopSessionToLibrary() {
   server.stop();
   wifiEnd();
-  Improv::notifyUploadSession(false);
+  WifiProvisioning::notifyUploadSession(false);
 
   resetBookUpload();
   resetSleepUpload();
