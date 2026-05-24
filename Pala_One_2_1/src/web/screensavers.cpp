@@ -123,6 +123,45 @@ static void handleSleepThumb() {
 }
 
 // ============================================================================
+//  GET /screensavers/download — serve raw 3904-byte .bin for sharing.
+// ============================================================================
+static void handleSleepDownload() {
+  uint8_t buf[Screensavers::SCREENSAVER_BYTES];
+  bool gotBytes = false;
+  String filename = "screensaver.bin";
+
+  if (server.hasArg("single")) {
+    File f = FS.open("/sleep.bin", "r");
+    if (f && f.size() >= (size_t)Screensavers::SCREENSAVER_BYTES) {
+      gotBytes = (f.read(buf, Screensavers::SCREENSAVER_BYTES) ==
+                  (size_t)Screensavers::SCREENSAVER_BYTES);
+    }
+    if (f) f.close();
+    filename = "sleep.bin";
+  } else if (server.hasArg("slot")) {
+    int slot = server.arg("slot").toInt();
+    if (slot >= 0 && slot < Screensavers::MAX_SLOTS) {
+      gotBytes = Screensavers::readSlot(slot, buf);
+      filename = "screensaver-slot-" + String(slot) + ".bin";
+    }
+  }
+
+  if (!gotBytes) {
+    server.send(404, "text/plain; charset=utf-8", "Screensaver not found");
+    return;
+  }
+
+  server.setContentLength(Screensavers::SCREENSAVER_BYTES);
+  server.sendHeader(
+    "Content-Disposition",
+    String("attachment; filename=\"") + filename + "\""
+  );
+  server.send(200, "application/octet-stream", "");
+  WiFiClient client = server.client();
+  client.write(buf, Screensavers::SCREENSAVER_BYTES);
+}
+
+// ============================================================================
 //  POST /screensavers/delete — remove a slot or the legacy single image.
 // ============================================================================
 static void handleSleepDelete() {
@@ -260,10 +299,25 @@ static const char kEditorStyle[] PROGMEM =
   ".ss-meta,.ss-status{font-size:12px;color:var(--muted)}"
   ".ss-slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}"
   ".ss-slot{border:1px solid var(--line-soft);border-radius:10px;padding:8px;background:var(--stat-bg);display:flex;flex-direction:column;gap:6px;align-items:center}"
+  ".ss-slot-actions{display:flex;gap:8px;align-items:center;justify-content:center;width:100%;margin-top:4px}"
+  ".btn-icon{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;margin:0;border:1px solid var(--line);border-radius:10px;background:var(--card);color:inherit;text-decoration:none;cursor:pointer;transition:background .2s ease}"
+  ".btn-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}"
+  ".btn-icon:hover{background:var(--line-soft); }"
+  ".btn-icon.danger{color:var(--danger);border-color:var(--danger)}"
   ".ss-slot img{width:100%;height:auto;border:1px solid var(--line);border-radius:6px;background:#fff;image-rendering:pixelated}"
   ".ss-slot .ss-slot-empty{width:100%;aspect-ratio:250/122;display:flex;align-items:center;justify-content:center;border:1px dashed var(--line);border-radius:6px;color:var(--muted);font-size:12px}"
   "@media(max-width:560px){.ss-grid{grid-template-columns:1fr}}"
   "</style>";
+
+static const char kIconDownload[] PROGMEM =
+  "<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M12 4v10m0 0l4-4m-4 4l-4-4M5 20h14'/></svg>";
+static const char kIconTrash[] PROGMEM =
+  "<svg viewBox='0 0 24 24' aria-hidden='true'>"
+  "<path d='M4 7h16'/>"
+  "<path d='M8 7V5h8v2'/>"
+  "<path d='M7 7v12h10V7'/>"
+  "<path d='M10 11v5M14 11v5'/>"
+  "</svg>";
 
 static const char kEditorScript[] PROGMEM =
   "<script>(function(){"
@@ -318,6 +372,37 @@ static const char kEditorScript[] PROGMEM =
   "setLbls();render();"
   "})();</script>";
 
+// Download + delete icon buttons for a populated slot or the legacy single image.
+static String screensaverActionsHtml(bool single, int slot) {
+  String out;
+  out.reserve(420);
+  out += "<div class='ss-slot-actions'>";
+  out += "<a class='btn-icon' href='/screensavers/download?";
+  if (single) out += "single=1";
+  else out += "slot=" + String(slot);
+  out += "' download title='" D_WEB_SS_DOWNLOAD_ARIA "' aria-label='" D_WEB_SS_DOWNLOAD_ARIA "'>";
+  out += FPSTR(kIconDownload);
+  out += "</a>";
+  out += "<form method='POST' action='/screensavers/delete' style='margin:0'>";
+  if (single) {
+    out += "<input type='hidden' name='single' value='1'>";
+    out += "<button type='submit' class='btn-icon danger' title='" D_WEB_SS_DELETE_ARIA "' "
+           "aria-label='" D_WEB_SS_DELETE_ARIA "' "
+           "onclick=\"return confirm('" D_WEB_SS_CONFIRM_DEL_SINGLE "')\">";
+  } else {
+    out += "<input type='hidden' name='slot' value='" + String(slot) + "'>";
+    out += "<button type='submit' class='btn-icon danger' title='" D_WEB_SS_DELETE_ARIA "' "
+           "aria-label='" D_WEB_SS_DELETE_ARIA "' "
+           "onclick=\"return confirm('" D_WEB_SS_CONFIRM_DEL_SLOT "')\">";
+  }
+  out += FPSTR(kIconTrash);
+  out += "</button></form></div>";
+  return out;
+}
+
+// Build the slot grid HTML — one card per slot with thumbnail (when
+// populated) and a delete form. Appended into a containing card by the
+// editor handler.
 // Build the slot grid HTML — one card per slot with thumbnail (when
 // populated) and a delete form. Appended into a containing card by the
 // editor handler.
@@ -332,11 +417,7 @@ static String slotGridHtml() {
     if (Screensavers::slotExists(i)) {
       out += "<img src='/screensavers/thumb?slot=" + String(i) +
              "' alt='" D_WEB_SS_SLOT_LABEL " " + String(i) + "'>";
-      out += "<form method='POST' action='/screensavers/delete' style='width:100%'>";
-      out += "<input type='hidden' name='slot' value='" + String(i) + "'>";
-      out += "<button type='submit' class='btn secondary' style='width:100%;padding:6px 10px;font-size:13px' "
-             "onclick=\"return confirm('" D_WEB_SS_CONFIRM_DEL_SLOT "')\">" D_WEB_DELETE_BUTTON "</button>";
-      out += "</form>";
+      out += screensaverActionsHtml(false, i);
     } else {
       out += "<div class='ss-slot-empty'>" D_WEB_SS_SLOT_EMPTY "</div>";
     }
@@ -472,6 +553,7 @@ static void handleSleepEditorPage() {
 void registerScreensaverRoutes() {
   server.on("/screensavers",         HTTP_GET,  handleSleepEditorPage);
   server.on("/screensavers/thumb",   HTTP_GET,  handleSleepThumb);
+  server.on("/screensavers/download", HTTP_GET,  handleSleepDownload);
   server.on("/screensavers/delete",  HTTP_POST, handleSleepDelete);
   server.on("/screensavers/mode",    HTTP_POST, handleSleepModePost);
   server.on("/screensavers/upload",  HTTP_POST,
