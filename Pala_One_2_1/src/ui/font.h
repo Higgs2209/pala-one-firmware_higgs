@@ -73,8 +73,9 @@ void setLineGap(int gap);
 void setFamily(Family fam);
 void setBionic(bool on);
 
-// Current applied values. Page-cache stamping passes all four so on-disk
-// caches self-invalidate when any of them changes.
+// Current applied values. Page-cache stamping passes everything through
+// `layoutForCache()`; these direct accessors exist for places that need
+// the individual values (web settings form, debug output).
 int    currentBodySize();
 int    currentLineGap();
 Family currentFamily();
@@ -82,7 +83,9 @@ bool   bionicEnabled();
 
 // One-shot snapshot of every layout-affecting setting, packed for stamping
 // the on-disk page cache. Centralizing this here means call sites in
-// reader.cpp / text.cpp don't need to know the four-field layout shape.
+// reader.cpp / text.cpp don't need to know which fields the cache stamps.
+// Includes the statusbar reserve height so that toggling statusbar mode
+// (which changes how many lines fit on a page) invalidates the cache too.
 PageCacheLayout layoutForCache();
 
 // Pixel gap inserted between the bold prefix and the regular tail of a

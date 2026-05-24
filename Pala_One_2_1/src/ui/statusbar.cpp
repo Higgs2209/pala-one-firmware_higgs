@@ -1,8 +1,9 @@
 #include "src/ui/statusbar.h"
 
-#include "src/config.h"   // STATUS_H
-#include "src/state.h"    // prefs
-#include "src/ui/font.h"  // Font::invalidateLayoutCache
+#include "src/config.h"     // STATUS_H
+#include "src/state.h"      // prefs
+#include "src/ui/font.h"    // Font::invalidateLayoutCache
+#include "src/ui/reader.h"  // repaginateForLayoutChange
 
 namespace Statusbar {
 
@@ -35,7 +36,12 @@ void setMode(Mode m) {
   if (nm == s_mode) return;
   s_mode = nm;
   prefs.putInt(kKey, (int)s_mode);
+  // Layout's `maxLines` is computed from `SCREEN_H - reserveH()`, so a mode
+  // change shifts pagination. Invalidate the font's layout-metrics cache
+  // and the reader's in-memory page-offset table together — they would
+  // otherwise hold offsets computed under the old reserve.
   Font::invalidateLayoutCache();
+  repaginateForLayoutChange();
 }
 
 void cycleMode() {

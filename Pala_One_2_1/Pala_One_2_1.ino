@@ -87,6 +87,7 @@
 #include "src/ui/font.h"
 #include "src/ui/pala_api_impl.h"
 #include "src/ui/reader.h"
+#include "src/ui/reader_actions.h"  // Gestures::loadSettings
 #include "src/ui/screen.h"
 #include "src/ui/widgets.h"  // drawCenter
 #include "src/ui/screens/about_screen.h"
@@ -220,6 +221,18 @@ void setup() {
   setCpuFrequencyMhz(80);
 }
 
+// Idle-deadline + sleep-gate check shared by the locked and normal branches
+// of `loop()`. Returns true iff `Sleep::enter()` was called (deep sleep does
+// not return, so the `true` arm is really "we're not coming back" — the
+// return value is for the caller's control flow on builds that mock sleep).
+static bool deepSleepIfAllowed() {
+  if (!ENABLE_DEEP_SLEEP) return false;
+  if (!g_currentScreen->allowSleep()) return false;
+  if (userIdleMs() <= Sleep::idleTimeoutMs()) return false;
+  Sleep::enter();
+  return true;
+}
+
 // ============================================================================
 //  Main loop
 // ============================================================================
@@ -237,7 +250,8 @@ void loop() {
   //
   // Crucially this branch does NOT call markUserActivity for non-unlock
   // events, so the idle deadline keeps ticking and an idle locked device
-  // re-sleeps instead of draining battery.
+  // re-sleeps instead of draining battery. cfg_locked is left set in NVS
+  // so a re-sleep stays locked.
   if (Lock::isLocked()) {
     if (Lock::isUnlockGesture(ev)) {
       Lock::disengage();
@@ -249,23 +263,13 @@ void loop() {
       g_currentScreen->draw();
       return;
     }
-    if (ENABLE_DEEP_SLEEP && g_currentScreen->allowSleep()) {
-      if (userIdleMs() > Sleep::idleTimeoutMs()) {
-        Sleep::enter();  // cfg_locked remains true; we re-sleep still locked
-        return;
-      }
-    }
+    deepSleepIfAllowed();
     return;
   }
 
   if (ev.any()) markUserActivity();
 
-  if (ENABLE_DEEP_SLEEP && g_currentScreen->allowSleep()) {
-    if (userIdleMs() > Sleep::idleTimeoutMs()) {
-      Sleep::enter();
-      return;
-    }
-  }
+  if (deepSleepIfAllowed()) return;
 
   g_currentScreen->onButton(ev);
   g_currentScreen->onIdleTick();

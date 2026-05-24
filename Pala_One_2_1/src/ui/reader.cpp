@@ -7,7 +7,7 @@
 #include "src/storage/page_cache.h"
 #include "src/storage/preferences_store.h"
 
-#include "src/ui/font.h"                    // currentBodySize/currentLineGap for cache stamping
+#include "src/ui/font.h"                    // layoutForCache for cache stamping
 #include "src/ui/screens/library_screen.h"  // navigateToLibraryRoot — fallback on error
 #include "src/ui/statusbar.h"               // Statusbar::mode for the per-mode statusbar render
 #include "src/ui/text.h"
@@ -332,6 +332,38 @@ bool retreatPage() {
   g_bookview.cursor.pageIndex--;
   g_bookview.cursor.pageTurnsSinceFull++;
   return true;
+}
+
+// ============================================================================
+//  Layout-change response — keeps `g_bookview.pages` consistent with the
+//  current Font::layoutForCache(). See header comment for the contract.
+// ============================================================================
+void repaginateForLayoutChange() {
+  if (!g_bookview.book.isOpen()) return;
+
+  // Remember the byte offset of the current page so we can find the
+  // matching page under the new layout. Offsets are file-position-based
+  // and invariant under any layout change.
+  uint32_t savedOffset = 0;
+  if (g_bookview.cursor.pageIndex >= 0
+      && g_bookview.cursor.pageIndex < g_bookview.pages.count) {
+    savedOffset = g_bookview.pages.offsets[g_bookview.cursor.pageIndex];
+  }
+
+  // Reset the in-memory table to the empty seed and let the disk cache
+  // populate it if it happens to be valid for the new layout. The cache
+  // file's layout stamp will mismatch in the actually-changed case and
+  // the load is a no-op; ensureOffsetsUpTo will rebuild on the next render.
+  g_bookview.pages.count = 1;
+  g_bookview.pages.offsets[0] = 0;
+  g_bookview.pages.eofReached = false;
+  loadPageOffsetCacheForBook(g_bookview.book.path(), g_bookview.book.size(),
+                             Font::layoutForCache(),
+                             g_bookview.pages);
+
+  g_bookview.cursor.pageIndex = findPageForOffset(savedOffset);
+  g_bookview.cursor.pageTurnsSinceFull = 0;
+  resetSaveThrottle();
 }
 
 // ============================================================================

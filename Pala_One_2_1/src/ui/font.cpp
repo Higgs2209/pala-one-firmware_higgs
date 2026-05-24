@@ -164,11 +164,16 @@ Family currentFamily()   { return s_family; }
 bool   bionicEnabled()   { return s_bionic; }
 
 PageCacheLayout layoutForCache() {
+  // Statusbar reserve goes into the cache stamp too — toggling between
+  // Full / Minimal / Hidden modes changes the page's text area (and
+  // therefore `maxLines`), which shifts every page boundary in the cached
+  // offset table. See Statusbar::setMode and page_cache.cpp's magic history.
   return PageCacheLayout{
-    /*bodySize=*/s_size,
-    /*lineGap =*/s_lineGap,
-    /*family  =*/(uint8_t)s_family,
-    /*bionic  =*/(uint8_t)(s_bionic ? 1 : 0),
+    /*bodySize        =*/s_size,
+    /*lineGap         =*/s_lineGap,
+    /*family          =*/(uint8_t)s_family,
+    /*bionic          =*/(uint8_t)(s_bionic ? 1 : 0),
+    /*statusbarReserve=*/(uint8_t)Statusbar::reserveH(),
   };
 }
 

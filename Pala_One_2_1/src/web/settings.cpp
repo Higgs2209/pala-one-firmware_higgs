@@ -1,7 +1,6 @@
 #include "src/web/settings.h"
 
 #include "src/config.h"
-#include "src/hal/input.h"   // ButtonAction + Gestures
 #include "src/state.h"
 #include "src/pure/hashing.h"             // prefKeyForBook
 #include "src/storage/book_metadata.h"
@@ -9,6 +8,7 @@
 #include "src/storage/preferences_store.h"
 #include "src/ui/font.h"
 #include "src/ui/reader.h"                // g_bookview, findPageForOffset, renderCurrentPage
+#include "src/ui/reader_actions.h"        // ButtonAction + Gestures
 #include "src/ui/screens/reader_screen.h" // g_readerScreen — active-reader check
 #include "src/ui/sleep.h"
 #include "src/web/chrome.h"

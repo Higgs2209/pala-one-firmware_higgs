@@ -1,9 +1,10 @@
 #include "src/ui/screens/reader_screen.h"
 
 #include "src/hal/display.h"
-#include "src/hal/input.h"                   // Gestures::actionFor
+#include "src/hal/input.h"
 #include "src/ui/lock.h"                     // Lock::engage on ACTION_LOCK
 #include "src/ui/reader.h"
+#include "src/ui/reader_actions.h"           // Gestures::actionFor + ButtonAction
 #include "src/ui/reader_menu.h"              // overlay state + dispatch
 #include "src/ui/screens/library_screen.h"
 #include "src/ui/sleep.h"                    // Sleep::enter on ACTION_LOCK

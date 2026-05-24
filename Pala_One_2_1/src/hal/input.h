@@ -139,41 +139,6 @@ struct ButtonEvent {
   bool any() const { return kind != None; }
 };
 
-// ============================================================================
-//  Remappable hold-gesture bindings — owned by the input layer because the
-//  bindings are gesture-to-action, not screen-to-screen. The reader screen
-//  asks `actionFor(Kind)` and dispatches to its own action handler.
-// ============================================================================
-
-enum ButtonAction {
-  ACTION_NONE     = 0,
-  ACTION_BOOKMARK = 1,
-  ACTION_LOCK     = 2,
-  ACTION_MENU     = 3,
-};
-
-namespace Gestures {
-
-// NVS load on boot — call once from setup() after `prefs.begin`.
-void loadSettings();
-
-// Current bound action for each remappable gesture.
-ButtonAction actionLong();       // plain long press (>= LONG_MS, < VERY_LONG_MS, no preceding click)
-ButtonAction actionExtraLong();  // very-long press (>= VERY_LONG_MS, no preceding click)
-ButtonAction actionClickHold();  // short click then immediate long hold
-
-// Apply + persist a binding. Out-of-range values clamp to ACTION_NONE.
-void setActionLong(ButtonAction a);
-void setActionExtraLong(ButtonAction a);
-void setActionClickHold(ButtonAction a);
-
-// Convenience: which action (if any) is currently bound to the gesture
-// kind that just fired. Returns ACTION_NONE for non-remappable kinds
-// (Short, Double, Triple, Quad, None).
-ButtonAction actionFor(ButtonEvent::Kind kind);
-
-}  // namespace Gestures
-
 // ----------------------------------------------------------------------------
 //  Lifecycle / interrupt plumbing
 // ----------------------------------------------------------------------------
