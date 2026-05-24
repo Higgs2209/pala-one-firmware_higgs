@@ -7,12 +7,12 @@ The goal of the project was to create a simple, distraction-free reading device 
 
 ## Install (no toolchain needed)
 
-[Web Installer](https://gnatpat.github.io/pala-one-firmware/)
+[Web Installer](https://paullagier.github.io/pala-one-firmware/)
 
 The easiest way to flash a board is via the web installer. Plug your Heltec Wireless Paper into a desktop computer running Chrome, Edge, or Opera, then open the installer page and pick a channel:
 
-- **Stable** ([`/stable/`](https://gnatpat.github.io/pala-one-firmware/stable/)) — latest release from `main`. Use this unless you have a reason not to.
-- **Development** ([`/dev/`](https://gnatpat.github.io/pala-one-firmware/dev/)) — latest build from `dev`; new features, may break.
+- **Stable** ([`/stable/`](https://paullagier.github.io/pala-one-firmware/stable/)) — latest tagged release (`vX.Y.Z`). Use this unless you have a reason not to.
+- **Development** ([`/dev/`](https://paullagier.github.io/pala-one-firmware/dev/)) — latest build from `dev`; new features, may break.
 
 Each channel page lists both display revisions (V1.1 / V1.2) and both languages (English / Spanish-LA) — four install buttons total. Pick the one that matches your board + language and click **Install**. The installer keeps existing reading progress, bookmarks, and uploaded books across re-flashes.
 
@@ -92,16 +92,17 @@ Both envs share libraries and partition table via `platformio.ini`. The PIO buil
 
 ### Installer site (channels & CI)
 
-The [web installer](https://gnatpat.github.io/pala-one-firmware/) is published to the `gh-pages` branch by [`.github/workflows/deploy-installer.yml`](.github/workflows/deploy-installer.yml). Two channels live side-by-side and never overwrite each other:
+The [web installer](https://paullagier.github.io/pala-one-firmware/) is published to the `gh-pages` branch by [`.github/workflows/deploy-installer.yml`](.github/workflows/deploy-installer.yml). Two channels live side-by-side and never overwrite each other:
 
-| Trigger                       | Channel  | URL path     | `DEBUG_BUILD` |
-|-------------------------------|----------|--------------|---------------|
-| push to `dev`                 | `dev`    | `/dev/`      | `1` (git hash visible on device) |
-| push to `main`                | `stable` | `/stable/`   | `0` (clean UI) |
-| tag `v*` on `main`            | `stable` | `/stable/`   | `0` |
-| `workflow_dispatch`           | choose   | matches      | depends on channel |
+| Trigger                       | Channel  | URL path     | `DEBUG_BUILD` | Manifest version |
+|-------------------------------|----------|--------------|---------------|------------------|
+| push to `dev`                 | `dev`    | `/dev/`      | `1` (git hash visible on device) | `dev-<sha>` |
+| tag `v*`                      | `stable` | `/stable/`   | `0` (clean UI) | `vX.Y.Z` |
+| `workflow_dispatch`           | choose   | matches      | depends on channel | `dev-<sha>` / `manual-<sha>` |
 
-Every run rebuilds the channel it owns and publishes only the corresponding `gh-pages/<channel>/` subdirectory (the workflow uses `keep_files: true`, so the other channel's directory is preserved). A small landing page at the gh-pages root links to both — it is republished on every run with identical content, so the cross-write is safe.
+Merges to `main` do **not** auto-publish. Tagging is the explicit release event, so `/stable/` never carries an arbitrary mid-release snapshot and the install dialog always shows a clean version name. To cut a release: merge to `main`, then `git tag vX.Y.Z && git push origin vX.Y.Z`.
+
+Every run rebuilds the channel it owns and publishes only the corresponding `gh-pages/<channel>/` subdirectory (the workflow uses `keep_files: true`, so the other channel's directory is preserved). A small landing page at the gh-pages root links to both — it is republished on every run with identical content, so the cross-write is safe. The Improv post-provisioning `connected.html` also lives at the gh-pages root (its content is channel-agnostic and the URL is baked into the firmware).
 
 Source HTML/manifests live in `install/` on the normal branches. The `gh-pages` branch is fully generated; do not edit it by hand.
 
@@ -111,7 +112,7 @@ Source HTML/manifests live in `install/` on the normal branches. The `gh-pages` 
 2. **Settings → Actions → General → Workflow permissions** must allow **Read and write permissions** so the workflow can push to `gh-pages` (the workflow's `permissions: contents: write` only takes effect when the repo policy allows it).
 3. No secrets are required — the workflow uses the default `GITHUB_TOKEN`.
 
-To cut a stable release, merge to `main` (or push a `vX.Y.Z` tag for a labelled build). To preview work in progress, push to `dev`. A `workflow_dispatch` run is available for republishing without a code change.
+To cut a stable release: push a `vX.Y.Z` tag (typically after merging to `main`). To preview work in progress: push to `dev`. A `workflow_dispatch` run is available for republishing either channel without a code change.
 
 #### Local development
 

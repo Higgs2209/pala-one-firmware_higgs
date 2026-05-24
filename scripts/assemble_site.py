@@ -16,12 +16,16 @@ publishes a two-channel layout suitable for the gh-pages branch:
 
     site/
     ├── index.html              # landing page: pick stable or dev
+    ├── connected.html          # Improv post-provisioning landing (channel-agnostic)
     └── <channel>/
         ├── index.html          # the ESP Web Tools installer page
-        ├── connected.html
         ├── manifest-v1_{1,2}-{en,es}.json   # 4 manifests (board x language)
         ├── firmware-v1_{1,2}-{en,es}.bin    # 4 firmware images
         └── bootloader.bin / partitions.bin / boot_app0.bin
+
+connected.html lives at the gh-pages root, not under a channel, because
+its content is identical for stable + dev and the firmware-baked redirect
+URL has no way to know which channel installed it.
 
 The workflow uploads this to `gh-pages` with keep_files=true so the
 *other* channel's directory survives untouched.
@@ -86,7 +90,8 @@ def write_installer_bundle(out: Path, repo: Path, version: str,
     for env_name, out_name in leaves:
         shutil.copy(require_file(pio / env_name / "firmware.bin"), out / out_name)
 
-    shutil.copy(require_file(inst / "connected.html"), out / "connected.html")
+    # connected.html is placed by the caller — root in channel mode, alongside
+    # the installer in flat local-dev mode.
 
     # Inject channel + version into the installer page header. The template
     # carries placeholders that get filled here so the page can show which
@@ -128,18 +133,23 @@ def main() -> int:
 
     if args.channel:
         out.mkdir(parents=True, exist_ok=True)
-        # Root landing page — same content regardless of which channel is
-        # being deployed, so safe to rewrite on every run.
-        shutil.copy(require_file(inst / "landing.html"), out / "index.html")
+        # Root landing page + Improv post-provisioning page — same content
+        # regardless of which channel is being deployed, so safe to rewrite
+        # on every run.
+        shutil.copy(require_file(inst / "landing.html"),   out / "index.html")
+        shutil.copy(require_file(inst / "connected.html"), out / "connected.html")
         bundle_dir = out / args.channel
         write_installer_bundle(bundle_dir, repo, args.version, args.channel)
         print(f"Assembled {args.channel} installer bundle -> {bundle_dir}  "
               f"(version: {args.version})")
-        print(f"Landing page -> {out / 'index.html'}")
+        print(f"Landing page    -> {out / 'index.html'}")
+        print(f"Connected page  -> {out / 'connected.html'}")
         for p in sorted(bundle_dir.iterdir()):
             print(f"  {args.channel}/{p.name:30s} {p.stat().st_size:>10d} bytes")
     else:
         write_installer_bundle(out, repo, args.version, None)
+        # Flat local-dev mode: connected.html lives alongside the installer.
+        shutil.copy(require_file(inst / "connected.html"), out / "connected.html")
         print(f"Assembled installer bundle -> {out}  (version: {args.version})")
         for p in sorted(out.iterdir()):
             print(f"  {p.name:30s} {p.stat().st_size:>10d} bytes")

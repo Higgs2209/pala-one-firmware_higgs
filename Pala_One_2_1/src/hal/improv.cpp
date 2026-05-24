@@ -69,7 +69,7 @@ void begin() {
       "Pala One",
       "2.1",
       "Pala One",
-      "https://gnatpat.github.io/pala-one-firmware/connected.html");
+      "https://paullagier.github.io/pala-one-firmware/connected.html");
 
   // The library handles WiFi.begin() itself; we only persist creds once the
   // association succeeds. If the association fails the library reports the
