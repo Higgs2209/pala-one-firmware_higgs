@@ -106,14 +106,6 @@ Every run rebuilds the channel it owns and publishes only the corresponding `gh-
 
 Source HTML/manifests live in `install/` on the normal branches. The `gh-pages` branch is fully generated; do not edit it by hand.
 
-#### Maintainer setup (one-time)
-
-1. In the repository, **Settings → Pages → Build and deployment**, set **Source** to **Deploy from a branch**, branch **`gh-pages`**, folder **`/ (root)`**. The first workflow run creates the branch.
-2. **Settings → Actions → General → Workflow permissions** must allow **Read and write permissions** so the workflow can push to `gh-pages` (the workflow's `permissions: contents: write` only takes effect when the repo policy allows it).
-3. No secrets are required — the workflow uses the default `GITHUB_TOKEN`.
-
-To cut a stable release: push a `vX.Y.Z` tag (typically after merging to `main`). To preview work in progress: push to `dev`. A `workflow_dispatch` run is available for republishing either channel without a code change.
-
 #### Local development
 
 To iterate on the installer page (HTML, Improv Serial provisioning flow, manifest tweaks) without CI:
