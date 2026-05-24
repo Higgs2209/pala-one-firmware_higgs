@@ -30,10 +30,22 @@
 #define D_MENU_BOOKMARKS            "Bookmarks"
 #define D_MENU_LIST                 "List"
 #define D_MENU_APPS                 "Apps"
+#define D_MENU_STATISTICS           "Statistics"
 #define D_MENU_DEVICE               "Device"
 #define D_MENU_UPLOAD               "Upload"
 #define D_LIBRARY_OPEN_FAILED       "Open failed"
 #define D_LIBRARY_TRY_UPLOAD        "Try upload again"
+
+// ----------------------------------------------------------------------------
+//  Statistics screen (src/ui/screens/statistics_screen.cpp). The *_FMT
+//  strings are snprintf templates with %u / %llu placeholders — keep the
+//  positional order across translations.
+// ----------------------------------------------------------------------------
+#define D_STATS_HEADING                "Statistics"
+#define D_STATS_STREAK_CURRENT_FMT     "Current streak: %u days"
+#define D_STATS_STREAK_LONGEST_FMT     "Longest: %u  Sessions: %u"
+#define D_STATS_LIFETIME_PAGES_FMT     "Pages turned: %llu"
+#define D_STATS_LIFETIME_PRESSES_FMT   "Button presses: %llu"
 
 // ----------------------------------------------------------------------------
 //  List screen (src/ui/screens/list_screen.cpp)

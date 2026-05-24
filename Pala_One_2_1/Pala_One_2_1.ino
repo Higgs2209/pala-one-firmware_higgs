@@ -84,6 +84,7 @@
 #include "src/storage/library.h"
 #include "src/storage/list_items.h"
 #include "src/storage/page_cache.h"
+#include "src/storage/statistics.h"
 #include "src/ui/font.h"
 #include "src/ui/pala_api_impl.h"
 #include "src/ui/reader.h"
@@ -97,6 +98,7 @@
 #include "src/ui/screens/library_screen.h"
 #include "src/ui/screens/list_screen.h"
 #include "src/ui/screens/reader_screen.h"
+#include "src/ui/screens/statistics_screen.h"
 #include "src/ui/screens/upload_screen.h"
 #include "src/ui/screensavers.h"
 #include "src/ui/sleep.h"
@@ -113,6 +115,7 @@ UploadScreen               g_uploadScreen;
 AboutScreen                g_aboutScreen;
 AppsScreen                 g_appsScreen;
 ListScreen                 g_listScreen;
+StatisticsScreen           g_statsScreen;
 BookmarkBookSelectScreen   g_bmBookSelectScreen;
 BookmarkListScreen         g_bmListScreen;
 BookmarkPreviewScreen      g_bmPreviewScreen;
@@ -178,6 +181,10 @@ void setup() {
   registerWebRoutes();
   markUserActivity();
 
+  // Reload lifetime counters from NVS into RTC RAM (no-op on warm wake).
+  // Streak state bootstraps lazily on the first page turn.
+  Statistics::loadOnBoot();
+
   if (tryRestoreReadingSession()) {
     renderCurrentPage();      // ~300ms draw — wake-press releases during this
     resetInputFrontend();     // then discard the wake-press only
@@ -202,6 +209,19 @@ void loop() {
 
   ButtonEvent ev = ButtonEvent::fromButtonState(g_btns);
   if (ev.any()) markUserActivity();
+
+  // Lifetime button-press counter. peekPressCount is monotonic-up except
+  // when the apps API consumes-and-resets — guard by clamping lastSeen to
+  // the current value if it ran backwards.
+  {
+    static uint32_t lastSeenPressCount = 0;
+    uint32_t pc = g_btns.peekPressCount();
+    if (pc < lastSeenPressCount) lastSeenPressCount = pc;
+    if (pc != lastSeenPressCount) {
+      Statistics::bumpButtons(pc - lastSeenPressCount);
+      lastSeenPressCount = pc;
+    }
+  }
 
   if (ENABLE_DEEP_SLEEP && g_currentScreen->allowSleep()) {
     if (userIdleMs() > Sleep::idleTimeoutMs()) {
