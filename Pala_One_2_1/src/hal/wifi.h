@@ -3,15 +3,27 @@
 
 #include <Arduino.h>
 
-// Bundled "upload-mode" power+net resource: brings Wi-Fi up for the upload
-// session and clocks the CPU to 240 MHz; wifiEnd() reverses both. Only one
-// caller today (the upload screen) so the CPU-freq concern rides along; split
-// if a second caller needs just the radio without the clock change.
+// Upload-session network primitives. All non-blocking — the upload screen
+// drives the STA-vs-AP decision itself with a small state machine so the
+// main loop stays alive throughout (button events, Improv polling, screen
+// redraws keep working through a slow STA association).
 //
-// Tries Station (STA) mode first if creds are stored ([[wifi-creds]]), with a
-// timeout and an early-cancel hook so the upload screen can let the user bail
-// out and use the hotspot. On STA failure / cancel / no creds, falls back to
-// the original SoftAP behaviour byte-for-byte.
+// Typical sequence:
+//
+//   if (wifiStaBegin()) {
+//     // poll wifiStaPoll() each loop iteration; on Connected, take the
+//     // session. On Failed (or after the caller's own timeout) call
+//     // wifiStaAbort() and fall back to wifiBeginAccessPoint().
+//   } else {
+//     // no stored creds — straight to AP.
+//     session = wifiBeginAccessPoint();
+//   }
+//   ... use session ...
+//   wifiEnd();
+//
+// CPU clock: any of the begin functions bumps to 240 MHz (Wi-Fi needs it);
+// wifiEnd() drops back to 80 MHz. wifiStaAbort() leaves the clock alone in
+// case the caller is about to call wifiBeginAccessPoint().
 
 enum class WifiMode { Station, AccessPoint };
 
@@ -24,9 +36,32 @@ struct WifiSession {
   String      staSsid;        // populated in Station mode only
 };
 
-// `cancel` is polled while waiting for the STA association — returning true
-// aborts the attempt and triggers AP fallback. Pass nullptr to disable.
-WifiSession wifiBeginUploadSession(uint32_t staTimeoutMs, bool (*cancel)());
-void        wifiEnd();
+enum class WifiStaResult {
+  Connecting,   // still associating — keep polling
+  Connected,    // associated; `out` is filled, stop polling
+  Failed,       // hard error from the stack (no SSID, bad password, etc.)
+};
+
+// Kick off an STA association attempt against the stored credentials.
+// Returns false if no creds are saved (caller should go straight to AP).
+// Non-blocking; bumps CPU to 240 MHz.
+bool          wifiStaBegin();
+
+// Poll the in-flight STA attempt. On Connected, `out` is filled with the
+// session and the caller takes ownership. On Failed, the caller should
+// call wifiStaAbort() and fall back to AP. The caller decides when to
+// give up on Connecting (typical: 5s timeout).
+WifiStaResult wifiStaPoll(WifiSession& out);
+
+// Tear down an in-flight STA attempt. Cheaper than wifiEnd() because no
+// full session was ever brought up; leaves the CPU clock alone since the
+// caller typically calls wifiBeginAccessPoint() next.
+void          wifiStaAbort();
+
+// Bring up SoftAP. Always succeeds. Bumps CPU to 240 MHz if not already.
+WifiSession   wifiBeginAccessPoint();
+
+// Tears down whichever mode is active and drops CPU back to 80 MHz.
+void          wifiEnd();
 
 #endif  // PALA_HAL_WIFI_H

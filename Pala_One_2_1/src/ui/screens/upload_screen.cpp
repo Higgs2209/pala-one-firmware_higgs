@@ -1,8 +1,9 @@
 #include "src/ui/screens/upload_screen.h"
 
-#include "src/config.h"           // BTN
+#include "src/config.h"
 #include "src/hal/display.h"
 #include "src/hal/improv.h"
+#include "src/hal/input.h"        // resetInputFrontend() — used on exit only
 #include "src/hal/wifi.h"
 #include "src/state.h"            // server
 #include "src/storage/library.h"
@@ -13,22 +14,12 @@
 #include "src/web/apps_upload.h"  // resetAppUpload()
 #include "src/web/upload.h"       // resetBookUpload() / resetSleepUpload()
 
-// ---- Cancel callback ------------------------------------------------------
-// The STA-association poll inside wifiBeginUploadSession() calls this every
-// ~50ms. We watch for a button press, but only after the button has first
-// gone HIGH — otherwise the click that brought the user *to* the upload
-// screen would itself be read as a cancel.
-static bool s_cancelButtonReleased = false;
+// How long to wait for an STA association before falling back to AP. Long
+// enough for a typical 2.4 GHz home network (~1-3s); short enough that an
+// unreachable network doesn't leave the user staring at "Connecting…".
+static constexpr uint32_t kStaTimeoutMs = 5000;
 
-static bool cancelOnButtonPress() {
-  const int btn = digitalRead(BTN);
-  if (btn == HIGH) s_cancelButtonReleased = true;
-  return s_cancelButtonReleased && (btn == LOW);
-}
-
-// ---- Connecting splash ----------------------------------------------------
-// Shown briefly while we try STA, so the user has something to look at and
-// knows they can bail out.
+// ---- Drawing --------------------------------------------------------------
 static void drawConnecting(const String& ssid) {
   prepareMenuFrame();
   int y = drawSectionHeader(D_UPLOAD_HEADER);
@@ -51,11 +42,6 @@ static void drawConnecting(const String& ssid) {
   u8g2.print(D_UPLOAD_HOTSPOT_HINT_L2);
 
   display.update();
-}
-
-void UploadScreen::onEnter() {
-  startSession();
-  draw();
 }
 
 void UploadScreen::draw() {
@@ -124,52 +110,92 @@ void UploadScreen::draw() {
   display.update();
 }
 
-void UploadScreen::startSession() {
-  startedMs_ = millis();
+// ---- Lifecycle ------------------------------------------------------------
+void UploadScreen::onEnter() {
+  beginSession();
+}
+
+void UploadScreen::beginSession() {
   resetBookUpload();
   resetSleepUpload();
   resetAppUpload();
 
-  // If we have stored creds, give the user a connecting splash + 5s STA
-  // window before falling back. Without creds, go straight to AP — no point
-  // showing a connecting screen for a path we know will time out.
-  if (WifiCreds::has()) {
-    drawConnecting(WifiCreds::ssid());
-    s_cancelButtonReleased = false;
-    net_ = wifiBeginUploadSession(5000, cancelOnButtonPress);
-  } else {
-    net_ = wifiBeginUploadSession(0, nullptr);
-  }
-
-  server.begin();
-
-  // Improv is always polling whenever USB is connected; just tell it not to
-  // touch Wi-Fi while we hold the radio. (Important because there's no
-  // physical reset button on the device, so users may need to reprovision
-  // mid-session by plugging in USB.)
+  // Tell Improv to keep its hands off the radio for the duration of the
+  // session — set BEFORE wifiStaBegin so a same-tick Improv::loop() can't
+  // race the WiFi.begin() we're about to fire.
   Improv::notifyUploadSession(true);
+
+  if (wifiStaBegin()) {
+    phase_        = Phase::ConnectingSta;
+    staStartedMs_ = millis();
+    drawConnecting(WifiCreds::ssid());
+  } else {
+    // No stored creds — straight to AP, no point showing a splash for a
+    // path we know will time out.
+    net_ = wifiBeginAccessPoint();
+    enterReady();
+  }
+}
+
+void UploadScreen::enterReady() {
+  phase_     = Phase::Ready;
+  startedMs_ = millis();
+  server.begin();
+  draw();
+}
+
+void UploadScreen::fallbackToAp() {
+  wifiStaAbort();
+  net_ = wifiBeginAccessPoint();
+  enterReady();
 }
 
 void UploadScreen::stopSessionToLibrary() {
-  Improv::notifyUploadSession(false);
   server.stop();
   wifiEnd();
+  Improv::notifyUploadSession(false);
+
   resetBookUpload();
   resetSleepUpload();
   resetAppUpload();
 
   loadBooks();
+  // Discard the exit-click so it doesn't leak into the library screen as a
+  // menu selection.
   resetInputFrontend();
   nextScreen = &g_libraryScreen;
 }
 
+// ---- Per-iteration input + tick -------------------------------------------
 void UploadScreen::onButton(const ButtonEvent& e) {
+  if (!e.any()) return;
+
+  // Any tap during the connecting splash means "use the hotspot instead".
+  if (phase_ == Phase::ConnectingSta) {
+    fallbackToAp();
+    return;
+  }
+
   if (e.kind == ButtonEvent::Short || e.kind == ButtonEvent::Triple) {
     stopSessionToLibrary();
   }
 }
 
 void UploadScreen::onIdleTick() {
+  if (phase_ == Phase::ConnectingSta) {
+    WifiStaResult r = wifiStaPoll(net_);
+    if (r == WifiStaResult::Connected) {
+      enterReady();
+      return;
+    }
+    if (r == WifiStaResult::Failed ||
+        (uint32_t)(millis() - staStartedMs_) > kStaTimeoutMs) {
+      fallbackToAp();
+      return;
+    }
+    return;   // still associating — server isn't up yet
+  }
+
   server.handleClient();
   if ((uint32_t)(millis() - startedMs_) > UPLOAD_AUTO_EXIT_MS) {
     stopSessionToLibrary();

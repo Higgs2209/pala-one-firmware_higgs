@@ -3,6 +3,7 @@
 #include <ImprovWiFiLibrary.h>
 #include <WiFi.h>
 
+#include "src/config.h"
 #include "src/storage/wifi_creds.h"
 
 namespace Improv {
@@ -67,7 +68,7 @@ void begin() {
   s_state.lib.setDeviceInfo(
       ImprovTypes::ChipFamily::CF_ESP32_S3,
       "Pala One",
-      "2.1",
+      FW_VERSION,
       "Pala One",
       "https://paullagier.github.io/pala-one-firmware/connected.html");
 
