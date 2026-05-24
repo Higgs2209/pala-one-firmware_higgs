@@ -360,6 +360,24 @@
 #define D_WEB_NO_BOOKMARKS_THIS_BOOK "Sin marcapáginas para este libro"
 
 // ----------------------------------------------------------------------------
+//  Lector en el navegador + buscar/saltar (src/web/find.cpp).
+// ----------------------------------------------------------------------------
+#define D_WEB_READ_TITLE            "Leer"
+#define D_WEB_READ_SUBTITLE         "Explora y busca el libro en tu navegador. Usa Saltar para fijar el punto de retoma del dispositivo."
+#define D_WEB_READ_BYTES_LABEL      "bytes"
+#define D_WEB_READ_CURRENT_PAGE_LABEL "página actual:"
+#define D_WEB_READ_FIND_PLACEHOLDER "Buscar en el libro"
+#define D_WEB_READ_FIND_ALL         "Buscar todo"
+#define D_WEB_READ_FIND_PREV        "Anterior"
+#define D_WEB_READ_FIND_NEXT        "Siguiente"
+#define D_WEB_READ_JUMP_HERE        "Saltar aquí"
+#define D_WEB_READ_LOADING          "Cargando texto del libro..."
+#define D_WEB_READ_PAGE_PLACEHOLDER "Número de página"
+#define D_WEB_READ_JUMP_PAGE        "Saltar a página"
+#define D_WEB_READ_JUMP_HINT        "Guarda directamente la próxima página de apertura."
+#define D_WEB_READ_AND_FIND_LINK    "Leer y buscar"
+
+// ----------------------------------------------------------------------------
 //  Familia de fuente + lectura biónica + retención de posición
 //  (src/web/settings.cpp).
 // ----------------------------------------------------------------------------
