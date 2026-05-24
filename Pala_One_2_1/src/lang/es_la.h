@@ -33,10 +33,20 @@
 #define D_MENU_BOOKMARKS            "Marcapáginas"
 #define D_MENU_LIST                 "Lista"
 #define D_MENU_APPS                 "Apps"
+#define D_MENU_STATISTICS           "Estadísticas"
 #define D_MENU_DEVICE               "Dispositivo"
 #define D_MENU_UPLOAD               "Conectar"
 #define D_LIBRARY_OPEN_FAILED       "Error al abrir"
 #define D_LIBRARY_TRY_UPLOAD        "Intente subir de nuevo"
+
+// ----------------------------------------------------------------------------
+//  Statistics screen
+// ----------------------------------------------------------------------------
+#define D_STATS_HEADING                "Estadísticas"
+#define D_STATS_STREAK_CURRENT_FMT     "Racha actual: %u días"
+#define D_STATS_STREAK_LONGEST_FMT     "Mejor: %u  Sesiones: %u"
+#define D_STATS_LIFETIME_PAGES_FMT     "Páginas leídas: %llu"
+#define D_STATS_LIFETIME_PRESSES_FMT   "Pulsaciones: %llu"
 
 // ----------------------------------------------------------------------------
 //  List screen
