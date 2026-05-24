@@ -88,7 +88,12 @@ The same sources build under either toolchain.
    pio device monitor
    ```
 
-Both envs share libraries and partition table via `platformio.ini`. The PIO build also runs `scripts/build_info.py` to inject the current git short hash as `BUILD_GIT_HASH`; Arduino IDE builds fall back to `"unknown"`.
+Both envs share libraries and partition table via `platformio.ini`. The PIO build also runs `scripts/build_info.py` to inject:
+
+- `FW_VERSION` from `git describe --tags --always --dirty` (e.g. `v2.1`, `v2.1-3-gabc1234`, `…-dirty`)
+- `BUILD_GIT_HASH` from the current short SHA
+
+Arduino IDE / host-test builds skip the script and fall back to `"dev"` and `"unknown"` respectively — those toolchains are for developer iteration; releases go through the PIO + tagged-CI flow where the real values get injected.
 
 ### Installer site (channels & CI)
 

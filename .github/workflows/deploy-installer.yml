@@ -45,6 +45,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full history + tags so scripts/build_info.py can derive FW_VERSION
+          # via `git describe --tags`. Shallow (default depth=1) breaks that.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
