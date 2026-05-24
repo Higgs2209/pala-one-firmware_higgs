@@ -14,7 +14,7 @@ The easiest way to flash a board is via the web installer. Plug your Heltec Wire
 - **Stable** ([`/stable/`](https://gnatpat.github.io/pala-one-firmware/stable/)) — latest release from `main`. Use this unless you have a reason not to.
 - **Development** ([`/dev/`](https://gnatpat.github.io/pala-one-firmware/dev/)) — latest build from `dev`; new features, may break.
 
-Pick your display revision (V1.1 or V1.2) on the channel page and click **Install**. The installer keeps existing reading progress, bookmarks, and uploaded books across re-flashes.
+Each channel page lists both display revisions (V1.1 / V1.2) and both languages (English / Spanish-LA) — four install buttons total. Pick the one that matches your board + language and click **Install**. The installer keeps existing reading progress, bookmarks, and uploaded books across re-flashes.
 
 ## Contributing
 
@@ -117,10 +117,12 @@ To cut a stable release, merge to `main` (or push a `vX.Y.Z` tag for a labelled 
 
 To iterate on the installer page (HTML, Improv Serial provisioning flow, manifest tweaks) without CI:
 
-1. Build both envs at least once so the firmware bins exist:
+1. Build all four leaf envs at least once so the firmware bins exist:
    ```
-   pio run -e wireless-paper-v1_1
-   pio run -e wireless-paper-v1_2
+   pio run -e wireless-paper-v1_1-en
+   pio run -e wireless-paper-v1_1-es
+   pio run -e wireless-paper-v1_2-en
+   pio run -e wireless-paper-v1_2-es
    ```
 2. Assemble the bundle. Two layouts are supported:
    ```
