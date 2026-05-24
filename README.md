@@ -5,6 +5,17 @@ Pala One — A tiny E-Ink reader project by Paul Lagier
 
 The goal of the project was to create a simple, distraction-free reading device that feels minimal, portable and easy to build while still looking and behaving more like a real product than a typical DIY electronics project.
 
+## Install (no toolchain needed)
+
+[Web Installer](https://gnatpat.github.io/pala-one-firmware/)
+
+The easiest way to flash a board is via the web installer. Plug your Heltec Wireless Paper into a desktop computer running Chrome, Edge, or Opera, then open the installer page and pick a channel:
+
+- **Stable** ([`/stable/`](https://gnatpat.github.io/pala-one-firmware/stable/)) — latest release from `main`. Use this unless you have a reason not to.
+- **Development** ([`/dev/`](https://gnatpat.github.io/pala-one-firmware/dev/)) — latest build from `dev`; new features, may break.
+
+Pick your display revision (V1.1 or V1.2) on the channel page and click **Install**. The installer keeps existing reading progress, bookmarks, and uploaded books across re-flashes.
+
 ## Contributing
 
 If you improve the firmware, add features or fix bugs, feel free to open a pull request.
@@ -79,6 +90,51 @@ The same sources build under either toolchain.
 
 Both envs share libraries and partition table via `platformio.ini`. The PIO build also runs `scripts/build_info.py` to inject the current git short hash as `BUILD_GIT_HASH`; Arduino IDE builds fall back to `"unknown"`.
 
+### Installer site (channels & CI)
+
+The [web installer](https://gnatpat.github.io/pala-one-firmware/) is published to the `gh-pages` branch by [`.github/workflows/deploy-installer.yml`](.github/workflows/deploy-installer.yml). Two channels live side-by-side and never overwrite each other:
+
+| Trigger                       | Channel  | URL path     | `DEBUG_BUILD` |
+|-------------------------------|----------|--------------|---------------|
+| push to `dev`                 | `dev`    | `/dev/`      | `1` (git hash visible on device) |
+| push to `main`                | `stable` | `/stable/`   | `0` (clean UI) |
+| tag `v*` on `main`            | `stable` | `/stable/`   | `0` |
+| `workflow_dispatch`           | choose   | matches      | depends on channel |
+
+Every run rebuilds the channel it owns and publishes only the corresponding `gh-pages/<channel>/` subdirectory (the workflow uses `keep_files: true`, so the other channel's directory is preserved). A small landing page at the gh-pages root links to both — it is republished on every run with identical content, so the cross-write is safe.
+
+Source HTML/manifests live in `install/` on the normal branches. The `gh-pages` branch is fully generated; do not edit it by hand.
+
+#### Maintainer setup (one-time)
+
+1. In the repository, **Settings → Pages → Build and deployment**, set **Source** to **Deploy from a branch**, branch **`gh-pages`**, folder **`/ (root)`**. The first workflow run creates the branch.
+2. **Settings → Actions → General → Workflow permissions** must allow **Read and write permissions** so the workflow can push to `gh-pages` (the workflow's `permissions: contents: write` only takes effect when the repo policy allows it).
+3. No secrets are required — the workflow uses the default `GITHUB_TOKEN`.
+
+To cut a stable release, merge to `main` (or push a `vX.Y.Z` tag for a labelled build). To preview work in progress, push to `dev`. A `workflow_dispatch` run is available for republishing without a code change.
+
+#### Local development
+
+To iterate on the installer page (HTML, Improv Serial provisioning flow, manifest tweaks) without CI:
+
+1. Build both envs at least once so the firmware bins exist:
+   ```
+   pio run -e wireless-paper-v1_1
+   pio run -e wireless-paper-v1_2
+   ```
+2. Assemble the bundle. Two layouts are supported:
+   ```
+   python scripts/assemble_site.py                       # flat layout in site/
+   python scripts/assemble_site.py --channel dev         # site/index.html + site/dev/
+   ```
+3. Serve it. Web Serial works on `localhost` without HTTPS:
+   ```
+   python -m http.server 8000 --directory site
+   ```
+4. Open <http://localhost:8000> in Chrome, Edge, or Opera. With `--channel`, the landing page is served; without, the installer is served directly.
+
+Optional flags: `--version <string>` to label the manifest, `--out <dir>` to write somewhere other than `site/`. The channel-aware layout produced locally is bit-identical to what the workflow uploads to `gh-pages`.
+
 ## Codebase layout
 
 ```
@@ -100,6 +156,7 @@ docs/                    # Architecture notes + refactor journal
 scripts/                 # PlatformIO pre-build helpers
 test/                    # Host-side CMake unit tests for pure/ + storage/
 examples/                # Sample apps (click_counter, palagotchi)
+install/                 # ESP Web Tools installer page (deployed to GitHub Pages by CI)
 archive/                 # Past firmware revisions, kept for reference
 ```
 
