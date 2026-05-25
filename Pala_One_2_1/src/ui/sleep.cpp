@@ -49,48 +49,31 @@ void setNoScreensaver(bool val) {
   prefs.putBool(kKeyNoScreensaver, val);
 }
 
-// Draw a small padlock glyph + "Locked" label in the top-right corner so a
-// user who has locked the device and walked away can tell at a glance why
-// it's not responding. White-text-on-black pill so it stays readable over
-// both the built-in screensaver (mostly white) and any user-uploaded image.
+// Draw a "Locked" label in the top-right corner so a user who has locked the
+// device and walked away can tell at a glance why it's not responding.
+// White-text-on-black pill so it stays readable over both the built-in
+// screensaver (mostly white) and any user-uploaded image.
 static void drawLockBadge() {
+  // Text-only pill — the 7×9 px padlock glyph rendered as two thin vertical
+  // bars at e-ink scale, so it has been removed. The label text is sufficient.
   Font::useToast();   // Latin Extended — D_SCREENSAVER_LOCKED may have accents
   const int textW  = u8g2.getUTF8Width(D_SCREENSAVER_LOCKED);
   const int ascent = u8g2.getFontAscent();
+  const int padX   = 5;
+  const int padY   = 2;
+  const int boxH   = ascent + padY * 2;
+  const int boxW   = padX + textW + padX;
+  const int boxX   = SCREEN_W - boxW - 2;
+  const int boxY   = 2;
 
-  const int iconW = 7;   // padlock body width
-  const int iconH = 9;   // shackle + body height
-  const int padX  = 4;
-  const int padY  = 2;
-  const int gap   = 3;
-  const int boxH  = ascent + padY * 2;
-  const int boxW  = padX + iconW + gap + textW + padX;
-  const int boxX  = SCREEN_W - boxW - 2;
-  const int boxY  = 2;
-
-  // Pill: black fill, white 1px border bleed for a hairline of contrast
-  // against dark uploaded images. Order matters — the inner fill draws last.
+  // Pill: black fill, white 1px border bleed for hairline contrast against
+  // dark uploaded images. Order matters — inner fill draws last.
   gfx.fillRect(boxX - 1, boxY - 1, boxW + 2, boxH + 2, 0);
   gfx.fillRect(boxX, boxY, boxW, boxH, 1);
 
-  // Padlock glyph, white-on-black. Body is a 7x5 filled rect with a 3x3
-  // shackle drawn as a U above it.
-  const int iconX = boxX + padX;
-  const int iconY = boxY + (boxH - iconH) / 2;
-  const int bodyY = iconY + 4;
-  gfx.fillRect(iconX, bodyY, iconW, 5, 0);          // body
-  gfx.drawPixel(iconX + 3, bodyY + 2, 1);           // keyhole
-  // Shackle: two verticals + a top — leaves the inside black so it reads
-  // as a closed loop, not a filled blob.
-  gfx.drawFastVLine(iconX + 1, iconY, 4, 0);
-  gfx.drawFastVLine(iconX + 5, iconY, 4, 0);
-  gfx.drawPixel(iconX + 2, iconY, 0);
-  gfx.drawPixel(iconX + 3, iconY, 0);
-  gfx.drawPixel(iconX + 4, iconY, 0);
-
   // White text on the black pill.
   u8g2.setForegroundColor(0);
-  u8g2.setCursor(iconX + iconW + gap, boxY + padY + ascent - 1);
+  u8g2.setCursor(boxX + padX, boxY + padY + ascent - 1);
   u8g2.print(D_SCREENSAVER_LOCKED);
   u8g2.setForegroundColor(1);   // restore project-wide default
   Font::useBody();
@@ -130,7 +113,11 @@ void enter() {
   if (s_noScreensaver && wasReading) {
     // Full refresh of the last page so it sits cleanly on the panel.
     // The reader's framebuffer content is still intact at this point.
+    // Draw the lock badge on top of that framebuffer when locked — the badge
+    // is skipped by this branch (which bypasses drawSleepScreen entirely), so
+    // we inject it here before the final display.update() flush.
     display.fastmodeOff();
+    if (Lock::isLocked()) drawLockBadge();
     display.update();
     delay(600);
   } else {
