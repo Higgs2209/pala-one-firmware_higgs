@@ -49,34 +49,39 @@ void setNoScreensaver(bool val) {
   prefs.putBool(kKeyNoScreensaver, val);
 }
 
-// Draw a "Locked" label in the top-right corner so a user who has locked the
+// Draw a padlock icon in the top-right corner so a user who has locked the
 // device and walked away can tell at a glance why it's not responding.
-// White-text-on-black pill so it stays readable over both the built-in
-// screensaver (mostly white) and any user-uploaded image.
+// White-on-black pill, icon only (no text label) — stays readable over both
+// the built-in screensaver and any user-uploaded image.
 static void drawLockBadge() {
-  // Text-only pill — the 7×9 px padlock glyph rendered as two thin vertical
-  // bars at e-ink scale, so it has been removed. The label text is sufficient.
-  Font::useToast();   // Latin Extended — D_SCREENSAVER_LOCKED may have accents
-  const int textW  = u8g2.getUTF8Width(D_SCREENSAVER_LOCKED);
-  const int ascent = u8g2.getFontAscent();
-  const int padX   = 5;
-  const int padY   = 2;
-  const int boxH   = ascent + padY * 2;
-  const int boxW   = padX + textW + padX;
-  const int boxX   = SCREEN_W - boxW - 2;
-  const int boxY   = 2;
+  const int iconW = 7;   // padlock body width (cols 0–6)
+  const int iconH = 9;   // total height: 4 rows shackle + 5 rows body
+  const int padX  = 4;
+  const int padY  = 2;
+  const int boxW  = padX + iconW + padX;   // 15 px
+  const int boxH  = padY + iconH + padY;   // 13 px
+  const int boxX  = SCREEN_W - boxW - 2;
+  const int boxY  = 2;
 
   // Pill: black fill, white 1px border bleed for hairline contrast against
   // dark uploaded images. Order matters — inner fill draws last.
   gfx.fillRect(boxX - 1, boxY - 1, boxW + 2, boxH + 2, 0);
   gfx.fillRect(boxX, boxY, boxW, boxH, 1);
 
-  // White text on the black pill.
-  u8g2.setForegroundColor(0);
-  u8g2.setCursor(boxX + padX, boxY + padY + ascent - 1);
-  u8g2.print(D_SCREENSAVER_LOCKED);
-  u8g2.setForegroundColor(1);   // restore project-wide default
-  Font::useBody();
+  // Padlock glyph, white-on-black.
+  const int iconX = boxX + padX;
+  const int iconY = boxY + padY;
+  const int bodyY = iconY + 4;
+  // Body: solid white 7×5 rectangle.
+  gfx.fillRect(iconX, bodyY, iconW, 5, 0);
+  // Keyhole: one black pixel at the body centre.
+  gfx.drawPixel(iconX + 3, bodyY + 2, 1);
+  // Shackle: U-shape — left/right verticals (4 px tall) + 3-px top connector.
+  gfx.drawFastVLine(iconX + 1, iconY, 4, 0);
+  gfx.drawFastVLine(iconX + 5, iconY, 4, 0);
+  gfx.drawPixel(iconX + 2, iconY, 0);
+  gfx.drawPixel(iconX + 3, iconY, 0);
+  gfx.drawPixel(iconX + 4, iconY, 0);
 }
 
 // Render the screensaver onto the e-ink before powering down. Falls back to
