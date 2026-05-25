@@ -154,22 +154,27 @@ void setup() {
   updateBatteryCached(true);
 #endif
 
-  // Load Sleep settings early — before display.clear() — so the no-screensaver
-  // flag is available to gate the full-refresh boot clear below.
+  // Load Sleep and Lock settings early — before display.clear() — so both
+  // flags are available to gate the full-refresh boot clear below.
   prefs.begin("ereader", false);
   Sleep::loadSettings();
+  Lock::loadSettings();
 
-  // Skip the full-refresh boot clear only when all three are true:
-  //   (a) waking from deep sleep (not a fresh boot),
-  //   (b) no-screensaver mode is on, and
-  //   (c) we were reading a book (wake_path was set by armResumeOnWake during
-  //       the sleep entry — tryRestoreReadingSession() will consume it later).
-  // If the user fell asleep in a menu the screensaver was shown, so we always
-  // clear normally in that case.
+  // Skip the full-refresh boot clear when waking from deep sleep AND either:
+  //   (a) the device is locked — the screensaver (with its lock badge) is
+  //       already on the e-ink; clearing to white and then drawing nothing
+  //       leaves a blank screen until the idle timeout fires, OR
+  //   (b) no-screensaver mode is on and we were reading — the last reader
+  //       page sits cleanly on the panel; a clear would briefly flash white
+  //       before the page redraws.
+  // On a fresh boot (not ext0 wake) always clear, regardless of lock state.
   bool wokeFromSleep = (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT0);
   bool wereReading   = (prefs.getString("wake_path", "").length() > 0);
   display.fastmodeOff();
-  if (!wokeFromSleep || !Sleep::noScreensaver() || !wereReading) {
+  bool skipClear = wokeFromSleep &&
+                   (Lock::isLocked() ||
+                    (Sleep::noScreensaver() && wereReading));
+  if (!skipClear) {
     display.clear();
   }
 
@@ -188,9 +193,9 @@ void setup() {
   Screensavers::loadSettings();
   Statusbar::loadSettings();
   Gestures::loadSettings();
-  Lock::loadSettings();
-  // Sleep::loadSettings() already ran earlier in setup() so the no-screensaver
-  // flag was available for the boot-clear gate above — don't reload it here.
+  // Sleep::loadSettings() and Lock::loadSettings() already ran earlier in
+  // setup() so both flags were available for the boot-clear gate above —
+  // don't reload them here.
   loadBooks();
   loadListItems();
   loadApps();
