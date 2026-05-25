@@ -20,6 +20,13 @@
 // the reader.
 BookView g_bookview;
 
+// One-shot flag: force the next renderCurrentPage() to do a full e-ink refresh
+// regardless of pageTurnsSinceFull. Set by forceNextRenderFull() (called from
+// the unlock path to clear screensaver ghosting).
+static bool s_forceNextFull = false;
+
+void forceNextRenderFull() { s_forceNextFull = true; }
+
 // Auto-save throttle bookkeeping. Private to this translation unit — only
 // the save-progress functions and `resetSaveThrottle` touch it, and only
 // the reader calls them on its hot path (preview never auto-saves).
@@ -273,7 +280,9 @@ void renderCurrentPage() {
 
   uint32_t start = g_bookview.pages.offsets[g_bookview.cursor.pageIndex];
 
-  bool doFull = (g_bookview.cursor.pageTurnsSinceFull >= FULL_REFRESH_EVERY_N_PAGES);
+  bool doFull = s_forceNextFull
+             || (g_bookview.cursor.pageTurnsSinceFull >= FULL_REFRESH_EVERY_N_PAGES);
+  s_forceNextFull = false;
   if (doFull) {
     display.fastmodeOff();
     g_bookview.cursor.pageTurnsSinceFull = 0;
