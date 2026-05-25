@@ -115,6 +115,12 @@
 #define D_TOAST_BOOKMARK_EXISTS     "Bookmark exists"
 #define D_TOAST_BOOKMARK_SAVED      "Bookmark saved"
 
+// ----------------------------------------------------------------------------
+//  Lock / screensaver (src/ui/sleep.cpp, Pala_One_2_1.ino)
+// ----------------------------------------------------------------------------
+#define D_SCREENSAVER_LOCKED        "Locked"
+#define D_TOAST_UNLOCKED            "Unlocked"
+
 // ============================================================================
 //  Web UI (captive portal) — strings embedded in HTML via adjacent-literal
 //  concatenation. All endpoints declare Content-Type: charset=utf-8 already,
@@ -288,6 +294,19 @@
 #define D_WEB_SCREENSAVER_DEFAULT   "Using built-in screensaver."
 #define D_WEB_SLEEP_IMAGE_LABEL     "Sleep image file"
 #define D_WEB_SCREENSAVER_UPLOAD_BUTTON "Upload image"
+
+// Buttons / remappable hold-gestures section.
+#define D_WEB_BUTTONS_HEADING       "Buttons"
+#define D_WEB_BUTTONS_HINT          "1 click = next, 2 = previous, 3 = home. The three holds below are remappable."
+#define D_WEB_BUTTONS_LONG          "Long press"
+#define D_WEB_BUTTONS_EXTRA_LONG    "Extra-long press"
+#define D_WEB_BUTTONS_CLICK_HOLD    "Click, then hold"
+#define D_WEB_BUTTONS_SAVE          "Save buttons"
+#define D_WEB_BUTTONS_LOCK_HINT     "If locked, repeat any hold gesture to unlock."
+#define D_WEB_BUTTONS_ACTION_NONE     "None"
+#define D_WEB_BUTTONS_ACTION_BOOKMARK "Bookmark page"
+#define D_WEB_BUTTONS_ACTION_LOCK     "Lock device"
+#define D_WEB_BUTTONS_ACTION_MENU     "Open menu"
 
 // ----------------------------------------------------------------------------
 //  Upload (book + sleep image) routes (src/web/upload.cpp)
