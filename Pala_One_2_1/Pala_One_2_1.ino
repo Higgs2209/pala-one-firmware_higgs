@@ -78,6 +78,7 @@
 #include "src/hal/battery.h"
 #include "src/hal/display.h"
 #include "src/hal/input.h"
+#include "src/hal/wifi_provisioning.h"
 #include "src/pure/hashing.h"
 #include "src/storage/app_catalog.h"
 #include "src/storage/fs_util.h"
@@ -237,19 +238,14 @@ void setup() {
   // Drop to 80 MHz for normal operation — saves significant power.
   // Upload mode will raise it back to 240 MHz temporarily.
   setCpuFrequencyMhz(80);
+
+  // Browser-side Wi-Fi provisioning over USB-CDC (Improv Serial under the
+  // hood). Once registered, WifiProvisioning::loop() listens whenever a host
+  // has the USB-CDC port open. No host = no listening = no battery cost. See
+  // src/hal/wifi_provisioning.h for the contract.
+  WifiProvisioning::begin();
 }
 
-// Idle-deadline + sleep-gate check shared by the locked and normal branches
-// of `loop()`. Returns true iff `Sleep::enter()` was called (deep sleep does
-// not return, so the `true` arm is really "we're not coming back" — the
-// return value is for the caller's control flow on builds that mock sleep).
-static bool deepSleepIfAllowed() {
-  if (!ENABLE_DEEP_SLEEP) return false;
-  if (!g_currentScreen->allowSleep()) return false;
-  if (userIdleMs() <= Sleep::idleTimeoutMs()) return false;
-  Sleep::enter();
-  return true;
-}
 
 // ============================================================================
 //  Main loop
@@ -275,34 +271,58 @@ void loop() {
     }
   }
 
-  // Locked: swallow all input except any hold-type gesture (which unlocks).
-  // We accept any of {Long, VeryLong, ClickHold} rather than strictly the
-  // gesture currently bound to ACTION_LOCK — after a deep-sleep wake the
-  // firmware can't reliably reconstruct a chord, so strict matching would
-  // leave the user stuck if they bound LOCK to the chord.
+  // Locked: swallow all input except unlock gestures (Long/VeryLong/ClickHold).
+  // Does NOT call markUserActivity for non-unlock events so the idle deadline
+  // keeps ticking. cfg_locked persists in NVS so a re-sleep stays locked.
   //
-  // Crucially this branch does NOT call markUserActivity for non-unlock
-  // events, so the idle deadline keeps ticking and an idle locked device
-  // re-sleeps instead of draining battery. cfg_locked is left set in NVS
-  // so a re-sleep stays locked.
-  if (Lock::isLocked()) {
-    if (Lock::isUnlockGesture(ev)) {
-      Lock::disengage();
-      markUserActivity();
-      Toast::show(D_TOAST_UNLOCKED);
-      // Partial refresh is enough — the underlying page is already on
-      // screen (either from before the lock, or rendered by setup() after
-      // a deep-sleep wake). The render cycle paints the toast.
-      g_currentScreen->draw();
+  // Wake-press handling: the short press that woke the device re-appears
+  // through the classifier in the first loop iteration. We absorb it silently
+  // (s_lockedWakePressConsumed). A *subsequent* non-unlock press while still
+  // locked means the user deliberately tapped again → re-enter deep sleep
+  // immediately. A short 1500ms locked-idle timeout (independent of the user's
+  // sleep setting) also returns to deep sleep so an accidental wake doesn't
+  // leave the device on indefinitely.
+  {
+    static bool s_lockedWakePressConsumed = false;  // reset each deep-sleep wake
+
+    if (Lock::isLocked()) {
+      if (Lock::isUnlockGesture(ev)) {
+        s_lockedWakePressConsumed = false;
+        Lock::disengage();
+        markUserActivity();
+        Toast::show(D_TOAST_UNLOCKED);
+        // Partial refresh is enough — underlying page already on screen.
+        g_currentScreen->draw();
+        return;
+      }
+      if (ev.any()) {
+        if (!s_lockedWakePressConsumed) {
+          s_lockedWakePressConsumed = true;   // absorb wake press
+        } else {
+          Sleep::enter();                     // second tap → back to screensaver
+          return;
+        }
+      }
+      // Short locked-idle: re-sleep after 1500ms with no input.
+      if (ENABLE_DEEP_SLEEP && g_currentScreen->allowSleep() && userIdleMs() > 1500) {
+        Sleep::enter();
+        return;
+      }
       return;
     }
-    deepSleepIfAllowed();
-    return;
+    s_lockedWakePressConsumed = false;  // clear when unlocked so state is fresh on next lock
   }
 
   if (ev.any()) markUserActivity();
 
-  if (deepSleepIfAllowed()) return;
+  if (ENABLE_DEEP_SLEEP && g_currentScreen->allowSleep() && !WifiProvisioning::isActive()) {
+    if (userIdleMs() > Sleep::idleTimeoutMs()) {
+      Sleep::enter();
+      return;
+    }
+  }
+
+  WifiProvisioning::loop();   // no-op unless a USB host is on the bus
 
   g_currentScreen->onButton(ev);
   g_currentScreen->onIdleTick();
@@ -335,7 +355,8 @@ void loop() {
   // worst case under the bound below).
   if (g_currentScreen->allowSleep()
       && !g_btns.hasPendingClicks()
-      && !buttonQueueNonEmpty()) {
+      && !buttonQueueNonEmpty()
+      && !WifiProvisioning::isActive()) {
     Sleep::idleLightSleep(Toast::isActive());
   }
 }
