@@ -403,9 +403,6 @@ static String screensaverActionsHtml(bool single, int slot) {
 // Build the slot grid HTML — one card per slot with thumbnail (when
 // populated) and a delete form. Appended into a containing card by the
 // editor handler.
-// Build the slot grid HTML — one card per slot with thumbnail (when
-// populated) and a delete form. Appended into a containing card by the
-// editor handler.
 static String slotGridHtml() {
   String out;
   out.reserve(2000);
