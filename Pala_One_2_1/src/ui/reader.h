@@ -63,6 +63,7 @@ extern BookView g_bookview;
 
 bool openBookByIndex(int idx);
 void renderCurrentPage();
+void forceNextRenderFull();  // one-shot: next renderCurrentPage() does a full refresh
 
 // Cursor navigation. Both move the cursor and bump `pageTurnsSinceFull` on
 // a real page change; `advancePage` lazily paginates one ahead and clamps

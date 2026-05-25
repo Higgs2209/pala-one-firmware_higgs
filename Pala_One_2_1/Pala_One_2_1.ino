@@ -143,8 +143,13 @@ void setup() {
   // never made it into the queue. Seed the input state so the upcoming
   // release edge is classified as a real press, not silently dropped.
   // Required for "click-then-hold on wake" to form a single chord gesture.
+  // Pass 0 (not millis()) so the duration is measured from boot-start, giving
+  // the full boot time as credit toward the hold — the button press triggered
+  // the ext0 wakeup, so it was down before the MCU started. Using millis() here
+  // would subtract the ~200ms delay() above and incorrectly shorten the
+  // measured hold, causing a Long press to be misclassified as Short.
   if (digitalRead(BTN) == LOW) {
-    g_btns.seedPressOnWake(millis());
+    g_btns.seedPressOnWake(0);
   }
 
   u8g2.begin(gfx);
@@ -292,6 +297,10 @@ void loop() {
         markUserActivity();
         Toast::show(D_TOAST_UNLOCKED);
         // Full refresh to clear screensaver ghosting on unlock.
+        // forceNextRenderFull() overrides the reader's per-page fast-mode
+        // decision so renderCurrentPage() uses fastmodeOff regardless of
+        // pageTurnsSinceFull. display.fastmodeOff() covers non-reader screens.
+        forceNextRenderFull();
         display.fastmodeOff();
         g_currentScreen->draw();
         return;
@@ -305,7 +314,10 @@ void loop() {
         }
       }
       // Short locked-idle: re-sleep after 1500ms with no input.
-      if (ENABLE_DEEP_SLEEP && g_currentScreen->allowSleep() && userIdleMs() > 1500) {
+      // Don't sleep while the button is held — a Long-press unlock gesture
+      // fires on release, so sleeping mid-hold would swallow the gesture.
+      if (ENABLE_DEEP_SLEEP && g_currentScreen->allowSleep()
+          && userIdleMs() > 1500 && !g_btns.isPressed()) {
         Sleep::enter();
         return;
       }
