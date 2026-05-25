@@ -27,12 +27,14 @@ static PalaAPI s_palaAPI;
 // (the apps API v3 didn't define one); treated as "no event".
 static uint8_t toPalaCode(ButtonEvent::Kind k) {
   switch (k) {
-    case ButtonEvent::Short:  return PALA_CLICK;
-    case ButtonEvent::Double: return PALA_DOUBLE;
-    case ButtonEvent::Triple: return PALA_TRIPLE;
-    case ButtonEvent::Long:   return PALA_LONG;
-    case ButtonEvent::Quad:   return 0;  // no PALA_QUAD in v3
-    case ButtonEvent::None:   return 0;
+    case ButtonEvent::Short:     return PALA_CLICK;
+    case ButtonEvent::Double:    return PALA_DOUBLE;
+    case ButtonEvent::Triple:    return PALA_TRIPLE;
+    case ButtonEvent::Long:      return PALA_LONG;
+    case ButtonEvent::Quad:      return 0;  // no PALA_QUAD in v3
+    case ButtonEvent::VeryLong:  return 0;  // no PALA_VERYLONG in v3
+    case ButtonEvent::ClickHold: return 0;  // no PALA_CLICKHOLD in v3
+    case ButtonEvent::None:      return 0;
   }
   return 0;
 }
