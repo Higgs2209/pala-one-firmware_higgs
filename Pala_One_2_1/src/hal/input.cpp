@@ -414,8 +414,8 @@ void resetInputFrontend() {
   // from leaking into the new mode as an accidental action.
   // We do NOT clear the whole ISR queue — any presses that arrive AFTER
   // release are intentional and should be processed normally.
-  uint32_t deadline = millis() + 600; // safety timeout
-  while (digitalRead(BTN) == LOW && (uint32_t)(millis()) < deadline) delay(1);
+  uint32_t start = millis();
+  while (digitalRead(BTN) == LOW && (uint32_t)(millis() - start) < 600) delay(1);
   delay(DEBOUNCE_MS + 2); // minimal debounce after release
 
   // Discard only events that happened BEFORE this moment (the transition press).
