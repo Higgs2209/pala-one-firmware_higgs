@@ -78,6 +78,7 @@
 #include "src/hal/battery.h"
 #include "src/hal/display.h"
 #include "src/hal/input.h"
+#include "src/hal/wifi_provisioning.h"
 #include "src/pure/hashing.h"
 #include "src/storage/app_catalog.h"
 #include "src/storage/fs_util.h"
@@ -198,6 +199,12 @@ void setup() {
   // Drop to 80 MHz for normal operation — saves significant power.
   // Upload mode will raise it back to 240 MHz temporarily.
   setCpuFrequencyMhz(80);
+
+  // Browser-side Wi-Fi provisioning over USB-CDC (Improv Serial under the
+  // hood). Once registered, WifiProvisioning::loop() listens whenever a host
+  // has the USB-CDC port open. No host = no listening = no battery cost. See
+  // src/hal/wifi_provisioning.h for the contract.
+  WifiProvisioning::begin();
 }
 
 // ============================================================================
@@ -223,12 +230,16 @@ void loop() {
     }
   }
 
-  if (ENABLE_DEEP_SLEEP && g_currentScreen->allowSleep()) {
+  if (ENABLE_DEEP_SLEEP
+      && g_currentScreen->allowSleep()
+      && !WifiProvisioning::isActive()) {
     if (userIdleMs() > Sleep::idleTimeoutMs()) {
       Sleep::enter();
       return;
     }
   }
+
+  WifiProvisioning::loop();   // no-op unless a USB host is on the bus
 
   g_currentScreen->onButton(ev);
   g_currentScreen->onIdleTick();
@@ -261,7 +272,8 @@ void loop() {
   // worst case under the bound below).
   if (g_currentScreen->allowSleep()
       && !g_btns.hasPendingClicks()
-      && !buttonQueueNonEmpty()) {
+      && !buttonQueueNonEmpty()
+      && !WifiProvisioning::isActive()) {
     Sleep::idleLightSleep(Toast::isActive());
   }
 }

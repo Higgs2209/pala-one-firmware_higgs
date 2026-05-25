@@ -24,7 +24,7 @@
 
 static void handleRoot() {
   String subtitle = D_WEB_HOME_FW_PREFIX;
-  subtitle += FW_BUILD;
+  subtitle += FW_VERSION;
   subtitle += D_WEB_HOME_MIDDOT_SEP;
   subtitle += String(g_library.bookCount);
   subtitle += D_WEB_HOME_BOOKS_SUFFIX;

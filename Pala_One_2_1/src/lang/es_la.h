@@ -61,6 +61,10 @@
 #define D_UPLOAD_WIFI               "Wi-Fi"
 #define D_UPLOAD_PASSWORD           "Contraseña"
 #define D_UPLOAD_OPEN               "Abrir"
+#define D_UPLOAD_CONNECTING         "Conectando"
+#define D_UPLOAD_CONNECTED          "Conectado"
+#define D_UPLOAD_HOTSPOT_HINT_L1    "Pulsa el botón para"
+#define D_UPLOAD_HOTSPOT_HINT_L2    "usar punto de acceso"
 
 // ----------------------------------------------------------------------------
 //  Apps screen

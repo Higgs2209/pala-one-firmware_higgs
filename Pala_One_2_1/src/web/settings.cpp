@@ -45,7 +45,7 @@ static void handleSettings() {
 
   String out = webPageStart(
     D_WEB_SETTINGS_TITLE,
-    D_WEB_SETTINGS_SUBTITLE_PREFIX FW_BUILD D_WEB_SETTINGS_SUBTITLE_SUFFIX,
+    D_WEB_SETTINGS_SUBTITLE_PREFIX FW_VERSION D_WEB_SETTINGS_SUBTITLE_SUFFIX,
     "<a href='/'>" D_WEB_SETTINGS_BACK_NAV "</a>"
   );
   out.reserve(out.length() + 4000);
