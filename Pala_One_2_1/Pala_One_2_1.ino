@@ -195,23 +195,29 @@ void setup() {
   registerWebRoutes();
   markUserActivity();
 
+  // When locked at boot, we skip the screen draw and leave the sleep image
+  // (with its lock indicator) on the e-ink. Otherwise a short-press wake
+  // would render the reader/library over the screensaver while the loop is
+  // still swallowing input — the device looks alive but ignores presses
+  // until an unlock gesture. The unlock branch in loop() calls
+  // g_currentScreen->draw() to paint the real screen once unlocked.
   if (tryRestoreReadingSession()) {
-    renderCurrentPage();      // ~300ms draw — wake-press releases during this
+    g_currentScreen = &g_readerScreen;
     if (Lock::isLocked()) {
       // Keep the wake-press edges so a click-then-hold can wake AND unlock
       // in one motion. resetInputFrontend would otherwise drain them and
       // force the user to repeat the unlock gesture.
       markUserActivity();
     } else {
-      resetInputFrontend();   // discard the wake-press only
+      renderCurrentPage();      // ~300ms draw — wake-press releases during this
+      resetInputFrontend();     // discard the wake-press only
     }
-    g_currentScreen = &g_readerScreen;
   } else {
     g_currentScreen = &g_libraryScreen;
-    g_libraryScreen.onEnter();
     if (Lock::isLocked()) {
       markUserActivity();
     } else {
+      g_libraryScreen.onEnter();
       resetInputFrontend();
     }
   }
@@ -256,7 +262,7 @@ void loop() {
     if (Lock::isUnlockGesture(ev)) {
       Lock::disengage();
       markUserActivity();
-      Toast::show("Unlocked");
+      Toast::show(D_TOAST_UNLOCKED);
       // Partial refresh is enough — the underlying page is already on
       // screen (either from before the lock, or rendered by setup() after
       // a deep-sleep wake). The render cycle paints the toast.

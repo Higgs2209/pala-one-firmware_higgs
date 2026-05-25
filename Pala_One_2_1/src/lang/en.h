@@ -99,6 +99,12 @@
 #define D_TOAST_BOOKMARK_EXISTS     "Bookmark exists"
 #define D_TOAST_BOOKMARK_SAVED      "Bookmark saved"
 
+// ----------------------------------------------------------------------------
+//  Lock / screensaver (src/ui/sleep.cpp, Pala_One_2_1.ino)
+// ----------------------------------------------------------------------------
+#define D_SCREENSAVER_LOCKED        "Locked"
+#define D_TOAST_UNLOCKED            "Unlocked"
+
 // ============================================================================
 //  Web UI (captive portal) — strings embedded in HTML via adjacent-literal
 //  concatenation. All endpoints declare Content-Type: charset=utf-8 already,

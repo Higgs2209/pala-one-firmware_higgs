@@ -99,6 +99,12 @@
 #define D_TOAST_BOOKMARK_EXISTS     "Marcapáginas ya existe"
 #define D_TOAST_BOOKMARK_SAVED      "Marcapáginas guardado"
 
+// ----------------------------------------------------------------------------
+//  Lock / screensaver
+// ----------------------------------------------------------------------------
+#define D_SCREENSAVER_LOCKED        "Bloqueado"
+#define D_TOAST_UNLOCKED            "Desbloqueado"
+
 // ============================================================================
 //  Web UI
 // ============================================================================
