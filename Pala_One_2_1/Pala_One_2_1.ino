@@ -171,6 +171,8 @@ void setup() {
   // On a fresh boot (not ext0 wake) always clear, regardless of lock state.
   bool wokeFromSleep = (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT0);
   bool wereReading   = (prefs.getString("wake_path", "").length() > 0);
+  Serial.printf("[boot] wokeFromSleep=%d isLocked=%d wereReading=%d\n",
+                wokeFromSleep, Lock::isLocked(), wereReading);
   display.fastmodeOff();
   bool skipClear = wokeFromSleep &&
                    (Lock::isLocked() ||
@@ -284,6 +286,11 @@ void loop() {
   // leave the device on indefinitely.
   {
     static bool s_lockedWakePressConsumed = false;  // reset each deep-sleep wake
+    static bool s_lockedDebugPrinted = false;
+    if (!s_lockedDebugPrinted && Lock::isLocked()) {
+      s_lockedDebugPrinted = true;
+      Serial.printf("[lock] loop locked branch entered idleMs=%lu\n", userIdleMs());
+    }
 
     if (Lock::isLocked()) {
       if (Lock::isUnlockGesture(ev)) {
