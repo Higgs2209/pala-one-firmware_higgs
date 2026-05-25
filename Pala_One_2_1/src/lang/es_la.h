@@ -33,10 +33,20 @@
 #define D_MENU_BOOKMARKS            "Marcapáginas"
 #define D_MENU_LIST                 "Lista"
 #define D_MENU_APPS                 "Apps"
+#define D_MENU_STATISTICS           "Estadísticas"
 #define D_MENU_DEVICE               "Dispositivo"
 #define D_MENU_UPLOAD               "Conectar"
 #define D_LIBRARY_OPEN_FAILED       "Error al abrir"
 #define D_LIBRARY_TRY_UPLOAD        "Intente subir de nuevo"
+
+// ----------------------------------------------------------------------------
+//  Statistics screen
+// ----------------------------------------------------------------------------
+#define D_STATS_HEADING                "Estadísticas"
+#define D_STATS_STREAK_CURRENT_FMT     "Racha actual: %u días"
+#define D_STATS_STREAK_LONGEST_FMT     "Mejor: %u  Sesiones: %u"
+#define D_STATS_LIFETIME_PAGES_FMT     "Páginas leídas: %llu"
+#define D_STATS_LIFETIME_PRESSES_FMT   "Pulsaciones: %llu"
 
 // ----------------------------------------------------------------------------
 //  List screen
@@ -367,6 +377,24 @@
 #define D_WEB_BMEXPORT_BOOKMARKS    "Marcapáginas: "
 #define D_WEB_BMEXPORT_BOOKMARK_LBL "Marcapáginas "
 #define D_WEB_NO_BOOKMARKS_THIS_BOOK "Sin marcapáginas para este libro"
+
+// ----------------------------------------------------------------------------
+//  Lector en el navegador + buscar/saltar (src/web/find.cpp).
+// ----------------------------------------------------------------------------
+#define D_WEB_READ_TITLE            "Leer"
+#define D_WEB_READ_SUBTITLE         "Explora y busca el libro en tu navegador. Usa Saltar para fijar el punto de retoma del dispositivo."
+#define D_WEB_READ_BYTES_LABEL      "bytes"
+#define D_WEB_READ_CURRENT_PAGE_LABEL "página actual:"
+#define D_WEB_READ_FIND_PLACEHOLDER "Buscar en el libro"
+#define D_WEB_READ_FIND_ALL         "Buscar todo"
+#define D_WEB_READ_FIND_PREV        "Anterior"
+#define D_WEB_READ_FIND_NEXT        "Siguiente"
+#define D_WEB_READ_JUMP_HERE        "Saltar aquí"
+#define D_WEB_READ_LOADING          "Cargando texto del libro..."
+#define D_WEB_READ_PAGE_PLACEHOLDER "Número de página"
+#define D_WEB_READ_JUMP_PAGE        "Saltar a página"
+#define D_WEB_READ_JUMP_HINT        "Guarda directamente la próxima página de apertura."
+#define D_WEB_READ_AND_FIND_LINK    "Leer y buscar"
 
 // ----------------------------------------------------------------------------
 //  Familia de fuente + lectura biónica + retención de posición
