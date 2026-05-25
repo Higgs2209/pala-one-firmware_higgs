@@ -291,7 +291,8 @@ void loop() {
         Lock::disengage();
         markUserActivity();
         Toast::show(D_TOAST_UNLOCKED);
-        // Partial refresh is enough — underlying page already on screen.
+        // Full refresh to clear screensaver ghosting on unlock.
+        display.fastmodeOff();
         g_currentScreen->draw();
         return;
       }
