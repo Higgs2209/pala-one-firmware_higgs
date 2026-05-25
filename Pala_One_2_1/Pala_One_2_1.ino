@@ -138,16 +138,10 @@ void setup() {
   pinMode(BTN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(BTN), btnISR, CHANGE);
 
-  // If we just woke from deep sleep via ext0 and the button is still being
-  // held, the press started BEFORE the ISR was attached — its down-edge
-  // never made it into the queue. Seed the input state so the upcoming
-  // release edge is classified as a real press, not silently dropped.
-  // Required for "click-then-hold on wake" to form a single chord gesture.
-  // Pass 0 (not millis()) so the duration is measured from boot-start, giving
-  // the full boot time as credit toward the hold — the button press triggered
-  // the ext0 wakeup, so it was down before the MCU started. Using millis() here
-  // would subtract the ~200ms delay() above and incorrectly shorten the
-  // measured hold, causing a Long press to be misclassified as Short.
+  // Button held through ext0 wake: its down-edge predates the ISR, so seed
+  // the press state manually. Pass 0 (not millis()) to credit the full boot
+  // time; millis() ≈ 200 here (after delay(200)) would shorten the hold and
+  // misclassify a Long press as Short.
   if (digitalRead(BTN) == LOW) {
     g_btns.seedPressOnWake(0);
   }
