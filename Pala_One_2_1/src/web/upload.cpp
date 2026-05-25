@@ -274,7 +274,13 @@ static void handleUploadSleepStream() {
         s_sleep.error = D_WEB_SLEEP_ERR_SIZE;
         return;
       }
-      s_sleep.tmpFile.write(upS.buf, upS.currentSize);
+      size_t wrote = s_sleep.tmpFile.write(upS.buf, upS.currentSize);
+      if (wrote != upS.currentSize) {
+        s_sleep.tmpFile.close();
+        if (FS.exists(s_sleep.tmpPath)) FS.remove(s_sleep.tmpPath);
+        s_sleep.error = D_WEB_SLEEP_ERR_SAVE;
+        return;
+      }
     }
   }
   else if (upS.status == UPLOAD_FILE_END) {

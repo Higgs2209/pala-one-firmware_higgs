@@ -239,7 +239,13 @@ static void handleScreensaverUploadStream() {
         s_up.error = "Image file is too large";
         return;
       }
-      s_up.tmpFile.write(up.buf, up.currentSize);
+      size_t wrote = s_up.tmpFile.write(up.buf, up.currentSize);
+      if (wrote != up.currentSize) {
+        s_up.tmpFile.close();
+        if (FS.exists(s_up.tmpPath)) FS.remove(s_up.tmpPath);
+        s_up.error = "Write failed (disk full?)";
+        return;
+      }
     }
   }
   else if (up.status == UPLOAD_FILE_END) {
