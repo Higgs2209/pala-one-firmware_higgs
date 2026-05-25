@@ -135,12 +135,26 @@ static int api_snprintf_wrap(char* buf, int len, const char* fmt, ...) {
 
 // Per-app key-value storage: each app gets its own `/apps/{key}.dat` file.
 // Key namespacing across apps is the app author's responsibility (the v3
-// contract didn't sandbox by binary name; see docs/APPS_LAYER.md §9).
-// `/` and other path characters in `key` are NOT sanitized — preserves v3
-// behavior. A future API bump could tighten this.
+// contract didn't sandbox by binary name). Path separators in `key` are
+// replaced with '_' to prevent directory traversal.
+
+// Strip path-separator characters so app-supplied keys cannot escape /apps/.
+static void sanitizeStorageKey(char* out, size_t outLen, const char* key) {
+  size_t j = 0;
+  for (size_t i = 0; key[i] && j < outLen - 1; i++) {
+    char c = key[i];
+    if (c == '/' || c == '\\') c = '_';
+    out[j++] = c;
+  }
+  out[j] = '\0';
+}
+
 static int api_storageRead(const char* key, void* buf, int maxlen) {
+  if (!key || !key[0]) return -1;
+  char safeKey[54];
+  sanitizeStorageKey(safeKey, sizeof(safeKey), key);
   char path[64];
-  snprintf(path, sizeof(path), "/apps/%s.dat", key);
+  snprintf(path, sizeof(path), "/apps/%s.dat", safeKey);
   File f = FS.open(path, "r");
   if (!f) return -1;
   int n = f.read((uint8_t*)buf, maxlen);
@@ -149,8 +163,11 @@ static int api_storageRead(const char* key, void* buf, int maxlen) {
 }
 
 static int api_storageWrite(const char* key, const void* buf, int len) {
+  if (!key || !key[0]) return -1;
+  char safeKey[54];
+  sanitizeStorageKey(safeKey, sizeof(safeKey), key);
   char path[64];
-  snprintf(path, sizeof(path), "/apps/%s.dat", key);
+  snprintf(path, sizeof(path), "/apps/%s.dat", safeKey);
   File f = FS.open(path, "w");
   if (!f) return -1;
   int n = f.write((const uint8_t*)buf, len);
