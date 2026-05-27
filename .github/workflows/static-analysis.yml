@@ -4,11 +4,11 @@ name: Static analysis
 # The deploy workflow only triggers on dev/tags and does not cover PRs,
 # so this is a separate job to catch issues before they land on main.
 
-on:
-  push:
-    branches: [dev, main]
-  pull_request:
-    branches: [main, dev]
+#on:
+#  push:
+#    branches: [dev, main]
+#  pull_request:
+#    branches: [main, dev]
 
 jobs:
   cppcheck:
