@@ -58,6 +58,7 @@ static void handleResetDo() {
   server.send(200, "text/html; charset=utf-8", page);
 }
 
+// cppcheck-suppress unusedFunction
 void registerResetRoutes() {
   server.on("/reset", HTTP_GET,  handleResetConfirm);
   server.on("/reset", HTTP_POST, handleResetDo);

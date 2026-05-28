@@ -25,6 +25,7 @@ static bool s_noScreensaver = false;
 static constexpr const char* kKeyIdleSecs      = "cfg_sleep";
 static constexpr const char* kKeyNoScreensaver = "cfg_noscr";
 
+// cppcheck-suppress unusedFunction
 void loadSettings() {
   int s = prefs.getInt(kKeyIdleSecs, 120);
   if (s < 10)   s = 10;
@@ -33,6 +34,7 @@ void loadSettings() {
   s_noScreensaver = prefs.getBool(kKeyNoScreensaver, false);
 }
 
+// cppcheck-suppress unusedFunction
 void setIdleTimeout(int secs) {
   if (secs < 10)   secs = 10;
   if (secs > 3600) secs = 3600;
@@ -40,10 +42,14 @@ void setIdleTimeout(int secs) {
   prefs.putInt(kKeyIdleSecs, s_idleSecs);
 }
 
+// cppcheck-suppress unusedFunction
 int      idleTimeoutSecs() { return s_idleSecs; }
+// cppcheck-suppress unusedFunction
 uint32_t idleTimeoutMs()   { return (uint32_t)s_idleSecs * 1000UL; }
+// cppcheck-suppress unusedFunction
 bool     noScreensaver()   { return s_noScreensaver; }
 
+// cppcheck-suppress unusedFunction
 void setNoScreensaver(bool val) {
   s_noScreensaver = val;
   prefs.putBool(kKeyNoScreensaver, val);
@@ -98,6 +104,7 @@ static void drawSleepScreen() {
   display.update();
 }
 
+// cppcheck-suppress unusedFunction
 void enter() {
   if (!ENABLE_DEEP_SLEEP) return;
 
@@ -158,6 +165,7 @@ void enter() {
   esp_deep_sleep_start();
 }
 
+// cppcheck-suppress unusedFunction
 void idleLightSleep(bool tightTick) {
   // Don't sleep if the button is already pressed — would be a level-triggered
   // immediate wake, burning a sleep/wake cycle for no reason and skewing

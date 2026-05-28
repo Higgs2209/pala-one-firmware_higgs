@@ -112,6 +112,7 @@ static void handleStyleCss() {
   server.send_P(200, "text/css; charset=utf-8", kStyleCss);
 }
 
+// cppcheck-suppress unusedFunction
 void registerChromeRoutes() {
   server.on("/style.css", HTTP_GET, handleStyleCss);
 }
@@ -153,6 +154,7 @@ String webPageEnd() {
   return String("</div></body></html>");
 }
 
+// cppcheck-suppress unusedFunction
 String successPage(const String& title, const String& subtitle,
                    const String& banner, const String& innerHtml) {
   String out = webPageStart(title, subtitle,
@@ -166,6 +168,7 @@ String successPage(const String& title, const String& subtitle,
 // ============================================================================
 //  Small helpers
 // ============================================================================
+// cppcheck-suppress unusedFunction
 String htmlEscape(const String& in) {
   String out;
   out.reserve(in.length() + 16);
@@ -197,6 +200,7 @@ int storageUsedPct() {
   return pct;
 }
 
+// cppcheck-suppress unusedFunction
 String storageCardHtml(const char* title) {
   size_t totalBytes = fsTotalBytesSafe();
   size_t usedBytes  = fsUsedBytesSafe();

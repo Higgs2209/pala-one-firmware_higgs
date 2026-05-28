@@ -8,6 +8,7 @@
 #include "src/ui/screens/library_screen.h"
 #include "src/ui/widgets.h"
 
+// cppcheck-suppress unusedFunction
 void StatisticsScreen::onEnter() {
   draw();
 }
@@ -72,6 +73,7 @@ void StatisticsScreen::draw() {
   display.update();
 }
 
+// cppcheck-suppress unusedFunction
 void StatisticsScreen::onButton(const ButtonEvent& e) {
   if (e.any()) nextScreen = &g_libraryScreen;
 }

@@ -10,6 +10,7 @@ static void readHeader(const void* buf, PalaAppHeader* out) {
   memcpy(out, buf, sizeof(PalaAppHeader));
 }
 
+// cppcheck-suppress unusedFunction
 AppHeaderStatus validateAppHeader(const void* buf, size_t fileSize,
                                   uint32_t* outFileApiVersion) {
   // +4 matches the old loader: a header alone is meaningless; the smallest
@@ -43,6 +44,7 @@ AppHeaderStatus validateAppHeader(const void* buf, size_t fileSize,
   return AppHeaderStatus::Ok;
 }
 
+// cppcheck-suppress unusedFunction
 bool validateRelocEntries(const void* buf, size_t fileSize) {
   PalaAppHeader hdr;
   readHeader(buf, &hdr);

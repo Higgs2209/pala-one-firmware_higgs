@@ -135,6 +135,7 @@ static String entryLabel(const LibEntry& e) {
 // ----------------------------------------------------------------------------
 //  Screen lifecycle
 // ----------------------------------------------------------------------------
+// cppcheck-suppress unusedFunction
 void LibraryScreen::onEnter() {
   // Full reset of reader/bookmark scratch state on every library entry —
   // downstream code never has to reason about stale reader state. Wake
@@ -190,6 +191,7 @@ void LibraryScreen::draw() {
   display.update();
 }
 
+// cppcheck-suppress unusedFunction
 void LibraryScreen::onButton(const ButtonEvent& e) {
   if (!e.any()) return;
 
@@ -263,10 +265,12 @@ void LibraryScreen::onButton(const ButtonEvent& e) {
 // ============================================================================
 //  Public ops for callers outside the screen
 // ============================================================================
+// cppcheck-suppress unusedFunction
 void navigateToLibraryRoot() {
   if (g_currentScreen) g_currentScreen->nextScreen = &g_libraryScreen;
 }
 
+// cppcheck-suppress unusedFunction
 void resetLibraryNav() {
   s_cursor = 0;
   s_expandedCount = 0;

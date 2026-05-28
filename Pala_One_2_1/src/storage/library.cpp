@@ -84,6 +84,7 @@ static void scanBooksRecursive(const String& absDir, const String& relDir) {
   dir.close();
 }
 
+// cppcheck-suppress unusedFunction
 void loadBooks() {
   g_library.bookCount = 0;
   g_library.folderCount = 0;
@@ -94,11 +95,13 @@ void loadBooks() {
   sortBooks();
 }
 
+// cppcheck-suppress unusedFunction
 const char* bookPath(int idx) {
   if (idx < 0 || idx >= g_library.bookCount) return nullptr;
   return g_library.books[idx].path;
 }
 
+// cppcheck-suppress unusedFunction
 int bookIndexForPath(const String& path) {
   for (int i = 0; i < g_library.bookCount; i++) {
     if (strcmp(g_library.books[i].path, path.c_str()) == 0) return i;

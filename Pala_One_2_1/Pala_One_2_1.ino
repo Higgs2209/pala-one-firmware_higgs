@@ -130,6 +130,7 @@ Screen* g_currentScreen = &g_libraryScreen;
 // ============================================================================
 //  Setup
 // ============================================================================
+// cppcheck-suppress unusedFunction
 void setup() {
   Serial.begin(115200);
   delay(200);

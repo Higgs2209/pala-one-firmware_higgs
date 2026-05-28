@@ -181,6 +181,7 @@ static int api_storageWrite(const char* key, const void* buf, int len) {
 //  Init + stub runner
 // ----------------------------------------------------------------------------
 
+// cppcheck-suppress unusedFunction
 void initPalaAPI() {
   // Field order is frozen — assignments below MUST match pala_api.h struct
   // order. Adding a field means appending here AND in pala_api.h AND
@@ -210,6 +211,7 @@ static void paintLoadError(const char* line1, const char* line2 = nullptr) {
   delay(1500);
 }
 
+// cppcheck-suppress unusedFunction
 void runApp(const char* path) {
   if (!path) {
     paintLoadError(D_APP_ERR_TITLE, D_APP_ERR_NULL_PATH);

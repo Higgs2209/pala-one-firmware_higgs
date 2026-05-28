@@ -36,15 +36,18 @@ String utf8CharAt(const String& s, int index) {
   return s.substring(index, index + len);
 }
 
+// cppcheck-suppress unusedFunction
 bool isBreakableWhitespaceByte(char b) {
   return b == ' ' || b == '\n' || b == '\t';
 }
 
+// cppcheck-suppress unusedFunction
 bool isBreakablePunctuationByte(char b) {
   return b == '.' || b == ',' || b == ';' || b == ':' || b == '!' || b == '?' ||
          b == ')' || b == ']' || b == '}' || b == '-' || b == '/';
 }
 
+// cppcheck-suppress unusedFunction
 String normalizeTypography(const String& in) {
   String out;
   out.reserve(in.length() + 8);

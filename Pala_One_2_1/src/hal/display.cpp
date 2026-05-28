@@ -6,6 +6,7 @@ HeltecGFXAdapter gfx(display);
 // ============================================================================
 //  Drawing primitives
 // ============================================================================
+// cppcheck-suppress unusedFunction
 void beginPageCanvas(bool clearMem) {
   if (clearMem) display.clearMemory();
   display.landscape();

@@ -63,6 +63,7 @@ static void rebuildListFromForm(bool dropChecked) {
 static void handleListSaveWeb()      { rebuildListFromForm(false); }
 static void handleListClearDoneWeb() { rebuildListFromForm(true);  }
 
+// cppcheck-suppress unusedFunction
 void registerListRoutes() {
   server.on("/list",            HTTP_GET,  handleListWeb);
   server.on("/list",            HTTP_POST, handleListSaveWeb);

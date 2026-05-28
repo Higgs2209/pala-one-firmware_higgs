@@ -9,11 +9,13 @@ String lastPathComponent(const String& path) {
   return (slash >= 0) ? path.substring(slash + 1) : path;
 }
 
+// cppcheck-suppress unusedFunction
 String folderParent(const String& relPath) {
   int slash = relPath.lastIndexOf('/');
   return (slash < 0) ? String("") : relPath.substring(0, slash);
 }
 
+// cppcheck-suppress unusedFunction
 String prettyRelativeLabel(const String& relPath) {
   String out;
   out.reserve(relPath.length() + 8);
@@ -26,12 +28,14 @@ String prettyRelativeLabel(const String& relPath) {
   return stripTxtExt(out);
 }
 
+// cppcheck-suppress unusedFunction
 String folderLeafLabel(const String& relPath) {
   String leaf = lastPathComponent(relPath);
   leaf.replace('_', ' ');
   return leaf;
 }
 
+// cppcheck-suppress unusedFunction
 String bookLeafLabel(const String& path) {
   String leaf = stripTxtExt(lastPathComponent(path));
   leaf.replace('_', ' ');
@@ -57,6 +61,7 @@ String sanitizeFolderSegment(const String& segment) {
   return clean;
 }
 
+// cppcheck-suppress unusedFunction
 String sanitizeFolderInput(const String& raw) {
   String normalized = raw;
   normalized.replace('\\', '/');
@@ -79,6 +84,7 @@ String sanitizeFolderInput(const String& raw) {
   return out;
 }
 
+// cppcheck-suppress unusedFunction
 String sanitizeUploadedFilename(String fname) {
   int slash = fname.lastIndexOf('/');
   if (slash >= 0) fname = fname.substring(slash + 1);
@@ -105,6 +111,7 @@ String sanitizeUploadedFilename(String fname) {
   return clean;
 }
 
+// cppcheck-suppress unusedFunction
 String sanitizeUploadedAppFilename(String fname) {
   int slash = fname.lastIndexOf('/');
   if (slash >= 0) fname = fname.substring(slash + 1);

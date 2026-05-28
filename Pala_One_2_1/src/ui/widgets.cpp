@@ -33,6 +33,7 @@ void prepareMenuFrame() {
   s_menuDrawsSinceFull++;
 }
 
+// cppcheck-suppress unusedFunction
 void drawCenter(const char* a, const char* b) {
   display.fastmodeOff();
   beginPageCanvas();
@@ -55,6 +56,7 @@ void drawCenter(const char* a, const char* b) {
   display.update();
 }
 
+// cppcheck-suppress unusedFunction
 int drawSectionHeader(const char* title) {
   Font::useBold();
   int ascent = u8g2.getFontAscent();
@@ -76,6 +78,7 @@ int drawSectionHeader(const char* title) {
   return contentTop;
 }
 
+// cppcheck-suppress unusedFunction
 void drawMenuRow(int yBaseline, const String& label, bool selected, int extraIndent) {
   u8g2.setForegroundColor(1);
   if (selected) Font::useBold();
@@ -91,6 +94,7 @@ int menuLineH() {
   return (ascent - descent) + Font::currentLineGap() + 1;
 }
 
+// cppcheck-suppress unusedFunction
 void drawScrollableList(int contentTopY, int itemCount, int selectedIndex,
                         const DrawListRowFn& drawRow) {
   if (itemCount <= 0) return;
@@ -127,6 +131,7 @@ void drawScrollableList(int contentTopY, int itemCount, int selectedIndex,
   }
 }
 
+// cppcheck-suppress unusedFunction
 void splitListLabelForDisplay(const String& in, int maxWidth, String& line1, String& line2) {
   line1 = in;
   line2 = "";

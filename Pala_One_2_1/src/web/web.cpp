@@ -17,6 +17,7 @@
 //  Each `register*Routes` is an `HTTP_GET`/`HTTP_POST` registration on the
 //  shared global `server`.
 // ============================================================================
+// cppcheck-suppress unusedFunction
 void registerWebRoutes() {
   registerChromeRoutes();      // /style.css
   registerFilesRoutes();       // /, /files, /del, /mkdir, /rmdir, /move, /jumppage

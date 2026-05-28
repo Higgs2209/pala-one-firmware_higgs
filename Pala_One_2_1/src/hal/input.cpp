@@ -150,6 +150,7 @@ void markUserActivity() {
   s_lastUserActionMs = millis();
 }
 
+// cppcheck-suppress unusedFunction
 uint32_t userIdleMs() {
   return (uint32_t)(millis() - s_lastUserActionMs);
 }
@@ -175,6 +176,7 @@ bool maybeRecoverFromIsrOverflow() {
   return true;
 }
 
+// cppcheck-suppress unusedFunction
 void IRAM_ATTR btnISR() {
   uint8_t next = (uint8_t)((s_btnQ.head + 1) % BTN_Q);
   if (next == s_btnQ.tail) {
@@ -189,10 +191,12 @@ void IRAM_ATTR btnISR() {
   s_btnQ.head = next;
 }
 
+// cppcheck-suppress unusedFunction
 bool buttonQueueNonEmpty() {
   return s_btnQ.head != s_btnQ.tail;
 }
 
+// cppcheck-suppress unusedFunction
 void injectButtonEdgeNow(bool pressed) {
   noInterrupts();
   uint8_t next = (uint8_t)((s_btnQ.head + 1) % BTN_Q);
@@ -388,6 +392,7 @@ void ButtonState::poll() {
   }
 }
 
+// cppcheck-suppress unusedFunction
 ButtonEvent waitForNextEvent() {
   markUserActivity();
   while (true) {
@@ -408,6 +413,7 @@ ButtonEvent waitForNextEvent() {
   }
 }
 
+// cppcheck-suppress unusedFunction
 void resetInputFrontend() {
   // Wait for the button that triggered this transition (wake or triple-click)
   // to be physically released, then debounce. This prevents that single press

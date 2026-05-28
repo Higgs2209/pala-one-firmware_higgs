@@ -21,14 +21,18 @@ static ButtonAction clamp(int v) {
   return (ButtonAction)v;
 }
 
+// cppcheck-suppress unusedFunction
 void loadSettings() {
   s_long      = clamp(prefs.getInt(kKeyLong,      ACTION_BOOKMARK));
   s_extraLong = clamp(prefs.getInt(kKeyExtraLong, ACTION_LOCK));
   s_clickHold = clamp(prefs.getInt(kKeyClickHold, ACTION_MENU));
 }
 
+// cppcheck-suppress unusedFunction
 ButtonAction actionLong()      { return s_long; }
+// cppcheck-suppress unusedFunction
 ButtonAction actionExtraLong() { return s_extraLong; }
+// cppcheck-suppress unusedFunction
 ButtonAction actionClickHold() { return s_clickHold; }
 
 static void persist(const char* key, ButtonAction& dest, ButtonAction value) {
@@ -38,10 +42,14 @@ static void persist(const char* key, ButtonAction& dest, ButtonAction value) {
   prefs.putInt(key, (int)v);
 }
 
+// cppcheck-suppress unusedFunction
 void setActionLong(ButtonAction a)      { persist(kKeyLong,      s_long,      a); }
+// cppcheck-suppress unusedFunction
 void setActionExtraLong(ButtonAction a) { persist(kKeyExtraLong, s_extraLong, a); }
+// cppcheck-suppress unusedFunction
 void setActionClickHold(ButtonAction a) { persist(kKeyClickHold, s_clickHold, a); }
 
+// cppcheck-suppress unusedFunction
 ButtonAction actionFor(ButtonEvent::Kind kind) {
   switch (kind) {
     case ButtonEvent::Long:      return s_long;

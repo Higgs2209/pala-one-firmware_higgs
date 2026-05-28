@@ -22,16 +22,19 @@ int loadSavedPage(KeyValueStore& kv, const String& bookKey) {
   return (p < 0) ? 0 : p;
 }
 
+// cppcheck-suppress unusedFunction
 void saveSavedPage(KeyValueStore& kv, const String& bookKey, int pageIndex) {
   kv.putInt((bookKey + "_p").c_str(), pageIndex);
 }
 
+// cppcheck-suppress unusedFunction
 uint32_t loadSavedOffset(KeyValueStore& kv, const String& bookKey) {
   // Stored as int; -1 (default when key absent) sentinels "not set."
   int v = kv.getInt((bookKey + "_off").c_str(), -1);
   return (v < 0) ? kOffsetUnset : (uint32_t)v;
 }
 
+// cppcheck-suppress unusedFunction
 void saveSavedOffset(KeyValueStore& kv, const String& bookKey, uint32_t byteOffset) {
   kv.putInt((bookKey + "_off").c_str(), (int)byteOffset);
 }
@@ -72,6 +75,7 @@ void renameBookMetadata(KeyValueStore& kv, const String& oldKey, const String& n
 #include "src/storage/page_cache.h"        // deletePageCacheForBook / renamePageCacheForBook
 #include "src/storage/preferences_store.h"
 
+// cppcheck-suppress unusedFunction
 uint8_t loadBookmarksForKey(const String& bookKey,
                             uint16_t outPages[MAX_BOOKMARKS],
                             uint32_t outOffsets[MAX_BOOKMARKS]) {
@@ -84,6 +88,7 @@ uint8_t loadBookmarksForKey(const String& bookKey,
   return bm.count;
 }
 
+// cppcheck-suppress unusedFunction
 void saveBookmarksForKey(const String& bookKey,
                          const uint16_t pages[MAX_BOOKMARKS],
                          const uint32_t offsets[MAX_BOOKMARKS],
@@ -98,17 +103,20 @@ void saveBookmarksForKey(const String& bookKey,
   saveBookmarks(kv, bookKey, bm);
 }
 
+// cppcheck-suppress unusedFunction
 int savedPageForBookPath(const String& path) {
   PreferencesStore kv(prefs);
   return loadSavedPage(kv, prefKeyForBook(path));
 }
 
+// cppcheck-suppress unusedFunction
 void deleteBookMetadata(const String& path) {
   PreferencesStore kv(prefs);
   clearBookMetadata(kv, prefKeyForBook(path));   // NVS: progress + bookmarks
   deletePageCacheForBook(path);                  // disk: pc_<hash>.bin
 }
 
+// cppcheck-suppress unusedFunction
 void migrateBookMetadata(const String& oldPath, const String& newPath) {
   PreferencesStore kv(prefs);
   renameBookMetadata(kv, prefKeyForBook(oldPath), prefKeyForBook(newPath));

@@ -34,6 +34,7 @@ SlotUpload s_up;
 
 }  // namespace
 
+// cppcheck-suppress unusedFunction
 void resetScreensaverUpload() {
   if (s_up.tmpFile) s_up.tmpFile.close();
   s_up = SlotUpload{};
@@ -562,6 +563,7 @@ static void handleSleepEditorPage() {
 // ============================================================================
 //  Route registration.
 // ============================================================================
+// cppcheck-suppress unusedFunction
 void registerScreensaverRoutes() {
   server.on("/screensavers",         HTTP_GET,  handleSleepEditorPage);
   server.on("/screensavers/thumb",   HTTP_GET,  handleSleepThumb);

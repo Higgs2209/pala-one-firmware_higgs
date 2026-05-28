@@ -160,12 +160,14 @@ static void streakAutoLogOnPageTurn() {
 
 namespace Statistics {
 
+// cppcheck-suppress unusedFunction
 void loadOnBoot() {
   loadStatsFromNvs();
   // Streak bootstrap is lazy — first page turn handles it. Keeps setup()
   // fast for users who never read.
 }
 
+// cppcheck-suppress unusedFunction
 void onReaderPageTurn() {
   loadStatsFromNvs();  // safety in case setup() didn't call us
   s_pagesRead++;
@@ -173,6 +175,7 @@ void onReaderPageTurn() {
   streakAutoLogOnPageTurn();
 }
 
+// cppcheck-suppress unusedFunction
 void bumpButtons(uint32_t delta) {
   if (delta == 0) return;
   loadStatsFromNvs();
@@ -180,11 +183,13 @@ void bumpButtons(uint32_t delta) {
   bumpEventsAndMaybeFlush();
 }
 
+// cppcheck-suppress unusedFunction
 void flushToNvs() {
   if (!s_rtcInitialised) return;
   writeStatsBlob();
 }
 
+// cppcheck-suppress unusedFunction
 StatisticsSnapshot snapshot() {
   loadStatsFromNvs();
 

@@ -337,6 +337,7 @@ static void handleJumpPageWeb() {
   server.send(302, "text/plain", "");
 }
 
+// cppcheck-suppress unusedFunction
 void registerFilesRoutes() {
   server.on("/",         HTTP_GET,  handleRoot);
   server.on("/files",    HTTP_GET,  handleFiles);

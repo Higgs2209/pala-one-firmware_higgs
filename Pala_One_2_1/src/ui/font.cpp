@@ -100,11 +100,16 @@ static void applyLineGap(int gap) {
 
 void useBody()     { u8g2.setFont(s_body); }
 void useBold()     { u8g2.setFont(s_bold); }
+// cppcheck-suppress unusedFunction
 void useToast()    { u8g2.setFont(s_toast); }
+// cppcheck-suppress unusedFunction
 void useUiSmall()  { u8g2.setFont(s_uiSmall); }
+// cppcheck-suppress unusedFunction
 void useUiTiny()   { u8g2.setFont(s_uiTiny); }
+// cppcheck-suppress unusedFunction
 void useAppLarge() { u8g2.setFont(u8g2_font_helvB14_te); }
 
+// cppcheck-suppress unusedFunction
 const LayoutMetrics& bodyLayout() {
   if (!s_layoutValid) {
     useBody();
@@ -126,6 +131,7 @@ const LayoutMetrics& bodyLayout() {
   return s_layout;
 }
 
+// cppcheck-suppress unusedFunction
 void loadSettings() {
   int famVal = prefs.getInt(kKeyFamily, 0);
   applyFamily(famVal == 1 ? Family::OpenDyslexic : Family::Helvetica);
@@ -134,21 +140,25 @@ void loadSettings() {
   s_bionic = (prefs.getInt(kKeyBionic, 0) != 0);
 }
 
+// cppcheck-suppress unusedFunction
 void setBodySize(int sz) {
   applyBodySize(sz);
   prefs.putInt(kKeyBodySize, s_size);  // s_size reflects validation fallback
 }
 
+// cppcheck-suppress unusedFunction
 void setLineGap(int gap) {
   applyLineGap(gap);
   prefs.putInt(kKeyLineGap, s_lineGap);  // s_lineGap reflects clamp
 }
 
+// cppcheck-suppress unusedFunction
 void setFamily(Family fam) {
   applyFamily(fam);
   prefs.putInt(kKeyFamily, fam == Family::OpenDyslexic ? 1 : 0);
 }
 
+// cppcheck-suppress unusedFunction
 void setBionic(bool on) {
   if (s_bionic == on) return;
   s_bionic = on;
@@ -158,11 +168,16 @@ void setBionic(bool on) {
   prefs.putInt(kKeyBionic, on ? 1 : 0);
 }
 
+// cppcheck-suppress unusedFunction
 int    currentBodySize() { return s_size; }
+// cppcheck-suppress unusedFunction
 int    currentLineGap()  { return s_lineGap; }
+// cppcheck-suppress unusedFunction
 Family currentFamily()   { return s_family; }
+// cppcheck-suppress unusedFunction
 bool   bionicEnabled()   { return s_bionic; }
 
+// cppcheck-suppress unusedFunction
 PageCacheLayout layoutForCache() {
   // Statusbar reserve goes into the cache stamp too — toggling between
   // Full / Minimal / Hidden modes changes the page's text area (and
@@ -305,6 +320,7 @@ static int measureBionicWord(const char* word, int len) {
   return wStrong + kBionicRestGapPx + wTail;
 }
 
+// cppcheck-suppress unusedFunction
 int measureBionicLine(const char* line) {
   if (!line) return 0;
   if (!s_bionic) {
@@ -324,6 +340,7 @@ int measureBionicLine(const char* line) {
   return total;
 }
 
+// cppcheck-suppress unusedFunction
 void drawBionicLine(int x, int y, const char* line) {
   if (!line) return;
   if (!s_bionic) {
@@ -359,6 +376,7 @@ void drawBionicLine(int x, int y, const char* line) {
   useBody();
 }
 
+// cppcheck-suppress unusedFunction
 void invalidateLayoutCache() { s_layoutValid = false; }
 
 }  // namespace Font

@@ -11,6 +11,7 @@ static constexpr size_t kLineMax   = 256;
 static constexpr size_t kTokenMax  = 512;
 static constexpr size_t kScratchMax = kLineMax + kTokenMax + 1;
 
+// cppcheck-suppress unusedFunction
 uint32_t paginatePage(IReadStream& in,
                       uint32_t startPos,
                       const LayoutMetrics& m,

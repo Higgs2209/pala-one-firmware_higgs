@@ -1,5 +1,6 @@
 #include "src/storage/fs_util.h"
 
+// cppcheck-suppress unusedFunction
 bool fsBegin() {
   // First try to mount without formatting — protects existing data.
   if (FS.begin(false)) return true;
@@ -19,12 +20,14 @@ bool fsBegin() {
 
 size_t fsTotalBytesSafe() { return FS.totalBytes(); }
 size_t fsUsedBytesSafe()  { return FS.usedBytes(); }
+// cppcheck-suppress unusedFunction
 size_t fsFreeBytesSafe() {
   size_t total = fsTotalBytesSafe();
   size_t used = fsUsedBytesSafe();
   return (total >= used) ? (total - used) : 0;
 }
 
+// cppcheck-suppress unusedFunction
 void ensureBooksDir() {
   if (!FS.exists("/books")) FS.mkdir("/books");
 }
@@ -43,6 +46,7 @@ bool ensureDirRecursive(const String& path) {
   return FS.mkdir(path);
 }
 
+// cppcheck-suppress unusedFunction
 bool isDirEmpty(const String& path) {
   File dir = FS.open(path);
   if (!dir || !dir.isDirectory()) {

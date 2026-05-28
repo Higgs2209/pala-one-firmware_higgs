@@ -13,6 +13,7 @@
 #include "src/ui/text.h"
 #include "src/ui/widgets.h"
 
+// cppcheck-suppress unusedFunction
 void BookmarkListScreen::onEnter() {
   draw();
 }
@@ -57,6 +58,7 @@ void BookmarkListScreen::draw() {
   display.update();
 }
 
+// cppcheck-suppress unusedFunction
 void BookmarkListScreen::onButton(const ButtonEvent& e) {
   if (!e.any()) return;
 

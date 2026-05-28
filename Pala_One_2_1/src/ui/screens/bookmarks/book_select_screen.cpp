@@ -8,6 +8,7 @@
 #include "src/ui/screens/library_screen.h"
 #include "src/ui/widgets.h"
 
+// cppcheck-suppress unusedFunction
 void BookmarkBookSelectScreen::onEnter() {
   draw();
 }
@@ -32,6 +33,7 @@ void BookmarkBookSelectScreen::draw() {
   display.update();
 }
 
+// cppcheck-suppress unusedFunction
 void BookmarkBookSelectScreen::onButton(const ButtonEvent& e) {
   if (e.kind == ButtonEvent::Triple) {
     nextScreen = &g_libraryScreen;
