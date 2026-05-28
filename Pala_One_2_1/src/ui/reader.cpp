@@ -27,6 +27,24 @@ static bool s_forceNextFull = false;
 
 void forceNextRenderFull() { s_forceNextFull = true; }
 
+// Deferred-repagination flag. Set by `markPagesDirtyForLayoutChange` when a
+// mid-session layout change (currently only Statusbar mode cycling) has
+// invalidated the in-memory page offset table. Consumed at the top of
+// `prepareForRender` so the slow re-walk happens once, on the next reader
+// draw, rather than synchronously inside the setting cycle.
+//
+// Why lazy: `repaginateForLayoutChange` may walk hundreds of pages forward
+// to relocate the current byte offset under the new layout. Doing that
+// inside `Statusbar::setMode` blocks the main loop for hundreds of ms while
+// the reader menu is open — short clicks queue up in the ISR buffer, the
+// classifier groups them into Double/Triple, and the menu closes from what
+// the user thought was a single cycle. Deferring to the next render moves
+// the wait to menu-close (where a slow redraw is already expected) and
+// keeps in-menu cycling responsive.
+static bool s_pagesLayoutDirty = false;
+
+void markPagesDirtyForLayoutChange() { s_pagesLayoutDirty = true; }
+
 // Auto-save throttle bookkeeping. Private to this translation unit — only
 // the save-progress functions and `resetSaveThrottle` touch it, and only
 // the reader calls them on its hot path (preview never auto-saves).
@@ -253,6 +271,13 @@ static void drawStatusBar(uint32_t startOffset) {
 // (modulo pageTurnsSinceFull, which is render-side bookkeeping).
 static bool prepareForRender() {
   if (g_bookview.book.size() == 0) return false;
+  // Consume any deferred layout-change repagination *before* extending the
+  // page table — otherwise `ensureOffsetsUpTo` would happily extend the
+  // stale table with new-layout offsets glued onto old-layout offsets.
+  if (s_pagesLayoutDirty) {
+    s_pagesLayoutDirty = false;
+    repaginateForLayoutChange();
+  }
   ensureOffsetsUpTo(g_bookview.cursor.pageIndex);
   if (g_bookview.pages.count <= 0) return false;
 

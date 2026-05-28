@@ -100,11 +100,22 @@ void armResumeOnWake();    // arm: persist currently-open book for resume
 // differs), and re-finds the current page from the saved byte offset.
 // No-op if no book is open. Caller is responsible for the redraw.
 //
-// Called from `Statusbar::setMode`, which is the only path that can change
-// layout while the reader screen is active. Font size / line gap go through
-// the web /settings form — the user can't be in the reader at that moment,
-// and the next `openBookByIndex` rebuilds the table from scratch anyway.
+// Direct callers should be rare — the slow re-walk inside `findPageForOffset`
+// can block the loop for hundreds of ms on a large book. Mid-session callers
+// go through `markPagesDirtyForLayoutChange` instead so the work is deferred
+// to the next reader render (typically after the user closes whatever
+// settings UI triggered the change). Font size / line gap go through the
+// web /settings form — the user can't be in the reader at that moment, and
+// the next `openBookByIndex` rebuilds the table from scratch anyway.
 void repaginateForLayoutChange();
+
+// Mark the in-memory page offset table as stale because a layout-affecting
+// setting (currently: Statusbar mode) just changed. The actual rebuild
+// happens lazily on the next `renderCurrentPage` call, keeping the
+// triggering input handler responsive. No-op-safe if no book is open: the
+// flag is set unconditionally and consumed inside `prepareForRender`, which
+// already early-outs when the book is closed.
+void markPagesDirtyForLayoutChange();
 
 // ============================================================================
 //  View lifecycle — full reset of every piece of `g_bookview` (and the reader's
