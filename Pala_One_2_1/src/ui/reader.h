@@ -95,18 +95,18 @@ void armResumeOnWake();    // arm: persist currently-open book for resume
 
 // Layout changed mid-session — the byte offsets in `g_bookview.pages` were
 // computed under the old layout and no longer map to page boundaries under
-// the new one. Resets the in-memory table, reloads the on-disk cache (which
-// is layout-fingerprinted and will be rejected if the layout actually
-// differs), and re-finds the current page from the saved byte offset.
+// the new one. The byte offset of the *current* page is layout-invariant,
+// though, so this keeps the existing offsets as back-history, truncates the
+// table at the current page, and lets pages ahead re-paginate lazily under
+// the new layout on the next advance. O(1) — no file I/O, no full re-walk.
 // No-op if no book is open. Caller is responsible for the redraw.
 //
-// Direct callers should be rare — the slow re-walk inside `findPageForOffset`
-// can block the loop for hundreds of ms on a large book. Mid-session callers
-// go through `markPagesDirtyForLayoutChange` instead so the work is deferred
-// to the next reader render (typically after the user closes whatever
-// settings UI triggered the change). Font size / line gap go through the
-// web /settings form — the user can't be in the reader at that moment, and
-// the next `openBookByIndex` rebuilds the table from scratch anyway.
+// Mid-session callers should still route through
+// `markPagesDirtyForLayoutChange` so multiple rapid changes (cycling the
+// Statusbar mode) collapse into a single rebase on the next render. Font
+// size / line gap go through the web /settings form — the user can't be in
+// the reader at that moment, and the next `openBookByIndex` rebuilds the
+// table from scratch anyway.
 void repaginateForLayoutChange();
 
 // Mark the in-memory page offset table as stale because a layout-affecting

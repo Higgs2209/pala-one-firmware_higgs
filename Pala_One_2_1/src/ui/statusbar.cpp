@@ -39,12 +39,10 @@ void setMode(Mode m) {
   // Layout's `maxLines` is computed from `SCREEN_H - reserveH()`, so a mode
   // change shifts pagination. Invalidate the font's layout-metrics cache
   // (cheap — recomputed on the next bodyLayout()) and mark the reader's
-  // in-memory page-offset table as stale so the next reader render rebuilds
-  // it. Synchronously repaginating here would block the caller (the reader
-  // menu's short-click handler) for hundreds of ms on a large book while
-  // `findPageForOffset` walks the file forward, queueing follow-up clicks
-  // in the ISR buffer that the classifier then groups into a Double — the
-  // menu would close from what the user thought was a single cycle.
+  // in-memory page-offset table as stale so the next reader render rebases
+  // it. Deferring (rather than rebasing here) keeps `setMode` a plain setting
+  // write and collapses rapid cycles into one rebase on the next render — see
+  // markPagesDirtyForLayoutChange / repaginateForLayoutChange in reader.cpp.
   Font::invalidateLayoutCache();
   markPagesDirtyForLayoutChange();
 }
