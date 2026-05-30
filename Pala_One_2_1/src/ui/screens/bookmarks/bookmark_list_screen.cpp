@@ -45,7 +45,6 @@ void BookmarkListScreen::draw() {
   drawScrollableList(y, (int)g_bookmarkSession.count, g_bookmarkSession.selectedIndex,
     [&](int idx, int rowY, bool selected, int /*budget*/) {
       int targetPage = (int)g_bookmarkSession.pages[idx];
-      if (targetPage < 0) targetPage = 0;
       uint32_t pageOff = resolveBookmarkOffset(bookPath, (uint16_t)targetPage,
                                                g_bookmarkSession.offsets[idx]);
       FileReadStream fs(f);
@@ -89,7 +88,6 @@ void BookmarkListScreen::onButton(const ButtonEvent& e) {
       uint32_t off = g_bookmarkSession.offsets[g_bookmarkSession.selectedIndex];
       if (off == kOffsetUnset) {
         int storedPage = (int)g_bookmarkSession.pages[g_bookmarkSession.selectedIndex];
-        if (storedPage < 0) storedPage = 0;
         g_bookview.cursor.pageIndex = storedPage;
       } else {
         g_bookview.cursor.pageIndex = findPageForOffset(off);

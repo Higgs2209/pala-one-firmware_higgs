@@ -303,7 +303,7 @@ void ButtonState::poll() {
     lastStableChange_ = edgeTime;
 
     // On a clean press, start the timer and arm for a future release.
-    if (!prevPressed && stablePressed_) {
+    if (!prevPressed) {
       pressStart_ = edgeTime;
       pressArmed_ = true;
     }
@@ -314,7 +314,7 @@ void ButtonState::poll() {
     // release ever lands, so the `dur >= LONG_MS` branch here is a defensive
     // fallback (e.g., for the unlikely case where poll() didn't run during
     // the hold).
-    if (prevPressed && !stablePressed_) {
+    if (prevPressed) {
       if (pressArmed_) {
         uint32_t dur = (uint32_t)(edgeTime - pressStart_);
         HoldGestureKind k = classifyHoldRelease(dur, clickCount_);
@@ -386,7 +386,7 @@ void ButtonState::poll() {
       if      (clickCount_ == 1) shortClick_  = true;
       else if (clickCount_ == 2) doubleClick_ = true;
       else if (clickCount_ == 3) tripleClick_ = true;
-      else if (clickCount_ >= 4) quadClick_   = true;
+      else                        quadClick_   = true;
       clickCount_ = 0;
     }
   }

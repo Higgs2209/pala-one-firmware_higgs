@@ -63,8 +63,6 @@ static void handleBookmarksWeb() {
 
     for (int j = 0; j < count; j++) {
       int targetPage = (int)pages[j];
-      if (targetPage < 0) targetPage = 0;
-
       uint32_t pageOff = resolveBookmarkOffset(bookPath, (uint16_t)targetPage, offsets[j]);
       FileReadStream fs(f);
       String sn = readBookmarkLabelAtOffset(fs, pageOff, targetPage);
@@ -221,8 +219,6 @@ static void handleExportBookmarksWeb() {
 
   for (int i = 0; i < count; i++) {
     int targetPage = (int)pages[i];
-    if (targetPage < 0) targetPage = 0;
-
     uint32_t pageOff = resolveBookmarkOffset(bookPath, (uint16_t)targetPage, offsets[i]);
     FileReadStream fs(f);
     String label = readBookmarkLabelAtOffset(fs, pageOff, targetPage);
