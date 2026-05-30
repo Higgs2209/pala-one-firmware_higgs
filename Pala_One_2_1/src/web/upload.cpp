@@ -145,7 +145,7 @@ static void handleUploadBookStream() {
         if (s_book.tmpPath.length() > 0 && FS.exists(s_book.tmpPath)) FS.remove(s_book.tmpPath);
         return;
       }
-      String chunk = s_book.pendingUtf8Tail + String((const char*)up.buf, up.currentSize);
+      String chunk = s_book.pendingUtf8Tail + String(reinterpret_cast<const char*>(up.buf), up.currentSize);
       int len = (int)chunk.length();
       if (len > 4) {
         s_book.pendingUtf8Tail = chunk.substring(len - 4);

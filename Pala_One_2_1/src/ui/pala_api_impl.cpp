@@ -159,7 +159,7 @@ static int api_storageRead(const char* key, void* buf, int maxlen) {
   snprintf(path, sizeof(path), "/apps/%s.dat", safeKey);
   File f = FS.open(path, "r");
   if (!f) return -1;
-  int n = f.read((uint8_t*)buf, maxlen);
+  int n = f.read(reinterpret_cast<uint8_t*>(buf), maxlen);
   f.close();
   return n;
 }
@@ -172,7 +172,7 @@ static int api_storageWrite(const char* key, const void* buf, int len) {
   snprintf(path, sizeof(path), "/apps/%s.dat", safeKey);
   File f = FS.open(path, "w");
   if (!f) return -1;
-  int n = f.write((const uint8_t*)buf, len);
+  int n = f.write(reinterpret_cast<const uint8_t*>(buf), len);
   f.close();
   return n;
 }

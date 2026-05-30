@@ -28,8 +28,8 @@ void adcSetupOnce() {
 }
 
 static int cmpUint16(const void* a, const void* b) {
-  uint16_t aa = *(const uint16_t*)a;
-  uint16_t bb = *(const uint16_t*)b;
+  uint16_t aa = *reinterpret_cast<const uint16_t*>(a);
+  uint16_t bb = *reinterpret_cast<const uint16_t*>(b);
   if (aa < bb) return -1;
   if (aa > bb) return 1;
   return 0;
