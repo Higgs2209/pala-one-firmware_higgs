@@ -1,12 +1,12 @@
 name: Static analysis
 
-# Runs on every PR targeting main and dev and on every push to dev.
+# Runs on every push (all branches) and every pull request.
 # The deploy workflow only triggers on dev/tags and does not cover PRs,
 # so this is a separate job to catch issues before they land on main.
 
 on:
-  push: {}
-  pull_request: {}
+  push:
+  pull_request:
 
 jobs:
   cppcheck:
@@ -33,7 +33,5 @@ jobs:
 
       # One environment is enough — all 4 leaf envs share the same source
       # tree; only preprocessor defines differ (board revision, language).
-      # --fail-on-defect high keeps CI strict without being noisy on first
-      # pass; tighten to medium once the baseline is clean.
       - name: Run cppcheck via pio check
-        run: pio check -e wireless-paper-v1_2-en --fail-on-defect medium
+        run: pio check -e wireless-paper-v1_2-en --fail-on-defect low
