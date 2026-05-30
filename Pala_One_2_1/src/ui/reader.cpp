@@ -45,6 +45,7 @@ void forceNextRenderFull() { s_forceNextFull = true; }
 // cleaner shape and keeps the menu's per-click feedback instant.)
 static bool s_pagesLayoutDirty = false;
 
+// cppcheck-suppress unusedFunction
 void markPagesDirtyForLayoutChange() { s_pagesLayoutDirty = true; }
 
 // Auto-save throttle bookkeeping. Private to this translation unit — only

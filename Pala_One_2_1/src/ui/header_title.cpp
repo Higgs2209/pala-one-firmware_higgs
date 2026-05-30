@@ -11,6 +11,7 @@ static constexpr const char* kNvsKey = "cfg_hdr_title";
 static char s_title[kMaxLen + 1] = "";
 static bool s_custom = false;
 
+// cppcheck-suppress unusedFunction
 void loadSettings() {
   if (prefs.isKey(kNvsKey)) {
     s_custom = true;
@@ -24,10 +25,12 @@ void loadSettings() {
   }
 }
 
+// cppcheck-suppress unusedFunction
 const char* current() {
   return s_title;
 }
 
+// cppcheck-suppress unusedFunction
 void set(const char* title) {
   if (title == nullptr) {
     resetToDefault();

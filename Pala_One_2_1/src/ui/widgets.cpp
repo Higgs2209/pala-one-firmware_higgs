@@ -17,8 +17,10 @@ static int s_menuDrawsSinceFull = 0;
 // reader page) doesn't ghost through a partial refresh.
 static bool s_forceMenuFrameFull = false;
 
+// cppcheck-suppress unusedFunction
 void forceNextMenuFrameFull() { s_forceMenuFrameFull = true; }
 
+// cppcheck-suppress unusedFunction
 void prepareMenuFrame() {
   bool doFull = s_forceMenuFrameFull
              || (s_menuDrawsSinceFull >= MENU_FULL_REFRESH_EVERY);
