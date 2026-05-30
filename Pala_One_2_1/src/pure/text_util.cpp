@@ -30,6 +30,7 @@ int utf8SafeCharLenAt(const char* buf, size_t len, size_t index) {
   return clen;
 }
 
+// cppcheck-suppress unusedFunction
 String utf8CharAt(const String& s, int index) {
   int len = utf8SafeCharLenAt(s, index);
   if (len <= 0) return String("");

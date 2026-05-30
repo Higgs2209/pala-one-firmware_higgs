@@ -93,8 +93,6 @@ static void handleSettings() {
   bool curBionic   = Font::bionicEnabled();
   String bChecked  = curBionic ? " checked" : "";
 
-  bool hasSleepImg = FS.exists("/sleep.bin");
-
   String out = webPageStart(
     D_WEB_SETTINGS_TITLE,
     D_WEB_SETTINGS_SUBTITLE_PREFIX FW_VERSION D_WEB_SETTINGS_SUBTITLE_SUFFIX,

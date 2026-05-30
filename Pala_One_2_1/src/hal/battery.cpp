@@ -128,7 +128,7 @@ void updateBatteryCached(bool force) {
     s_battery.pctShown = s_battery.pctRaw;
   } else {
     if (s_battery.pctRaw < s_battery.pctShown) {
-      if ((s_battery.pctShown - s_battery.pctRaw) >= 1) s_battery.pctShown--;
+      s_battery.pctShown--;
     } else if (s_battery.pctRaw > s_battery.pctShown + 2) {
       s_battery.pctShown++;
     }

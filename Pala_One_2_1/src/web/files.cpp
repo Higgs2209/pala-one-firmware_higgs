@@ -109,9 +109,9 @@ static void handleFiles() {
   } else {
     out += "<ul class='list'>";
     for (int i = 0; i < g_library.bookCount; i++) {
-      String bookPath = String(g_library.books[i].path);
+      String filePath = String(g_library.books[i].path);
       String folderLabel = g_library.books[i].folder[0] ? prettyRelativeLabel(g_library.books[i].folder) : String(D_WEB_BOOK_ROOT);
-      int savedPage = savedPageForBookPath(bookPath) + 1;
+      int savedPage = savedPageForBookPath(filePath) + 1;
       if (savedPage < 1) savedPage = 1;
 
       out += "<li><div class='row'><div><h3>";

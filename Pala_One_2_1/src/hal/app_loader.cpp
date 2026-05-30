@@ -86,7 +86,7 @@ LoadResult loadAndRunApp(const char* path, const PalaAPI* api,
   memcpy(&hdr, dataBuf, sizeof(hdr));
   uint32_t base = reinterpret_cast<uint32_t>(dataBuf);
   if (hdr.reloc_count > 0) {
-    uint32_t* relocs = reinterpret_cast<uint32_t*>(dataBuf + hdr.reloc_offset);
+    const uint32_t* relocs = reinterpret_cast<const uint32_t*>(dataBuf + hdr.reloc_offset);
     for (uint32_t i = 0; i < hdr.reloc_count; i++) {
       uint32_t off = relocs[i];
       *reinterpret_cast<uint32_t*>(dataBuf + off) += base;

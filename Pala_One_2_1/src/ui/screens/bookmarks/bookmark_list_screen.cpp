@@ -23,8 +23,8 @@ void BookmarkListScreen::draw() {
   Font::useBody();
   int y = drawSectionHeader(D_BOOKMARKS_HEADER);
 
-  String bookPath = String(g_library.books[g_bookmarkSession.bookIndex].path);
-  String key = prefKeyForBook(bookPath);
+  String filePath = String(g_library.books[g_bookmarkSession.bookIndex].path);
+  String key = prefKeyForBook(filePath);
   g_bookmarkSession.count = loadBookmarksForKey(key, g_bookmarkSession.pages, g_bookmarkSession.offsets);
   if (g_bookmarkSession.selectedIndex >= (int)g_bookmarkSession.count)
     g_bookmarkSession.selectedIndex = max(0, (int)g_bookmarkSession.count - 1);
@@ -35,7 +35,7 @@ void BookmarkListScreen::draw() {
     return;
   }
 
-  File f = FS.open(bookPath, "r");
+  File f = FS.open(filePath, "r");
   if (!f) {
     drawMenuRow(y, D_BOOKMARKS_OPEN_FAILED, false);
     display.update();
@@ -45,7 +45,7 @@ void BookmarkListScreen::draw() {
   drawScrollableList(y, (int)g_bookmarkSession.count, g_bookmarkSession.selectedIndex,
     [&](int idx, int rowY, bool selected, int /*budget*/) {
       int targetPage = (int)g_bookmarkSession.pages[idx];
-      uint32_t pageOff = resolveBookmarkOffset(bookPath, (uint16_t)targetPage,
+      uint32_t pageOff = resolveBookmarkOffset(filePath, (uint16_t)targetPage,
                                                g_bookmarkSession.offsets[idx]);
       FileReadStream fs(f);
       String sn = readBookmarkLabelAtOffset(fs, pageOff, targetPage);
