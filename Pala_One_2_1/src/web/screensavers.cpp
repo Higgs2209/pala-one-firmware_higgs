@@ -326,6 +326,8 @@ static const char kEditorStyle[] PROGMEM =
 
 static const char kIconDownload[] PROGMEM =
   "<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M12 4v10m0 0l4-4m-4 4l-4-4M5 20h14'/></svg>";
+static const char kIconUpload[] PROGMEM =
+  "<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M12 20v-10m0 0l4 4m-4-4l-4 4M5 4h14'/></svg>";
 static const char kIconTrash[] PROGMEM =
   "<svg viewBox='0 0 24 24' aria-hidden='true'>"
   "<path d='M4 7h16'/>"
@@ -387,31 +389,48 @@ static const char kEditorScript[] PROGMEM =
   "setLbls();render();"
   "})();</script>";
 
-// Download + delete icon buttons for a populated slot or the legacy single image.
-static String screensaverActionsHtml(bool single, int slot) {
+// Upload + (when populated) download + delete icon buttons for a slot or the
+// legacy single image. Upload is always shown so an empty slot can be filled
+// from a previously downloaded .bin without going through the image editor.
+static String screensaverActionsHtml(bool single, int slot, bool populated) {
   String out;
-  out.reserve(420);
+  out.reserve(560);
   out += "<div class='ss-slot-actions'>";
-  out += "<a class='btn-icon' href='/screensavers/download?";
-  if (single) out += "single=1";
-  else out += "slot=" + String(slot);
-  out += "' download title='" D_WEB_SS_DOWNLOAD_ARIA "' aria-label='" D_WEB_SS_DOWNLOAD_ARIA "'>";
-  out += FPSTR(kIconDownload);
-  out += "</a>";
-  out += "<form method='POST' action='/screensavers/delete' style='margin:0'>";
-  if (single) {
-    out += "<input type='hidden' name='single' value='1'>";
-    out += "<button type='submit' class='btn-icon danger' title='" D_WEB_SS_DELETE_ARIA "' "
-           "aria-label='" D_WEB_SS_DELETE_ARIA "' "
-           "onclick=\"return confirm('" D_WEB_SS_CONFIRM_DEL_SINGLE "')\">";
-  } else {
-    out += "<input type='hidden' name='slot' value='" + String(slot) + "'>";
-    out += "<button type='submit' class='btn-icon danger' title='" D_WEB_SS_DELETE_ARIA "' "
-           "aria-label='" D_WEB_SS_DELETE_ARIA "' "
-           "onclick=\"return confirm('" D_WEB_SS_CONFIRM_DEL_SLOT "')\">";
+
+  // Upload: label wraps a hidden file input so clicking the icon opens the
+  // file picker; onchange auto-submits the form to the existing upload route.
+  String uploadUrl = String("/screensavers/upload?") +
+                     (single ? "single=1" : "slot=" + String(slot));
+  out += "<form method='POST' action='" + uploadUrl + "' enctype='multipart/form-data' style='margin:0'>";
+  out += "<label class='btn-icon' title='" D_WEB_SS_UPLOAD_ARIA "' aria-label='" D_WEB_SS_UPLOAD_ARIA "'>";
+  out += "<input type='file' name='file' accept='.bin' style='display:none' onchange='this.form.submit()'>";
+  out += FPSTR(kIconUpload);
+  out += "</label></form>";
+
+  if (populated) {
+    out += "<a class='btn-icon' href='/screensavers/download?";
+    if (single) out += "single=1";
+    else out += "slot=" + String(slot);
+    out += "' download title='" D_WEB_SS_DOWNLOAD_ARIA "' aria-label='" D_WEB_SS_DOWNLOAD_ARIA "'>";
+    out += FPSTR(kIconDownload);
+    out += "</a>";
+    out += "<form method='POST' action='/screensavers/delete' style='margin:0'>";
+    if (single) {
+      out += "<input type='hidden' name='single' value='1'>";
+      out += "<button type='submit' class='btn-icon danger' title='" D_WEB_SS_DELETE_ARIA "' "
+             "aria-label='" D_WEB_SS_DELETE_ARIA "' "
+             "onclick=\"return confirm('" D_WEB_SS_CONFIRM_DEL_SINGLE "')\">";
+    } else {
+      out += "<input type='hidden' name='slot' value='" + String(slot) + "'>";
+      out += "<button type='submit' class='btn-icon danger' title='" D_WEB_SS_DELETE_ARIA "' "
+             "aria-label='" D_WEB_SS_DELETE_ARIA "' "
+             "onclick=\"return confirm('" D_WEB_SS_CONFIRM_DEL_SLOT "')\">";
+    }
+    out += FPSTR(kIconTrash);
+    out += "</button></form>";
   }
-  out += FPSTR(kIconTrash);
-  out += "</button></form></div>";
+
+  out += "</div>";
   return out;
 }
 
@@ -420,19 +439,20 @@ static String screensaverActionsHtml(bool single, int slot) {
 // editor handler.
 static String slotGridHtml() {
   String out;
-  out.reserve(2000);
+  out.reserve(6000);  // 8 slots × ~700 bytes each
   out += "<div class='ss-slots'>";
   for (int i = 0; i < Screensavers::MAX_SLOTS; i++) {
+    bool exists = Screensavers::slotExists(i);
     out += "<div class='ss-slot'><div class='muted small'>" D_WEB_SS_SLOT_LABEL " ";
     out += String(i);
     out += "</div>";
-    if (Screensavers::slotExists(i)) {
+    if (exists) {
       out += "<img src='/screensavers/thumb?slot=" + String(i) +
              "' alt='" D_WEB_SS_SLOT_LABEL " " + String(i) + "'>";
-      out += screensaverActionsHtml(false, i);
     } else {
       out += "<div class='ss-slot-empty'>" D_WEB_SS_SLOT_EMPTY "</div>";
     }
+    out += screensaverActionsHtml(false, i, exists);
     out += "</div>";
   }
   out += "</div>";
