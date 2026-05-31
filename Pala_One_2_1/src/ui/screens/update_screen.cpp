@@ -193,21 +193,14 @@ void UpdateScreen::draw() {
   if (focusItem_ == 1) Font::useBold(); else Font::useBody();
   u8g2.setCursor(cx, y);
   u8g2.print(D_UPDATE_CHAN_DEV);
-  y += 16;
+  y += 14;
 
-  if (!stableChan_) {
-    Font::useBody();
-    u8g2.setCursor(MARGIN_X, y);
-    u8g2.print(D_UPDATE_DEV_WARNING);
-    y += 14;
-  }
-  y += 6;
 
   // Check button
   if (focusItem_ == 2) Font::useBold(); else Font::useBody();
   u8g2.setCursor(MARGIN_X, y);
   u8g2.print(D_UPDATE_BTN_CHECK);
-  y += 14;
+  y += 20;
 
   // Status line — shown below the check button
   Font::useBody();

@@ -80,7 +80,6 @@
 #define D_UPDATE_CHANNEL_LABEL      "Select Firmware Channel:"
 #define D_UPDATE_CHAN_STABLE        "Stable"
 #define D_UPDATE_CHAN_DEV           "Dev"
-#define D_UPDATE_DEV_WARNING        "Dev builds may be unstable"
 #define D_UPDATE_BTN_CHECK          "[ Check for update ]"
 #define D_UPDATE_NO_CREDS_L1        "No Wi-Fi credentials."
 #define D_UPDATE_NO_CREDS_L2        "Setup via web installer."

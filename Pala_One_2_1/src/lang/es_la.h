@@ -81,7 +81,6 @@
 #define D_UPDATE_CHANNEL_LABEL      "Seleccionar canal:"
 #define D_UPDATE_CHAN_STABLE        "Estable"
 #define D_UPDATE_CHAN_DEV           "Dev"
-#define D_UPDATE_DEV_WARNING        "Dev puede ser inestable"
 #define D_UPDATE_BTN_CHECK          "[ Buscar actualización ]"
 #define D_UPDATE_NO_CREDS_L1        "Sin credenciales Wi-Fi."
 #define D_UPDATE_NO_CREDS_L2        "Configura via instalador."
