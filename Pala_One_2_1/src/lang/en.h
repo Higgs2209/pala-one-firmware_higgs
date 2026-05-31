@@ -72,6 +72,23 @@
 #define D_APPS_NONE                 "No apps installed"
 
 // ----------------------------------------------------------------------------
+//  Update screen (src/ui/screens/update_screen.cpp)
+// ----------------------------------------------------------------------------
+#define D_MENU_UPDATE               "Update"
+#define D_UPDATE_HEADER             "Firmware Update"
+#define D_UPDATE_VERSION_PREFIX     "Version: "
+#define D_UPDATE_CHANNEL_LABEL      "Channel: "
+#define D_UPDATE_CHAN_STABLE        "Stable"
+#define D_UPDATE_CHAN_DEV           "Dev"
+#define D_UPDATE_DEV_WARNING        "Dev builds may be unstable"
+#define D_UPDATE_BTN_CHECK          "[ Check for update ]"
+#define D_UPDATE_CONNECTING         "Connecting..."
+#define D_UPDATE_CONN_FAILED        "Wi-Fi not available"
+#define D_UPDATE_CHECKING           "Checking..."
+#define D_UPDATE_SERVER_FAIL        "Cannot reach update server"
+#define D_UPDATE_SERVER_OK          "Server reachable"
+
+// ----------------------------------------------------------------------------
 //  Bookmarks screens
 //  (src/ui/screens/bookmarks/{book_select_screen,bookmark_list_screen}.cpp)
 // ----------------------------------------------------------------------------

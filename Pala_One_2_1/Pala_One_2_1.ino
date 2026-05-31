@@ -101,6 +101,7 @@
 #include "src/ui/screens/list_screen.h"
 #include "src/ui/screens/reader_screen.h"
 #include "src/ui/screens/statistics_screen.h"
+#include "src/ui/screens/update_screen.h"
 #include "src/ui/screens/upload_screen.h"
 #include "src/ui/header_title.h"
 #include "src/ui/lock.h"
@@ -118,6 +119,7 @@ LibraryScreen              g_libraryScreen;
 ReaderScreen               g_readerScreen;
 UploadScreen               g_uploadScreen;
 AboutScreen                g_aboutScreen;
+UpdateScreen               g_updateScreen;
 AppsScreen                 g_appsScreen;
 ListScreen                 g_listScreen;
 StatisticsScreen           g_statsScreen;
