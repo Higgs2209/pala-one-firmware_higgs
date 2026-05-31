@@ -44,8 +44,11 @@ void UpdateScreen::setProgress(int pct) {
 //  Exit
 // ----------------------------------------------------------------------------
 void UpdateScreen::exitToLibrary() {
-  wifiEnd();
-  WifiProvisioning::notifyUploadSession(false);
+  if (wifiStarted_) {
+    wifiEnd();
+    WifiProvisioning::notifyUploadSession(false);
+    wifiStarted_ = false;
+  }
   nextScreen = &g_libraryScreen;
 }
 
@@ -57,14 +60,15 @@ void UpdateScreen::onEnter() {
   focusItem_     = 0;
   remoteVersion_ = "";
   progress_      = 0;
-  WifiProvisioning::notifyUploadSession(true);
+  wifiStarted_   = false;
 
   if (wifiStaBegin()) {
+    wifiStarted_ = true;
+    WifiProvisioning::notifyUploadSession(true);
     phase_      = Phase::Connecting;
     staStartMs_ = millis();
   } else {
     phase_ = Phase::ConnFailed;
-    WifiProvisioning::notifyUploadSession(false);
   }
   draw();
 }
@@ -82,6 +86,7 @@ void UpdateScreen::onIdleTick() {
       (uint32_t)(millis() - staStartMs_) > kStaTimeoutMs) {
     wifiEnd();
     WifiProvisioning::notifyUploadSession(false);
+    wifiStarted_ = false;
     phase_ = Phase::ConnFailed;
     draw();
   }

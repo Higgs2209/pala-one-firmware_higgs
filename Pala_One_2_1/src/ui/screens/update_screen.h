@@ -36,6 +36,7 @@ private:
   uint32_t    staStartMs_    = 0;
   WifiSession net_;
   bool        stableChan_    = true;
+  bool        wifiStarted_   = false;  // true only between wifiStaBegin() and wifiEnd()
   int         focusItem_     = 0;  // 0=Stable  1=Dev  2=Check  3=Install
   String      remoteVersion_;
   int         progress_      = 0;
