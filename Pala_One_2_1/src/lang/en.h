@@ -144,6 +144,7 @@
 #define D_WEB_NAV_FILES             "Files"
 #define D_WEB_NAV_BOOKMARKS         "Bookmarks"
 #define D_WEB_NAV_LIST              "List"
+#define D_WEB_NAV_SCREENSAVER       "Screensaver"
 #define D_WEB_NAV_SETTINGS          "Settings"
 #define D_WEB_NAV_FACTORY_RESET     "Factory reset"
 #define D_WEB_NAV_BACK              "Back"
@@ -430,11 +431,6 @@
 #define D_WEB_SETTINGS_APPLY_HINT   "Changes apply to the next page render."
 
 // ----------------------------------------------------------------------------
-//  Screensaver settings card link (src/web/settings.cpp).
-// ----------------------------------------------------------------------------
-#define D_WEB_SCREENSAVER_CARD_DESC "Manage the image (or multi-image rotation) shown on the e-ink when the device sleeps."
-#define D_WEB_SCREENSAVER_EDITOR_LINK "Open screensaver editor"
-#define D_WEB_SCREENSAVER_EDITOR_HINT "Includes an in-browser bitmap editor and up to 8 rotation slots."
 
 // ----------------------------------------------------------------------------
 //  Screensaver editor + multi-slot manager (src/web/screensavers.cpp).

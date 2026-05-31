@@ -140,6 +140,7 @@
 #define D_WEB_NAV_FILES             "Archivos"
 #define D_WEB_NAV_BOOKMARKS         "Marcapáginas"
 #define D_WEB_NAV_LIST              "Lista"
+#define D_WEB_NAV_SCREENSAVER       "Salvapantallas"
 #define D_WEB_NAV_SETTINGS          "Ajustes"
 #define D_WEB_NAV_FACTORY_RESET     "Reinicio de fábrica"
 #define D_WEB_NAV_BACK              "Atrás"
@@ -422,11 +423,6 @@
 #define D_WEB_SETTINGS_APPLY_HINT   "Los cambios se aplican en la próxima página renderizada."
 
 // ----------------------------------------------------------------------------
-//  Tarjeta de salvapantallas en la página de ajustes (src/web/settings.cpp).
-// ----------------------------------------------------------------------------
-#define D_WEB_SCREENSAVER_CARD_DESC "Administra la imagen (o rotación de imágenes) que se muestra en la pantalla cuando el dispositivo se suspende."
-#define D_WEB_SCREENSAVER_EDITOR_LINK "Abrir editor de salvapantallas"
-#define D_WEB_SCREENSAVER_EDITOR_HINT "Incluye un editor de bitmap en el navegador y hasta 8 ranuras de rotación."
 
 // ----------------------------------------------------------------------------
 //  Editor y administrador multi-ranura de salvapantallas (src/web/screensavers.cpp).

@@ -529,7 +529,7 @@ static void handleSleepEditorPage() {
   String out = webPageStart(
     D_WEB_SS_TITLE,
     D_WEB_SS_SUBTITLE,
-    "<a href='/'>" D_WEB_SETTINGS_BACK_NAV "</a><a href='/settings'>" D_WEB_NAV_SETTINGS "</a>",
+    "<a href='/'>" D_WEB_NAV_HOME "</a><a href='/settings'>" D_WEB_NAV_SETTINGS "</a>",
     true
   );
   out.reserve(out.length() + 8000);

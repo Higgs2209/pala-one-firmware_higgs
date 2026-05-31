@@ -73,7 +73,7 @@ static void handleRoot() {
   String out = webPageStart(
     D_WEB_HOME_TITLE,
     subtitle,
-    "<a href='/files'>" D_WEB_NAV_FILES "</a><a href='/bookmarks'>" D_WEB_NAV_BOOKMARKS "</a><a href='/list'>" D_WEB_NAV_LIST "</a><a href='/settings'>" D_WEB_NAV_SETTINGS "</a><a href='/reset'>" D_WEB_NAV_FACTORY_RESET "</a>"
+    "<a href='/files'>" D_WEB_NAV_FILES "</a><a href='/bookmarks'>" D_WEB_NAV_BOOKMARKS "</a><a href='/list'>" D_WEB_NAV_LIST "</a><a href='/screensavers'>" D_WEB_NAV_SCREENSAVER "</a><a href='/settings'>" D_WEB_NAV_SETTINGS "</a><a href='/reset'>" D_WEB_NAV_FACTORY_RESET "</a>"
   );
 
   out += storageCardHtml();
@@ -108,7 +108,7 @@ static void handleFiles() {
   String out = webPageStart(
     D_WEB_FILES_HEADING,
     D_WEB_FILES_SUBTITLE,
-    "<a href='/'>" D_WEB_NAV_HOME "</a><a href='/bookmarks'>" D_WEB_NAV_BOOKMARKS "</a><a href='/settings'>" D_WEB_NAV_SETTINGS "</a>",
+    "<a href='/'>" D_WEB_NAV_HOME "</a><a href='/bookmarks'>" D_WEB_NAV_BOOKMARKS "</a><a href='/screensavers'>" D_WEB_NAV_SCREENSAVER "</a><a href='/settings'>" D_WEB_NAV_SETTINGS "</a>",
     true
   );
 
