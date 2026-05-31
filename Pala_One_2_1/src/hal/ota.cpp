@@ -17,8 +17,6 @@ static constexpr const char* kOtaBaseUrl =
     "https://paullagier.github.io/pala-one-firmware/";
 
 // How long to wait for the next data chunk before aborting the download.
-// Distinct from http.setTimeout() which covers initial connection + each
-// individual read() call, not the total silence between reads in our loop.
 static constexpr uint32_t kDownloadStallMs = 30000;
 
 #if defined(DISPLAY_V1_2)
@@ -47,13 +45,19 @@ static void configureClient(WiFiClientSecure& client) {
 // ----------------------------------------------------------------------------
 
 bool OTA::isUpdateServerReachable() {
-  WiFiClientSecure client;
-  configureClient(client);
+  // Heap-allocate WiFiClientSecure — its TLS context setup uses significant
+  // stack even for failed connections, which overflows the 8 KB loopTask stack.
+  WiFiClientSecure* client = new WiFiClientSecure();
+  if (!client) return false;
+  configureClient(*client);
+
   HTTPClient http;
-  http.begin(client, kOtaBaseUrl);
+  http.begin(*client, kOtaBaseUrl);
   http.setTimeout(5000);
   int code = http.sendRequest("HEAD");
   http.end();
+  delete client;
+
   return code > 0 && code < 500;
 }
 
@@ -65,24 +69,32 @@ OtaCheckResult OTA::checkAvailable(const String& channel) {
   String url = String(kOtaBaseUrl) + channel + "/manifest-"
                + kBoardToken + "-" + kLangToken + ".json";
 
-  WiFiClientSecure client;
-  configureClient(client);
+  WiFiClientSecure* client = new WiFiClientSecure();
+  if (!client) return result;
+  configureClient(*client);
+
   HTTPClient http;
-  http.begin(client, url);
+  http.begin(*client, url);
   http.setTimeout(5000);
 
   if (http.GET() != HTTP_CODE_OK) {
     http.end();
+    delete client;
     return result;
   }
 
   // Stream-parse directly — avoids allocating the full body as a String.
-  // ArduinoJson reads only what it needs; extra bytes are left in the buffer
-  // and discarded when http.end() closes the connection.
   WiFiClient* stream = http.getStreamPtr();
+  if (!stream) {
+    http.end();
+    delete client;
+    return result;
+  }
+
   JsonDocument doc;
   DeserializationError err = deserializeJson(doc, *stream);
   http.end();
+  delete client;
 
   if (err) return result;
 
@@ -107,14 +119,17 @@ OtaDownloadResult OTA::download(const String& channel, OtaProgressFn progressCb)
   const esp_partition_t* target = esp_ota_get_next_update_partition(nullptr);
   if (!target) return result;
 
-  WiFiClientSecure client;
-  configureClient(client);
+  WiFiClientSecure* client = new WiFiClientSecure();
+  if (!client) return result;
+  configureClient(*client);
+
   HTTPClient http;
-  http.begin(client, url);
+  http.begin(*client, url);
   http.setTimeout(30000);
 
   if (http.GET() != HTTP_CODE_OK) {
     http.end();
+    delete client;
     return result;
   }
 
@@ -125,6 +140,7 @@ OtaDownloadResult OTA::download(const String& channel, OtaProgressFn progressCb)
   // if the image turns out to be too large.
   if (contentLength > 0 && (size_t)contentLength > target->size) {
     http.end();
+    delete client;
     result.partitionTooSmall = true;
     return result;
   }
@@ -132,23 +148,31 @@ OtaDownloadResult OTA::download(const String& channel, OtaProgressFn progressCb)
   esp_ota_handle_t handle;
   if (esp_ota_begin(target, OTA_WITH_SEQUENTIAL_WRITES, &handle) != ESP_OK) {
     http.end();
+    delete client;
     return result;
   }
 
-  WiFiClient* stream  = http.getStreamPtr();
+  WiFiClient* stream = http.getStreamPtr();
+  if (!stream) {
+    esp_ota_abort(handle);
+    http.end();
+    delete client;
+    return result;
+  }
+
   // Static buffer keeps 4 KB off the loopTask stack. Safe: download() is
   // never called re-entrantly — it blocks the main loop for its duration.
   static uint8_t buf[4096];
-  int  written     = 0;
-  int  remaining   = contentLength;
-  int  lastPct     = -1;
-  uint32_t lastDataMs = millis();
+  int      written     = 0;
+  int      remaining   = contentLength;
+  int      lastPct     = -1;
+  uint32_t lastDataMs  = millis();
 
   while (http.connected() || stream->available() > 0) {
     int avail = stream->available();
 
     if (avail > 0) {
-      lastDataMs = millis();  // reset stall timer on every arriving byte
+      lastDataMs = millis();
       int toRead = min(avail, (int)sizeof(buf));
       if (remaining > 0) toRead = min(toRead, remaining);
       int len = stream->readBytes(buf, toRead);
@@ -157,12 +181,13 @@ OtaDownloadResult OTA::download(const String& channel, OtaProgressFn progressCb)
       if (esp_ota_write(handle, buf, len) != ESP_OK) {
         esp_ota_abort(handle);
         http.end();
+        delete client;
         return result;
       }
       written += len;
       if (remaining > 0) {
         remaining -= len;
-        if (remaining == 0) break;  // received all declared bytes
+        if (remaining == 0) break;
       }
       if (progressCb && contentLength > 0) {
         int pct = (int)((int64_t)written * 100 / contentLength);
@@ -172,10 +197,10 @@ OtaDownloadResult OTA::download(const String& channel, OtaProgressFn progressCb)
         }
       }
     } else {
-      // No bytes available yet — check for a hung connection.
       if ((uint32_t)(millis() - lastDataMs) > kDownloadStallMs) {
         esp_ota_abort(handle);
         http.end();
+        delete client;
         return result;
       }
       delay(1);
@@ -183,6 +208,7 @@ OtaDownloadResult OTA::download(const String& channel, OtaProgressFn progressCb)
   }
 
   http.end();
+  delete client;
 
   // esp_ota_end validates the image (descriptor, SHA-256 if secure boot is
   // enabled). A truncated or corrupted binary will be rejected here. The
@@ -191,7 +217,6 @@ OtaDownloadResult OTA::download(const String& channel, OtaProgressFn progressCb)
   if (esp_ota_end(handle) != ESP_OK) return result;
 
   // Only mark the new partition as bootable after a clean validation.
-  // If this call fails the device stays on the current firmware.
   if (esp_ota_set_boot_partition(target) != ESP_OK) return result;
 
   result.success = true;
