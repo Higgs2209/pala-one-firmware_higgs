@@ -11,7 +11,7 @@
 #include "src/ui/screens/library_screen.h"
 #include "src/ui/widgets.h"
 
-static constexpr uint32_t kStaTimeoutMs  = 5000;
+static constexpr uint32_t    kStaTimeoutMs  = 5000;
 static constexpr const char* kKeyOtaChannel = "cfg_ota_channel";
 
 // ----------------------------------------------------------------------------
@@ -40,6 +40,7 @@ void UpdateScreen::exitToLibrary() {
 void UpdateScreen::onEnter() {
   loadChannel();
   focusItem_ = 0;
+  remoteVersion_ = "";
   WifiProvisioning::notifyUploadSession(true);
 
   if (wifiStaBegin()) {
@@ -78,20 +79,19 @@ void UpdateScreen::draw() {
   Font::useBody();
   int y = drawSectionHeader(D_UPDATE_HEADER);
 
+  // ---- Single-line transient states ----------------------------------------
   if (phase_ == Phase::Connecting) {
     u8g2.setCursor(MARGIN_X, y);
     u8g2.print(D_UPDATE_CONNECTING);
     display.update();
     return;
   }
-
   if (phase_ == Phase::ConnFailed) {
     u8g2.setCursor(MARGIN_X, y);
     u8g2.print(D_UPDATE_CONN_FAILED);
     display.update();
     return;
   }
-
   if (phase_ == Phase::Checking) {
     u8g2.setCursor(MARGIN_X, y);
     u8g2.print(D_UPDATE_CHECKING);
@@ -99,8 +99,13 @@ void UpdateScreen::draw() {
     return;
   }
 
-  // Phase::Idle, ServerFail, ServerOk — full UI with cursor
-  Font::useBody();
+  // ---- Full UI (Idle, ServerFail, UpToDate, UpdateAvailable) ---------------
+
+  // Clamp focus to valid range for the current phase
+  int maxItems = (phase_ == Phase::UpdateAvailable) ? 4 : 3;
+  if (focusItem_ >= maxItems) focusItem_ = 0;
+
+  // Version line
   u8g2.setCursor(MARGIN_X, y);
   u8g2.print(D_UPDATE_VERSION_PREFIX FW_VERSION);
   y += 16;
@@ -127,6 +132,7 @@ void UpdateScreen::draw() {
   u8g2.print(D_UPDATE_CHAN_DEV);
   y += 16;
 
+  // Dev warning
   if (!stableChan_) {
     Font::useBody();
     u8g2.setCursor(MARGIN_X, y);
@@ -135,22 +141,36 @@ void UpdateScreen::draw() {
   }
   y += 6;
 
-  // Probe result line
+  // Status line
+  Font::useBody();
   if (phase_ == Phase::ServerFail) {
-    Font::useBody();
     u8g2.setCursor(MARGIN_X, y);
     u8g2.print(D_UPDATE_SERVER_FAIL);
     y += 14;
-  } else if (phase_ == Phase::ServerOk) {
-    Font::useBody();
+  } else if (phase_ == Phase::UpToDate) {
     u8g2.setCursor(MARGIN_X, y);
-    u8g2.print(D_UPDATE_SERVER_OK);
+    u8g2.print(D_UPDATE_UP_TO_DATE);
+    y += 14;
+  } else if (phase_ == Phase::UpdateAvailable) {
+    u8g2.setCursor(MARGIN_X, y);
+    u8g2.print(D_UPDATE_AVAILABLE_PREFIX);
+    u8g2.print(remoteVersion_.c_str());
     y += 14;
   }
+  y += 2;
 
+  // Check button
   if (focusItem_ == 2) Font::useBold(); else Font::useBody();
   u8g2.setCursor(MARGIN_X, y);
   u8g2.print(D_UPDATE_BTN_CHECK);
+  y += 14;
+
+  // Install button — only when an update is available
+  if (phase_ == Phase::UpdateAvailable) {
+    if (focusItem_ == 3) Font::useBold(); else Font::useBody();
+    u8g2.setCursor(MARGIN_X, y);
+    u8g2.print(D_UPDATE_BTN_INSTALL);
+  }
 
   display.update();
 }
@@ -166,33 +186,48 @@ void UpdateScreen::onButton(const ButtonEvent& e) {
     return;
   }
 
-  // Cursor navigation and activation — available when full UI is visible
-  if (phase_ == Phase::Idle || phase_ == Phase::ServerFail ||
-      phase_ == Phase::ServerOk) {
+  // Full UI phases only
+  if (phase_ != Phase::Idle && phase_ != Phase::ServerFail &&
+      phase_ != Phase::UpToDate && phase_ != Phase::UpdateAvailable) return;
 
-    if (e.kind == ButtonEvent::Short) {
-      focusItem_ = (focusItem_ + 1) % 3;
+  if (e.kind == ButtonEvent::Short) {
+    int maxItems = (phase_ == Phase::UpdateAvailable) ? 4 : 3;
+    focusItem_   = (focusItem_ + 1) % maxItems;
+    draw();
+    return;
+  }
+
+  if (e.kind == ButtonEvent::Double) {
+    if (focusItem_ == 0) {
+      stableChan_ = true;
+      saveChannel();
       draw();
-      return;
-    }
-
-    if (e.kind == ButtonEvent::Double) {
-      if (focusItem_ == 0) {
-        stableChan_ = true;
-        saveChannel();
-        draw();
-      } else if (focusItem_ == 1) {
-        stableChan_ = false;
-        saveChannel();
-        draw();
+    } else if (focusItem_ == 1) {
+      stableChan_ = false;
+      saveChannel();
+      draw();
+    } else if (focusItem_ == 2) {
+      // Check: probe + manifest fetch in one blocking sequence
+      phase_ = Phase::Checking;
+      draw();
+      if (OTA::isUpdateServerReachable()) {
+        OtaCheckResult r = OTA::checkAvailable(stableChan_ ? "stable" : "dev");
+        if (r.updateAvailable) {
+          remoteVersion_ = r.remoteVersion;
+          phase_         = Phase::UpdateAvailable;
+        } else if (r.remoteVersion.length() > 0) {
+          phase_ = Phase::UpToDate;
+        } else {
+          phase_ = Phase::ServerFail;  // manifest fetch failed
+        }
       } else {
-        phase_ = Phase::Checking;
-        draw();
-        phase_ = OTA::isUpdateServerReachable() ? Phase::ServerOk : Phase::ServerFail;
-        clearButtonQueue();  // discard any presses that queued during the blocking probe
-        draw();
+        phase_ = Phase::ServerFail;
       }
-      return;
+      clearButtonQueue();
+      draw();
+    } else if (focusItem_ == 3) {
+      // Install — download + flash, implemented in next step
     }
+    return;
   }
 }

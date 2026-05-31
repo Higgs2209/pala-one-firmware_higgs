@@ -86,7 +86,9 @@
 #define D_UPDATE_CONN_FAILED        "Wi-Fi not available"
 #define D_UPDATE_CHECKING           "Checking..."
 #define D_UPDATE_SERVER_FAIL        "Cannot reach update server"
-#define D_UPDATE_SERVER_OK          "Server reachable"
+#define D_UPDATE_UP_TO_DATE         "Already up to date"
+#define D_UPDATE_AVAILABLE_PREFIX   "Available: "
+#define D_UPDATE_BTN_INSTALL        "[ Install update ]"
 
 // ----------------------------------------------------------------------------
 //  Bookmarks screens
