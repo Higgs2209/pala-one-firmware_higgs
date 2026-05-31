@@ -124,6 +124,12 @@ void enter() {
   // we were reading without coupling sleep.cpp to any screen type.
   bool wasReading = (prefs.getString("wake_path", "").length() > 0);
 
+  // Engage the lock BEFORE drawing so the badge gates (Lock::isLocked()) in
+  // both branches below see the new state. If we flipped it after the draw,
+  // the framebuffer flushed to the panel would render unlocked and the badge
+  // wouldn't appear until the next refresh (e.g. a button press on wake).
+  if (s_lockOnSleep) Lock::engage();
+
   if (s_noScreensaver && wasReading) {
     // Full refresh of the last page so it sits cleanly on the panel.
     // The reader's framebuffer content is still intact at this point.
@@ -138,8 +144,6 @@ void enter() {
     drawSleepScreen();
     delay(600);
   }
-
-  if (s_lockOnSleep) Lock::engage();
 
   WiFi.softAPdisconnect(true);
   WiFi.disconnect(true, true);
