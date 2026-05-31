@@ -564,14 +564,12 @@ static void handleSleepEditorPage() {
   if (hasLegacy) {
     out += "<div class='row' style='align-items:center;gap:12px'>"
            "<img src='/screensavers/thumb?single=1' alt='" D_WEB_SS_SINGLE_ALT "' "
-           "style='width:180px;border:1px solid var(--line);border-radius:8px;background:#fff;image-rendering:pixelated'>"
-           "<form method='POST' action='/screensavers/delete'>"
-           "<input type='hidden' name='single' value='1'>"
-           "<button type='submit' class='btn secondary' "
-           "onclick=\"return confirm('" D_WEB_SS_CONFIRM_DEL_SINGLE "')\">" D_WEB_DELETE_BUTTON "</button>"
-           "</form></div>";
+           "style='width:180px;border:1px solid var(--line);border-radius:8px;background:#fff;image-rendering:pixelated'>";
+    out += screensaverActionsHtml(true, -1, true);
+    out += "</div>";
   } else {
     out += "<p class='muted'>" D_WEB_SS_NO_SINGLE "</p>";
+    out += screensaverActionsHtml(true, -1, false);
   }
   out += "</div>";
 
