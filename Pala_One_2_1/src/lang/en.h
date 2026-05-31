@@ -76,8 +76,8 @@
 // ----------------------------------------------------------------------------
 #define D_MENU_UPDATE               "Firmware Update"
 #define D_UPDATE_HEADER             "Firmware Update"
-#define D_UPDATE_VERSION_PREFIX     "Version: "
-#define D_UPDATE_CHANNEL_LABEL      "Channel: "
+#define D_UPDATE_VERSION_PREFIX     "Current Version: "
+#define D_UPDATE_CHANNEL_LABEL      "Select Firmware Channel:"
 #define D_UPDATE_CHAN_STABLE        "Stable"
 #define D_UPDATE_CHAN_DEV           "Dev"
 #define D_UPDATE_DEV_WARNING        "Dev builds may be unstable"

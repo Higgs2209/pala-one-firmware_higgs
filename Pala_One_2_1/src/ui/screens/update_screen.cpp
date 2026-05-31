@@ -167,6 +167,12 @@ void UpdateScreen::draw() {
   u8g2.print(D_UPDATE_VERSION_PREFIX FW_VERSION);
   y += 16;
 
+  // Channel label on its own line
+  Font::useBody();
+  u8g2.setCursor(MARGIN_X, y);
+  u8g2.print(D_UPDATE_CHANNEL_LABEL);
+  y += 14;
+
   // Channel checkboxes
   int cx = MARGIN_X;
 
@@ -197,7 +203,13 @@ void UpdateScreen::draw() {
   }
   y += 6;
 
-  // Status line
+  // Check button
+  if (focusItem_ == 2) Font::useBold(); else Font::useBody();
+  u8g2.setCursor(MARGIN_X, y);
+  u8g2.print(D_UPDATE_BTN_CHECK);
+  y += 14;
+
+  // Status line — shown below the check button
   Font::useBody();
   if (phase_ == Phase::ServerFail) {
     u8g2.setCursor(MARGIN_X, y);
@@ -217,13 +229,6 @@ void UpdateScreen::draw() {
     u8g2.print(D_UPDATE_DOWNLOAD_FAILED);
     y += 14;
   }
-  y += 2;
-
-  // Check button
-  if (focusItem_ == 2) Font::useBold(); else Font::useBody();
-  u8g2.setCursor(MARGIN_X, y);
-  u8g2.print(D_UPDATE_BTN_CHECK);
-  y += 14;
 
   // Install button — shown when update is available or after failed download
   if (hasInstall) {

@@ -77,8 +77,8 @@
 // ----------------------------------------------------------------------------
 #define D_MENU_UPDATE               "Actualización FW"
 #define D_UPDATE_HEADER             "Actualización"
-#define D_UPDATE_VERSION_PREFIX     "Versión: "
-#define D_UPDATE_CHANNEL_LABEL      "Canal: "
+#define D_UPDATE_VERSION_PREFIX     "Versión actual: "
+#define D_UPDATE_CHANNEL_LABEL      "Seleccionar canal:"
 #define D_UPDATE_CHAN_STABLE        "Estable"
 #define D_UPDATE_CHAN_DEV           "Dev"
 #define D_UPDATE_DEV_WARNING        "Dev puede ser inestable"
