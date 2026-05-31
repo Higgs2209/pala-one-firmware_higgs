@@ -12,7 +12,9 @@ public:
   void draw() override;
   void onIdleTick() override;
 
-  bool allowSleep() const override { return false; }
+  // Block sleep only while the Wi-Fi session is active; once wifiEnd() is
+  // called (after flash or on exit) the device may sleep normally.
+  bool allowSleep() const override { return !wifiStarted_; }
 
   // Called from the OTA progress callback during the blocking download.
   // Redraws at every 10 % to limit e-ink refresh overhead.
@@ -20,8 +22,9 @@ public:
 
 private:
   enum class Phase {
+    NoCreds,          // no stored Wi-Fi credentials — prompt to use web installer
     Connecting,       // STA association in flight
-    ConnFailed,       // no stored creds or association error
+    ConnFailed,       // association error
     Idle,             // connected — ready to check
     Checking,         // probe + manifest fetch running (drawn then blocks)
     ServerFail,       // probe or manifest fetch failed

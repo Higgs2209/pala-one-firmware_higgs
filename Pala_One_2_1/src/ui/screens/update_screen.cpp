@@ -8,11 +8,12 @@
 #include "src/hal/wifi.h"
 #include "src/hal/wifi_provisioning.h"
 #include "src/state.h"
+#include "src/storage/wifi_creds.h"
 #include "src/ui/font.h"
 #include "src/ui/screens/library_screen.h"
 #include "src/ui/widgets.h"
 
-static constexpr uint32_t    kStaTimeoutMs  = 5000;
+static constexpr uint32_t    kStaTimeoutMs  = 15000;
 static constexpr const char* kKeyOtaChannel = "cfg_ota_channel";
 
 // Static progress callback — called from OTA::download() during the blocking
@@ -62,7 +63,9 @@ void UpdateScreen::onEnter() {
   progress_      = 0;
   wifiStarted_   = false;
 
-  if (wifiStaBegin()) {
+  if (!WifiCreds::has()) {
+    phase_ = Phase::NoCreds;
+  } else if (wifiStaBegin()) {
     wifiStarted_ = true;
     WifiProvisioning::notifyUploadSession(true);
     phase_      = Phase::Connecting;
@@ -102,6 +105,15 @@ void UpdateScreen::draw() {
 
   // ---- Transient / single-message states -----------------------------------
 
+  if (phase_ == Phase::NoCreds) {
+    u8g2.setCursor(MARGIN_X, y);
+    u8g2.print(D_UPDATE_NO_CREDS_L1);
+    y += 14;
+    u8g2.setCursor(MARGIN_X, y);
+    u8g2.print(D_UPDATE_NO_CREDS_L2);
+    display.update();
+    return;
+  }
   if (phase_ == Phase::Connecting) {
     u8g2.setCursor(MARGIN_X, y);
     u8g2.print(D_UPDATE_CONNECTING);
@@ -229,13 +241,10 @@ void UpdateScreen::draw() {
 void UpdateScreen::onButton(const ButtonEvent& e) {
   if (!e.any()) return;
 
-  // Reboot prompt — 2x confirms, 3x defers (returns to library without reboot)
+  // Reboot prompt — only 2x is accepted; device has no manual reboot option.
   if (phase_ == Phase::RebootPrompt) {
     if (e.kind == ButtonEvent::Double) {
       esp_restart();
-    }
-    if (e.kind == ButtonEvent::Triple) {
-      exitToLibrary();
     }
     return;
   }
@@ -301,6 +310,13 @@ void UpdateScreen::onButton(const ButtonEvent& e) {
                                           onDownloadProgress);
       clearButtonQueue();
       if (r.success) {
+        // Flash complete — tear down WiFi and drop CPU to 80 MHz before
+        // showing the reboot prompt. Sleep is now allowed again.
+        if (wifiStarted_) {
+          wifiEnd();
+          WifiProvisioning::notifyUploadSession(false);
+          wifiStarted_ = false;
+        }
         phase_ = Phase::RebootPrompt;
       } else {
         phase_ = Phase::DownloadFailed;

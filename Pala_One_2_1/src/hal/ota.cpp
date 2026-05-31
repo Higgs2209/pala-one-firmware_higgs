@@ -36,9 +36,12 @@ static constexpr uint32_t kDownloadStallMs = 30000;
 // ----------------------------------------------------------------------------
 
 static void configureClient(WiFiClientSecure& client) {
-  client.setCACertBundle(x509_crt_imported_bundle_bin_start,
-                         x509_crt_imported_bundle_bin_end -
-                         x509_crt_imported_bundle_bin_start);
+  // Use uintptr_t arithmetic instead of pointer subtraction: the two symbols
+  // are linker-generated section markers guaranteed to be contiguous, but
+  // cppcheck cannot verify that and would flag a comparePointers error.
+  size_t len = (size_t)((uintptr_t)x509_crt_imported_bundle_bin_end
+                       - (uintptr_t)x509_crt_imported_bundle_bin_start);
+  client.setCACertBundle(x509_crt_imported_bundle_bin_start, len);
 }
 
 // ----------------------------------------------------------------------------

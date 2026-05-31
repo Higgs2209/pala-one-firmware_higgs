@@ -74,7 +74,7 @@
 // ----------------------------------------------------------------------------
 //  Update screen (src/ui/screens/update_screen.cpp)
 // ----------------------------------------------------------------------------
-#define D_MENU_UPDATE               "Update"
+#define D_MENU_UPDATE               "Firmware Update"
 #define D_UPDATE_HEADER             "Firmware Update"
 #define D_UPDATE_VERSION_PREFIX     "Version: "
 #define D_UPDATE_CHANNEL_LABEL      "Channel: "
@@ -82,8 +82,10 @@
 #define D_UPDATE_CHAN_DEV           "Dev"
 #define D_UPDATE_DEV_WARNING        "Dev builds may be unstable"
 #define D_UPDATE_BTN_CHECK          "[ Check for update ]"
+#define D_UPDATE_NO_CREDS_L1        "No Wi-Fi credentials."
+#define D_UPDATE_NO_CREDS_L2        "Setup via web installer."
 #define D_UPDATE_CONNECTING         "Connecting..."
-#define D_UPDATE_CONN_FAILED        "Wi-Fi not available"
+#define D_UPDATE_CONN_FAILED        "Wi-Fi connection failed"
 #define D_UPDATE_CHECKING           "Checking..."
 #define D_UPDATE_SERVER_FAIL        "Cannot reach update server"
 #define D_UPDATE_UP_TO_DATE         "Already up to date"
@@ -92,7 +94,7 @@
 #define D_UPDATE_INSTALLING         "Installing..."
 #define D_UPDATE_DOWNLOAD_FAILED    "Download failed"
 #define D_UPDATE_REBOOT_MSG         "Update installed"
-#define D_UPDATE_REBOOT_HINT        "2x to reboot  3x later"
+#define D_UPDATE_REBOOT_HINT        "2x to reboot"
 
 // ----------------------------------------------------------------------------
 //  Bookmarks screens

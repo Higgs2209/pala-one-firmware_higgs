@@ -75,7 +75,7 @@
 // ----------------------------------------------------------------------------
 //  Update screen
 // ----------------------------------------------------------------------------
-#define D_MENU_UPDATE               "Actualizar"
+#define D_MENU_UPDATE               "Actualización FW"
 #define D_UPDATE_HEADER             "Actualización"
 #define D_UPDATE_VERSION_PREFIX     "Versión: "
 #define D_UPDATE_CHANNEL_LABEL      "Canal: "
@@ -83,8 +83,10 @@
 #define D_UPDATE_CHAN_DEV           "Dev"
 #define D_UPDATE_DEV_WARNING        "Dev puede ser inestable"
 #define D_UPDATE_BTN_CHECK          "[ Buscar actualización ]"
+#define D_UPDATE_NO_CREDS_L1        "Sin credenciales Wi-Fi."
+#define D_UPDATE_NO_CREDS_L2        "Configura via instalador."
 #define D_UPDATE_CONNECTING         "Conectando..."
-#define D_UPDATE_CONN_FAILED        "Wi-Fi no disponible"
+#define D_UPDATE_CONN_FAILED        "Conexión Wi-Fi fallida"
 #define D_UPDATE_CHECKING           "Verificando..."
 #define D_UPDATE_SERVER_FAIL        "No se puede alcanzar el servidor"
 #define D_UPDATE_UP_TO_DATE         "Ya está actualizado"
@@ -93,7 +95,7 @@
 #define D_UPDATE_INSTALLING         "Instalando..."
 #define D_UPDATE_DOWNLOAD_FAILED    "Descarga fallida"
 #define D_UPDATE_REBOOT_MSG         "Actualización instalada"
-#define D_UPDATE_REBOOT_HINT        "2x reiniciar  3x después"
+#define D_UPDATE_REBOOT_HINT        "2x para reiniciar"
 
 // ----------------------------------------------------------------------------
 //  Bookmarks screens

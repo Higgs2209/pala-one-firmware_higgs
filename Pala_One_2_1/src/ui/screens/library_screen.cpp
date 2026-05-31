@@ -166,8 +166,8 @@ void LibraryScreen::draw() {
   systemEntries[systemCount++] = LIB_ENTRY_APPS;
   systemEntries[systemCount++] = LIB_ENTRY_STATISTICS;
   systemEntries[systemCount++] = LIB_ENTRY_ABOUT;
-  systemEntries[systemCount++] = LIB_ENTRY_UPDATE;
   systemEntries[systemCount++] = LIB_ENTRY_UPLOAD;
+  systemEntries[systemCount++] = LIB_ENTRY_UPDATE;
 
   // Build the bool[] view that the assembler wants from our name-keyed
   // expansion set, against the current folder ordering.
