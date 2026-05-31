@@ -284,6 +284,8 @@
 #define D_WEB_LINE_SPACING_HINT     "A small change here can make text much easier to scan."
 #define D_WEB_NO_SCREENSAVER_LABEL  "No-screensaver mode"
 #define D_WEB_NO_SCREENSAVER_HINT   "Device still sleeps on the normal timer and refreshes the screen before going to sleep. Then it shows the last page of the book, and skips a full refresh on wake, so you can continue reading with a single click of the button without the interruption of a display refresh."
+#define D_WEB_LOCK_ON_SLEEP_LABEL   "Lock on sleep"
+#define D_WEB_LOCK_ON_SLEEP_HINT    "Automatically lock the device every time it goes to sleep. You will need to perform a long press to unlock on the next wake."
 #define D_WEB_SAVE_SETTINGS_BUTTON  "Save settings"
 #define D_WEB_SETTINGS_NO_EXTRAS    "No extra files, scripts, or fonts."
 #define D_WEB_SCREENSAVER_HEADING   "Screensaver"

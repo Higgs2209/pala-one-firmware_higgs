@@ -11,6 +11,7 @@
 #include "src/ui/reader.h"                // g_bookview, findPageForOffset, renderCurrentPage
 #include "src/ui/reader_actions.h"        // ButtonAction + Gestures
 #include "src/ui/screens/reader_screen.h" // g_readerScreen — active-reader check
+#include "src/ui/lock.h"
 #include "src/ui/sleep.h"
 #include "src/web/chrome.h"
 
@@ -157,6 +158,13 @@ static void handleSettings() {
   out +=
     "><span>" D_WEB_NO_SCREENSAVER_LABEL "</span></label>"
     "<div class='hint'>" D_WEB_NO_SCREENSAVER_HINT "</div></div>"
+    "<div style='margin-top:10px'>"
+    "<label style='display:flex;align-items:center;gap:8px;font-weight:600;cursor:pointer'>"
+    "<input type='checkbox' name='lckslp' id='lckslp' style='width:auto'";
+  if (Sleep::lockOnSleep()) out += " checked";
+  out +=
+    "><span>" D_WEB_LOCK_ON_SLEEP_LABEL "</span></label>"
+    "<div class='hint'>" D_WEB_LOCK_ON_SLEEP_HINT "</div></div>"
     "<input type='hidden' name='noscr_form' value='1'>"
     "<div class='actions' style='margin-top:24px'><button type='submit'>" D_WEB_SAVE_SETTINGS_BUTTON "</button>"
     "<span class='muted'>" D_WEB_SETTINGS_APPLY_HINT "</span></div>"
@@ -265,6 +273,8 @@ static void handleSettingsPost() {
   if (server.hasArg("noscr_form")) {
     bool ns = server.hasArg("noscr");
     if (ns != Sleep::noScreensaver()) Sleep::setNoScreensaver(ns);
+    bool ls = server.hasArg("lckslp");
+    if (ls != Sleep::lockOnSleep()) Sleep::setLockOnSleep(ls);
   }
 
   // Header title — its own form card.

@@ -22,8 +22,10 @@ namespace Sleep {
 // Owned settings + NVS keys — file-private.
 static int  s_idleSecs      = 120;
 static bool s_noScreensaver = false;
+static bool s_lockOnSleep   = false;
 static constexpr const char* kKeyIdleSecs      = "cfg_sleep";
 static constexpr const char* kKeyNoScreensaver = "cfg_noscr";
+static constexpr const char* kKeyLockOnSleep   = "cfg_lck_slp";
 
 void loadSettings() {
   int s = prefs.getInt(kKeyIdleSecs, 120);
@@ -31,6 +33,7 @@ void loadSettings() {
   if (s > 3600) s = 3600;
   s_idleSecs = s;
   s_noScreensaver = prefs.getBool(kKeyNoScreensaver, false);
+  s_lockOnSleep   = prefs.getBool(kKeyLockOnSleep,   false);
 }
 
 void setIdleTimeout(int secs) {
@@ -43,10 +46,16 @@ void setIdleTimeout(int secs) {
 int      idleTimeoutSecs() { return s_idleSecs; }
 uint32_t idleTimeoutMs()   { return (uint32_t)s_idleSecs * 1000UL; }
 bool     noScreensaver()   { return s_noScreensaver; }
+bool     lockOnSleep()     { return s_lockOnSleep; }
 
 void setNoScreensaver(bool val) {
   s_noScreensaver = val;
   prefs.putBool(kKeyNoScreensaver, val);
+}
+
+void setLockOnSleep(bool val) {
+  s_lockOnSleep = val;
+  prefs.putBool(kKeyLockOnSleep, val);
 }
 
 // Draw a padlock icon in the top-right corner so a user who has locked the
@@ -129,6 +138,8 @@ void enter() {
     drawSleepScreen();
     delay(600);
   }
+
+  if (s_lockOnSleep) Lock::engage();
 
   WiFi.softAPdisconnect(true);
   WiFi.disconnect(true, true);
