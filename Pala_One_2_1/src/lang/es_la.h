@@ -90,6 +90,10 @@
 #define D_UPDATE_UP_TO_DATE         "Ya está actualizado"
 #define D_UPDATE_AVAILABLE_PREFIX   "Disponible: "
 #define D_UPDATE_BTN_INSTALL        "[ Instalar actualización ]"
+#define D_UPDATE_INSTALLING         "Instalando..."
+#define D_UPDATE_DOWNLOAD_FAILED    "Descarga fallida"
+#define D_UPDATE_REBOOT_MSG         "Actualización instalada"
+#define D_UPDATE_REBOOT_HINT        "2x reiniciar  3x después"
 
 // ----------------------------------------------------------------------------
 //  Bookmarks screens
