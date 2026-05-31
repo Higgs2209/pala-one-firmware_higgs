@@ -79,7 +79,7 @@ Once the device has Wi-Fi credentials stored (see [Wi-Fi provisioning](#wi-fi-pr
 1. Navigate to **Firmware Update** at the bottom of the library menu.
 2. The device connects to your home network automatically.
 3. Select a channel with **1×** press:
-   - `[x] Stable` — latest tagged release, recommended for everyday use.
+   - `[x] Stable` — latest tagged release. 
    - `[ ] Dev` — latest development build; may contain new features or instabilities.
 4. Navigate to **[ Check for update ]** with **1×** and confirm with **2×**.
    The device probes the update server, fetches the manifest, and compares the remote version against the installed one.
