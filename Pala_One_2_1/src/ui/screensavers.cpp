@@ -40,14 +40,12 @@ bool slotExists(int slot) {
   return ok;
 }
 
-// cppcheck-suppress unusedFunction
 int populatedCount() {
   int n = 0;
   for (int i = 0; i < MAX_SLOTS; i++) if (slotExists(i)) n++;
   return n;
 }
 
-// cppcheck-suppress unusedFunction
 int firstFreeSlot() {
   for (int i = 0; i < MAX_SLOTS; i++) if (!slotExists(i)) return i;
   return -1;
@@ -73,7 +71,6 @@ static int collectSlots(int outSlots[MAX_SLOTS]) {
   return n;
 }
 
-// cppcheck-suppress unusedFunction
 void loadSettings() {
   ensureDir();
   int m = prefs.getInt(kKeyMode, (int)Mode::Single);
@@ -84,7 +81,6 @@ void loadSettings() {
   s_lastShown = prefs.getInt(kKeyLastShown, -1);
 }
 
-// cppcheck-suppress unusedFunction
 void setMode(Mode m) {
   s_mode = m;
   prefs.putInt(kKeyMode, (int)m);
@@ -93,10 +89,8 @@ void setMode(Mode m) {
   prefs.putInt(kKeyCycleIdx, 0);
 }
 
-// cppcheck-suppress unusedFunction
 Mode currentMode() { return s_mode; }
 
-// cppcheck-suppress unusedFunction
 bool installFromTemp(int slot, const String& tmpPath) {
   if (slot < 0 || slot >= MAX_SLOTS) {
     if (FS.exists(tmpPath)) FS.remove(tmpPath);
@@ -119,7 +113,6 @@ bool installFromTemp(int slot, const String& tmpPath) {
   return true;
 }
 
-// cppcheck-suppress unusedFunction
 void deleteSlot(int slot) {
   if (slot < 0 || slot >= MAX_SLOTS) return;
   String p = slotPath(slot);
@@ -130,7 +123,6 @@ void deleteSlot(int slot) {
   prefs.putInt(kKeyLastShown, -1);
 }
 
-// cppcheck-suppress unusedFunction
 bool drawNext() {
   if (s_mode == Mode::Single) {
     File sf = FS.open("/sleep.bin", "r");

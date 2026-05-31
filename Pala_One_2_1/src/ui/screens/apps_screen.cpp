@@ -11,7 +11,6 @@
 // matching how LibraryScreen / ListScreen behave.
 static int s_cursor = 0;
 
-// cppcheck-suppress unusedFunction
 void AppsScreen::onEnter() {
   // Re-scan the catalog on entry so newly uploaded apps appear without
   // a reboot. Cheap (one /apps/ directory walk).
@@ -41,7 +40,6 @@ void AppsScreen::draw() {
   display.update();
 }
 
-// cppcheck-suppress unusedFunction
 void AppsScreen::onButton(const ButtonEvent& e) {
   if (!e.any()) return;
 

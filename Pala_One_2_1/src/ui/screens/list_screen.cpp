@@ -6,7 +6,6 @@
 #include "src/ui/screens/library_screen.h"
 #include "src/ui/widgets.h"
 
-// cppcheck-suppress unusedFunction
 void ListScreen::onEnter() {
   draw();
 }
@@ -64,7 +63,6 @@ void ListScreen::draw() {
   display.update();
 }
 
-// cppcheck-suppress unusedFunction
 void ListScreen::onButton(const ButtonEvent& e) {
   if (!listHasVisibleItems()) {
     nextScreen = &g_libraryScreen;

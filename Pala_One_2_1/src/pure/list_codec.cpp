@@ -11,7 +11,6 @@ void sanitizeListItemText(String& s) {
   if ((int)s.length() > MAX_LIST_TEXT) s = s.substring(0, MAX_LIST_TEXT);
 }
 
-// cppcheck-suppress unusedFunction
 int decodeList(const uint8_t* buf, size_t got, ListData& out) {
   out.count = 0;
   if (got < 1) return 0;
@@ -40,7 +39,6 @@ int decodeList(const uint8_t* buf, size_t got, ListData& out) {
   return out.count;
 }
 
-// cppcheck-suppress unusedFunction
 size_t encodeList(const ListData& data, uint8_t* outBuf) {
   std::memset(outBuf, 0, LIST_ENCODED_MAX_SIZE);
   outBuf[0] = (uint8_t)data.count;
@@ -54,7 +52,6 @@ size_t encodeList(const ListData& data, uint8_t* outBuf) {
   return pos;
 }
 
-// cppcheck-suppress unusedFunction
 bool listHasVisible(const ListData& data) {
   for (int i = 0; i < data.count; i++) {
     if (data.items[i].text[0]) return true;

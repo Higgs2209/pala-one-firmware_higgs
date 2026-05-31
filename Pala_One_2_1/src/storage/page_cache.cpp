@@ -85,7 +85,6 @@ static bool openAndValidateCache(const String& path, size_t expectedSize,
   return true;
 }
 
-// cppcheck-suppress unusedFunction
 bool loadPageOffsetCacheForBook(const String& path, size_t expectedSize,
                                 const PageCacheLayout& layout,
                                 PageOffsetTable& out) {
@@ -108,7 +107,6 @@ bool loadPageOffsetCacheForBook(const String& path, size_t expectedSize,
   return true;
 }
 
-// cppcheck-suppress unusedFunction
 void savePageOffsetCacheForBook(const String& path, size_t fileSize,
                                 const PageCacheLayout& layout,
                                 const PageOffsetTable& in) {
@@ -130,7 +128,6 @@ void savePageOffsetCacheForBook(const String& path, size_t fileSize,
   f.close();
 }
 
-// cppcheck-suppress unusedFunction
 int loadOffsetForPageFromDisk(const String& path, size_t expectedSize,
                               const PageCacheLayout& layout,
                               int maxPage, uint32_t* out) {
@@ -152,13 +149,11 @@ int loadOffsetForPageFromDisk(const String& path, size_t expectedSize,
   return targetPage;
 }
 
-// cppcheck-suppress unusedFunction
 void deletePageCacheForBook(const String& path) {
   String cachePath = pageCachePathForBook(path);
   if (FS.exists(cachePath)) FS.remove(cachePath);
 }
 
-// cppcheck-suppress unusedFunction
 void renamePageCacheForBook(const String& oldPath, const String& newPath) {
   String oldCache = pageCachePathForBook(oldPath);
   if (!FS.exists(oldCache)) return;

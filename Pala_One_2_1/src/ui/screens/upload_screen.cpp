@@ -109,7 +109,6 @@ void UploadScreen::draw() {
 }
 
 // ---- Lifecycle ------------------------------------------------------------
-// cppcheck-suppress unusedFunction
 void UploadScreen::onEnter() {
   beginSession();
 }
@@ -166,7 +165,6 @@ void UploadScreen::stopSessionToLibrary() {
 }
 
 // ---- Per-iteration input + tick -------------------------------------------
-// cppcheck-suppress unusedFunction
 void UploadScreen::onButton(const ButtonEvent& e) {
   if (!e.any()) return;
 
@@ -181,7 +179,6 @@ void UploadScreen::onButton(const ButtonEvent& e) {
   }
 }
 
-// cppcheck-suppress unusedFunction
 void UploadScreen::onIdleTick() {
   if (phase_ == Phase::ConnectingSta) {
     WifiStaResult r = wifiStaPoll(net_);

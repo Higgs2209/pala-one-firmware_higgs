@@ -20,7 +20,6 @@ struct BatteryState {
 };
 static BatteryState s_battery;
 
-// cppcheck-suppress unusedFunction
 void adcSetupOnce() {
   pinMode(BAT_ADC_IN, INPUT);
   analogReadResolution(12);
@@ -141,7 +140,6 @@ void updateBatteryCached(bool force) {
   else if (s_battery.low && s_battery.pctShown >= 12) s_battery.low = false;
 }
 
-// cppcheck-suppress unusedFunction
 void drawBatteryTopRight() {
   updateBatteryCached(false);
 

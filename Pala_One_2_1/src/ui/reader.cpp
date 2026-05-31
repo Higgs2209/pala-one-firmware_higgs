@@ -25,7 +25,6 @@ BookView g_bookview;
 // the unlock path to clear screensaver ghosting).
 static bool s_forceNextFull = false;
 
-// cppcheck-suppress unusedFunction
 void forceNextRenderFull() { s_forceNextFull = true; }
 
 // Deferred-repagination flag. Set by `markPagesDirtyForLayoutChange` when a
@@ -45,7 +44,6 @@ void forceNextRenderFull() { s_forceNextFull = true; }
 // cleaner shape and keeps the menu's per-click feedback instant.)
 static bool s_pagesLayoutDirty = false;
 
-// cppcheck-suppress unusedFunction
 void markPagesDirtyForLayoutChange() { s_pagesLayoutDirty = true; }
 
 // Auto-save throttle bookkeeping. Private to this translation unit — only
@@ -87,7 +85,6 @@ void OpenBook::close() {
   key_  = "";
 }
 
-// cppcheck-suppress unusedFunction
 void armResumeOnWake() {
   if (!g_bookview.book.isOpen()) return;
   prefs.putString("wake_path", g_bookview.book.path());
@@ -298,7 +295,6 @@ static bool prepareForRender() {
   return true;
 }
 
-// cppcheck-suppress unusedFunction
 void renderCurrentPage() {
   // Strong invariant: if we got here, a book is open. The reader screen
   // is never active otherwise.
@@ -337,7 +333,6 @@ void renderCurrentPage() {
   display.update();
 }
 
-// cppcheck-suppress unusedFunction
 bool tryRestoreReadingSession() {
   // Single-shot: read wake intent, then clear it. From this point on
   // (during this runtime session) wake state is empty unless the reader
@@ -358,7 +353,6 @@ bool tryRestoreReadingSession() {
 //  caller-side post-move work (save progress, render) varies between the
 //  screens and stays at the call site.
 // ============================================================================
-// cppcheck-suppress unusedFunction
 bool advancePage() {
   int targetPage = g_bookview.cursor.pageIndex + 1;
   ensureOffsetsUpTo(targetPage);
@@ -370,7 +364,6 @@ bool advancePage() {
   return true;
 }
 
-// cppcheck-suppress unusedFunction
 bool retreatPage() {
   if (g_bookview.cursor.pageIndex <= 0) return false;
   g_bookview.cursor.pageIndex--;
@@ -383,7 +376,6 @@ bool retreatPage() {
 //  Layout-change response — keeps `g_bookview.pages` consistent with the
 //  current Font::layoutForCache(). See header comment for the contract.
 // ============================================================================
-// cppcheck-suppress unusedFunction
 void repaginateForLayoutChange() {
   if (!g_bookview.book.isOpen()) return;
 
@@ -427,7 +419,6 @@ void repaginateForLayoutChange() {
 // ============================================================================
 //  Full view reset — used when leaving the reader entirely.
 // ============================================================================
-// cppcheck-suppress unusedFunction
 void resetBookView() {
   g_bookview.book.close();
   g_bookview.cursor = ReaderCursor{};
@@ -457,7 +448,6 @@ void saveProgress() {
   s_save.lastSavedPage = g_bookview.cursor.pageIndex;
 }
 
-// cppcheck-suppress unusedFunction
 void saveProgressThrottled() {
   if (!g_bookview.book.isOpen()) return;
   if (g_bookview.cursor.pageIndex == s_save.lastSavedPage) return;
@@ -466,7 +456,6 @@ void saveProgressThrottled() {
   saveProgress();
 }
 
-// cppcheck-suppress unusedFunction
 const char* addBookmarkForCurrentBook() {
   if (!g_bookview.book.isOpen()) return nullptr;
 
@@ -487,7 +476,6 @@ const char* addBookmarkForCurrentBook() {
 // Used at every "leaving" moment (sleep, exit-to-home, preview commit) so a
 // later boot or open finds both the latest cursor and a fresh page table.
 // Mid-session uses `saveProgressThrottled` for cheaper, more frequent writes.
-// cppcheck-suppress unusedFunction
 void persistReaderState() {
   if (!g_bookview.book.isOpen()) return;
   saveProgress();

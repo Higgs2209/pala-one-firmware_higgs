@@ -11,12 +11,10 @@ uint32_t fnv1a32(const char* s) {
   return h;
 }
 
-// cppcheck-suppress unusedFunction
 uint32_t hashPath32(const String& path) {
   return fnv1a32(path.c_str());
 }
 
-// cppcheck-suppress unusedFunction
 String prefKeyForBook(const String& path) {
   uint32_t h = fnv1a32(path.c_str());
   char buf[16];
@@ -24,7 +22,6 @@ String prefKeyForBook(const String& path) {
   return String(buf);
 }
 
-// cppcheck-suppress unusedFunction
 String bmKeyFor(const String& bookKey) {
   return bookKey + "_bm";
 }

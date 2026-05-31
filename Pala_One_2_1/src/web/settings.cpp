@@ -299,7 +299,6 @@ static void handleDeleteSleepImg() {
   server.send(302, "text/plain", "");
 }
 
-// cppcheck-suppress unusedFunction
 void registerSettingsRoutes() {
   server.on("/settings",  HTTP_GET,  handleSettings);
   server.on("/settings",  HTTP_POST, handleSettingsPost);

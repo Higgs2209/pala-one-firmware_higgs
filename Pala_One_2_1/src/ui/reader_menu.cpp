@@ -21,10 +21,8 @@ static const char* statusbarLabel() {
   }
 }
 
-// cppcheck-suppress unusedFunction
 bool isActive() { return s_active; }
 
-// cppcheck-suppress unusedFunction
 void open() {
   s_active = true;
   // First paint of the menu sits over whatever the reader last drew. Use a
@@ -89,7 +87,6 @@ void draw() {
   display.update();
 }
 
-// cppcheck-suppress unusedFunction
 bool onButton(const ButtonEvent& ev) {
   if (!s_active) return false;
   if (!ev.any()) return false;

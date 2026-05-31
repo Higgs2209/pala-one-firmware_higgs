@@ -250,7 +250,6 @@ static void handleReadView() {
   server.send(200, "text/html; charset=utf-8", out);
 }
 
-// cppcheck-suppress unusedFunction
 void registerFindRoutes() {
   server.on("/read",          HTTP_GET,  handleReadView);
   server.on("/readbook-text", HTTP_GET,  handleReadbookText);

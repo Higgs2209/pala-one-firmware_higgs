@@ -16,15 +16,12 @@ static Mode clamp(int v) {
   return (Mode)v;
 }
 
-// cppcheck-suppress unusedFunction
 void loadSettings() {
   s_mode = clamp(prefs.getInt(kKey, Full));
 }
 
-// cppcheck-suppress unusedFunction
 Mode mode() { return s_mode; }
 
-// cppcheck-suppress unusedFunction
 int reserveH() {
   switch (s_mode) {
     case Hidden:  return 0;
@@ -50,7 +47,6 @@ void setMode(Mode m) {
   markPagesDirtyForLayoutChange();
 }
 
-// cppcheck-suppress unusedFunction
 void cycleMode() {
   Mode next = (Mode)((int)s_mode + 1);
   if (next > Hidden) next = Full;

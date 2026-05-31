@@ -14,7 +14,6 @@ static constexpr const char* kMdnsHost = "pala-one";
 // back to NVS. Cleared by wifiStaAbort() / wifiEnd().
 static String s_staSsid;
 
-// cppcheck-suppress unusedFunction
 bool wifiStaBegin() {
   if (!WifiCreds::has()) return false;
 
@@ -28,7 +27,6 @@ bool wifiStaBegin() {
   return true;
 }
 
-// cppcheck-suppress unusedFunction
 WifiStaResult wifiStaPoll(WifiSession& out) {
   switch (WiFi.status()) {
     case WL_CONNECTED: {
@@ -51,7 +49,6 @@ WifiStaResult wifiStaPoll(WifiSession& out) {
   }
 }
 
-// cppcheck-suppress unusedFunction
 void wifiStaAbort() {
   WiFi.disconnect(true, true);
   WiFi.mode(WIFI_OFF);
@@ -60,7 +57,6 @@ void wifiStaAbort() {
   // wifiBeginAccessPoint() which needs it anyway. wifiEnd() drops it.
 }
 
-// cppcheck-suppress unusedFunction
 WifiSession wifiBeginAccessPoint() {
   setCpuFrequencyMhz(240);
 
@@ -76,7 +72,6 @@ WifiSession wifiBeginAccessPoint() {
   return s;
 }
 
-// cppcheck-suppress unusedFunction
 void wifiEnd() {
   MDNS.end();
   WiFi.softAPdisconnect(true);

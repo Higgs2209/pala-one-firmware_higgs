@@ -30,7 +30,6 @@ static void addFolderTree(const Catalog& cat, const bool* folderExpanded,
   }
 }
 
-// cppcheck-suppress unusedFunction
 int buildLibraryEntries(
     const Catalog& cat,
     const bool* folderExpanded,

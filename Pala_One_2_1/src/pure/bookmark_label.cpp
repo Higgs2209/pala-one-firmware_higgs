@@ -7,7 +7,6 @@ static inline bool isBookmarkLabelWordChar(char c) {
          ((uint8_t)c >= 128);
 }
 
-// cppcheck-suppress unusedFunction
 String readBookmarkLabelAtOffset(IReadStream& in, uint32_t off, int page) {
   if (!in.seek(off)) return String("p. ") + String(page + 1);
 

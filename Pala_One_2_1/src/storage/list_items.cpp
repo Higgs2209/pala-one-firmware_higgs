@@ -34,12 +34,10 @@ void saveList(KeyValueStore& kv, const ListData& data) {
 // `saveListItems()`; the list screen reads/writes it for navigation.
 ListState g_list;
 
-// cppcheck-suppress unusedFunction
 void sanitizeListText(String& s) {
   sanitizeListItemText(s);
 }
 
-// cppcheck-suppress unusedFunction
 void loadListItems() {
   PreferencesStore kv(prefs);
   ListData data = loadList(kv);
@@ -60,7 +58,6 @@ void loadListItems() {
   else                                g_list.selectedIndex = prevSelection;
 }
 
-// cppcheck-suppress unusedFunction
 void saveListItems() {
   ListData data;
   data.count = g_list.count;
@@ -73,7 +70,6 @@ void saveListItems() {
   saveList(kv, data);
 }
 
-// cppcheck-suppress unusedFunction
 bool listHasVisibleItems() {
   for (int i = 0; i < g_list.count; i++) {
     if (g_list.items[i].text[0]) return true;

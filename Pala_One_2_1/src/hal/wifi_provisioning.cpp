@@ -71,7 +71,6 @@ static void clearGraceTimer() {
   s_state.credsReceivedMs = 0;
 }
 
-// cppcheck-suppress unusedFunction
 void begin() {
   s_state.lib.setDeviceInfo(
       ImprovTypes::ChipFamily::CF_ESP32_S3,
@@ -103,7 +102,6 @@ void begin() {
   });
 }
 
-// cppcheck-suppress unusedFunction
 void notifyUploadSession(bool active) {
   s_state.uploadSession = active;
   if (active) {
@@ -114,14 +112,12 @@ void notifyUploadSession(bool active) {
   }
 }
 
-// cppcheck-suppress unusedFunction
 bool isActive() {
   // Stay awake whenever a USB host is on the bus. Wall chargers and
   // unplugged cables register as not-plugged, so they don't pin us awake.
   return hostPresent();
 }
 
-// cppcheck-suppress unusedFunction
 void loop() {
   // Track bytes from host for the activity-window fallback in hostPresent().
   // Do this *before* handleSerial drains the buffer so we don't miss the

@@ -1,6 +1,5 @@
 #include "src/pure/streak_log.h"
 
-// cppcheck-suppress unusedFunction
 StreakLogResult applyStreakLog(const ReadingStreakFile& current, uint32_t today) {
   StreakLogResult r{};
   if (current.lastLoggedDay == today) {

@@ -14,7 +14,6 @@ static bool isExpired() {
   return s_untilMs != 0 && (int32_t)(millis() - s_untilMs) > 0;
 }
 
-// cppcheck-suppress unusedFunction
 void show(const String& msg) {
   s_msg = msg;
   s_untilMs = millis() + TOAST_MS;
@@ -24,7 +23,6 @@ bool isActive() {
   return s_untilMs != 0 && !isExpired();
 }
 
-// cppcheck-suppress unusedFunction
 bool clearIfExpired() {
   if (!isExpired()) return false;
   s_msg = "";
@@ -32,13 +30,11 @@ bool clearIfExpired() {
   return true;
 }
 
-// cppcheck-suppress unusedFunction
 void reset() {
   s_msg = "";
   s_untilMs = 0;
 }
 
-// cppcheck-suppress unusedFunction
 void draw() {
   if (!isActive()) return;
 

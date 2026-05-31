@@ -244,7 +244,6 @@ static void handleExportBookmarksWeb() {
   server.send(200, "text/plain; charset=utf-8", out);
 }
 
-// cppcheck-suppress unusedFunction
 void registerBookmarksRoutes() {
   server.on("/bookmarks", HTTP_GET,  handleBookmarksWeb);
   server.on("/viewbm",    HTTP_GET,  handleViewBookmarkWeb);

@@ -5,7 +5,6 @@
 #include "src/ui/screens/reader_screen.h"
 #include "src/ui/text.h"
 
-// cppcheck-suppress unusedFunction
 void BookmarkPreviewScreen::onEnter() {
   draw();
 }
@@ -14,7 +13,6 @@ void BookmarkPreviewScreen::draw() {
   renderCurrentPage();
 }
 
-// cppcheck-suppress unusedFunction
 void BookmarkPreviewScreen::onButton(const ButtonEvent& e) {
   if (e.kind == ButtonEvent::Triple) {
     // Cancel — full clear so we don't leave a half-open state for the next
@@ -43,7 +41,6 @@ void BookmarkPreviewScreen::onButton(const ButtonEvent& e) {
   }
 }
 
-// cppcheck-suppress unusedFunction
 void BookmarkPreviewScreen::onSleep() {
   // Preview is transient — don't commit progress, don't arm wake state.
   // Wake state stays empty, so next boot lands in library; resetBookView()

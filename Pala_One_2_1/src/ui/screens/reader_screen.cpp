@@ -40,7 +40,6 @@ static void performReaderAction(ButtonAction action) {
   }
 }
 
-// cppcheck-suppress unusedFunction
 void ReaderScreen::onEnter() {
   draw();
 }
@@ -95,7 +94,6 @@ void ReaderScreen::onButton(const ButtonEvent& e) {
   }
 }
 
-// cppcheck-suppress unusedFunction
 void ReaderScreen::onSleep() {
   // Strong invariant: reader screen is never active without an open book.
   persistReaderState();

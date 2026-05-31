@@ -56,7 +56,6 @@ static void sortByName() {
   }
 }
 
-// cppcheck-suppress unusedFunction
 void loadApps() {
   g_apps.count = 0;
 
@@ -113,7 +112,6 @@ void loadApps() {
   sortByName();
 }
 
-// cppcheck-suppress unusedFunction
 const char* appPath(int idx) {
   if (idx < 0 || idx >= g_apps.count) return nullptr;
   return g_apps.entries[idx].path;

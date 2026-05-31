@@ -39,13 +39,11 @@ BookUpload  s_book;
 SleepUpload s_sleep;
 }  // namespace
 
-// cppcheck-suppress unusedFunction
 void resetBookUpload() {
   if (s_book.tmpFile) s_book.tmpFile.close();
   s_book = BookUpload{};
 }
 
-// cppcheck-suppress unusedFunction
 void resetSleepUpload() {
   if (s_sleep.tmpFile) s_sleep.tmpFile.close();
   s_sleep = SleepUpload{};
@@ -314,7 +312,6 @@ static void handleUploadSleepStream() {
   }
 }
 
-// cppcheck-suppress unusedFunction
 void registerUploadRoutes() {
   server.on("/upload",       HTTP_POST, handleUploadDone,      handleUploadBookStream);
   server.on("/upload-sleep", HTTP_POST, handleUploadSleepDone, handleUploadSleepStream);

@@ -20,7 +20,6 @@ static int bodyMeasure(const char* s) {
 //  function and the metrics describe the same face. Each returns the byte
 //  offset where the next page begins.
 // ============================================================================
-// cppcheck-suppress unusedFunction
 uint32_t drawPageAt(File& f, uint32_t startPos) {
   FileReadStream stream(f);
   const LayoutMetrics& m = Font::bodyLayout();
@@ -37,7 +36,6 @@ uint32_t drawPageAt(File& f, uint32_t startPos) {
   return paginatePage(stream, startPos, m, bodyMeasure, onLine);
 }
 
-// cppcheck-suppress unusedFunction
 uint32_t extractPageText(File& f, uint32_t startPos, String& out) {
   FileReadStream stream(f);
   const LayoutMetrics& m = Font::bodyLayout();
@@ -85,7 +83,6 @@ uint32_t pageOffsetForPage(File& f, const String& path, int page) {
   return off;
 }
 
-// cppcheck-suppress unusedFunction
 uint32_t resolveBookmarkOffset(const String& path, uint16_t page, uint32_t storedOffset) {
   File f = FS.open(path, "r");
   if (!f) return 0;

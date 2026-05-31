@@ -2,7 +2,6 @@
 
 #include <cstring>
 
-// cppcheck-suppress unusedFunction
 uint8_t decodeBookmarks(const uint8_t* buf, size_t got, Bookmarks& out) {
   out.count = 0;
   if (got < 1) return 0;
@@ -31,7 +30,6 @@ uint8_t decodeBookmarks(const uint8_t* buf, size_t got, Bookmarks& out) {
   return count;
 }
 
-// cppcheck-suppress unusedFunction
 size_t encodeBookmarks(const Bookmarks& bm, uint8_t* outBuf) {
   uint8_t count = bm.count;
   if (count > MAX_BOOKMARKS) count = MAX_BOOKMARKS;
@@ -52,7 +50,6 @@ size_t encodeBookmarks(const Bookmarks& bm, uint8_t* outBuf) {
   return 1u + (size_t)count * 6u;
 }
 
-// cppcheck-suppress unusedFunction
 BookmarkAddResult addBookmark(Bookmarks& bm, uint16_t page, uint32_t offset) {
   for (uint8_t i = 0; i < bm.count; i++) {
     if (bm.pages[i] == page) return {false, D_TOAST_BOOKMARK_EXISTS};

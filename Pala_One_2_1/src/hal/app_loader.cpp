@@ -37,7 +37,6 @@ static LoadResult fromHeaderStatus(AppHeaderStatus s) {
   return LoadResult::BadEntryOffset;  // unreachable; keeps the compiler quiet
 }
 
-// cppcheck-suppress unusedFunction
 LoadResult loadAndRunApp(const char* path, const PalaAPI* api,
                          uint32_t* outFileApiVersion) {
   freeExecBuf();  // defensive — a prior bail-out should have done this already

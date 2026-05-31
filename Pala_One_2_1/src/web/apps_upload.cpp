@@ -25,7 +25,6 @@ struct AppUpload {
 AppUpload s_app;
 }  // namespace
 
-// cppcheck-suppress unusedFunction
 void resetAppUpload() {
   if (s_app.tmpFile) s_app.tmpFile.close();
   s_app = AppUpload{};
@@ -234,7 +233,6 @@ static void handleDeleteApp() {
   server.send(303);
 }
 
-// cppcheck-suppress unusedFunction
 void registerAppUploadRoutes() {
   server.on("/upload-app", HTTP_POST, handleUploadAppDone, handleUploadAppStream);
   server.on("/del-app",    HTTP_POST, handleDeleteApp);   // POST: destructive
