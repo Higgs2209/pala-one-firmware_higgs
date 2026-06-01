@@ -93,12 +93,10 @@ static void handleSettings() {
   bool curBionic   = Font::bionicEnabled();
   String bChecked  = curBionic ? " checked" : "";
 
-  bool hasSleepImg = FS.exists("/sleep.bin");
-
   String out = webPageStart(
     D_WEB_SETTINGS_TITLE,
     D_WEB_SETTINGS_SUBTITLE_PREFIX FW_VERSION D_WEB_SETTINGS_SUBTITLE_SUFFIX,
-    "<a href='/'>" D_WEB_SETTINGS_BACK_NAV "</a>"
+    "<a href='/'>" D_WEB_NAV_HOME "</a><a href='/screensavers'>" D_WEB_NAV_SCREENSAVER "</a>"
   );
   out.reserve(out.length() + 4500);
 
@@ -173,14 +171,6 @@ static void handleSettings() {
   out += "</div><div class='actions' style='margin-top:24px'><button type='submit'>" D_WEB_BUTTONS_SAVE "</button>";
   out += "<span class='muted'>" D_WEB_BUTTONS_LOCK_HINT "</span>";
   out += "</div></form></div>";
-
-  out +=
-    "<div class='card'><h2>" D_WEB_SCREENSAVER_HEADING "</h2>"
-    "<p class='muted'>" D_WEB_SCREENSAVER_CARD_DESC "</p>"
-    "<div class='actions' style='margin-top:8px'>"
-    "<a class='btn' href='/screensavers'>" D_WEB_SCREENSAVER_EDITOR_LINK "</a>"
-    "<span class='muted'>" D_WEB_SCREENSAVER_EDITOR_HINT "</span>"
-    "</div></div>";
 
   out += webPageEnd();
   server.send(200, "text/html; charset=utf-8", out);

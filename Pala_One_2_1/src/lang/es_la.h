@@ -140,6 +140,7 @@
 #define D_WEB_NAV_FILES             "Archivos"
 #define D_WEB_NAV_BOOKMARKS         "Marcapáginas"
 #define D_WEB_NAV_LIST              "Lista"
+#define D_WEB_NAV_SCREENSAVER       "Salvapantallas"
 #define D_WEB_NAV_SETTINGS          "Ajustes"
 #define D_WEB_NAV_FACTORY_RESET     "Reinicio de fábrica"
 #define D_WEB_NAV_BACK              "Atrás"
@@ -192,6 +193,7 @@
 #define D_WEB_MOVE_HINT             "Use la ruta exacta de la carpeta."
 #define D_WEB_MOVE_PLACEHOLDER      "vacío para raíz"
 #define D_WEB_CONFIRM_DELETE_FILE   "¿Eliminar archivo?"
+#define D_WEB_DOWNLOAD_BUTTON       "Descargar"
 #define D_WEB_APPS_PAGE_HEADING     "Apps"
 #define D_WEB_NO_APPS_INSTALLED     "Sin apps instaladas."
 #define D_WEB_CONFIRM_DELETE_APP    "¿Eliminar app?"
@@ -421,11 +423,6 @@
 #define D_WEB_SETTINGS_APPLY_HINT   "Los cambios se aplican en la próxima página renderizada."
 
 // ----------------------------------------------------------------------------
-//  Tarjeta de salvapantallas en la página de ajustes (src/web/settings.cpp).
-// ----------------------------------------------------------------------------
-#define D_WEB_SCREENSAVER_CARD_DESC "Administra la imagen (o rotación de imágenes) que se muestra en la pantalla cuando el dispositivo se suspende."
-#define D_WEB_SCREENSAVER_EDITOR_LINK "Abrir editor de salvapantallas"
-#define D_WEB_SCREENSAVER_EDITOR_HINT "Incluye un editor de bitmap en el navegador y hasta 8 ranuras de rotación."
 
 // ----------------------------------------------------------------------------
 //  Editor y administrador multi-ranura de salvapantallas (src/web/screensavers.cpp).
@@ -446,6 +443,7 @@
 #define D_WEB_SS_SLOT_EMPTY         "vacía"
 #define D_WEB_SS_CONFIRM_DEL_SLOT   "¿Eliminar esta ranura?"
 #define D_WEB_SS_DOWNLOAD_ARIA      "Descargar salvapantallas"
+#define D_WEB_SS_UPLOAD_ARIA        "Subir salvapantallas .bin"
 #define D_WEB_SS_DELETE_ARIA        "Eliminar salvapantallas"
 #define D_WEB_SS_ROTATE             "Girar 90\u00b0"
 #define D_WEB_SS_SINGLE_HEADING     "Salvapantallas único"

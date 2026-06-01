@@ -144,6 +144,7 @@
 #define D_WEB_NAV_FILES             "Files"
 #define D_WEB_NAV_BOOKMARKS         "Bookmarks"
 #define D_WEB_NAV_LIST              "List"
+#define D_WEB_NAV_SCREENSAVER       "Screensaver"
 #define D_WEB_NAV_SETTINGS          "Settings"
 #define D_WEB_NAV_FACTORY_RESET     "Factory reset"
 #define D_WEB_NAV_BACK              "Back"
@@ -196,6 +197,7 @@
 #define D_WEB_MOVE_HINT             "Use the exact folder path."
 #define D_WEB_MOVE_PLACEHOLDER      "leave blank for root"
 #define D_WEB_CONFIRM_DELETE_FILE   "Delete file?"
+#define D_WEB_DOWNLOAD_BUTTON       "Download"
 #define D_WEB_APPS_PAGE_HEADING     "Apps"
 #define D_WEB_NO_APPS_INSTALLED     "No apps installed."
 #define D_WEB_CONFIRM_DELETE_APP    "Delete app?"
@@ -429,11 +431,6 @@
 #define D_WEB_SETTINGS_APPLY_HINT   "Changes apply to the next page render."
 
 // ----------------------------------------------------------------------------
-//  Screensaver settings card link (src/web/settings.cpp).
-// ----------------------------------------------------------------------------
-#define D_WEB_SCREENSAVER_CARD_DESC "Manage the image (or multi-image rotation) shown on the e-ink when the device sleeps."
-#define D_WEB_SCREENSAVER_EDITOR_LINK "Open screensaver editor"
-#define D_WEB_SCREENSAVER_EDITOR_HINT "Includes an in-browser bitmap editor and up to 8 rotation slots."
 
 // ----------------------------------------------------------------------------
 //  Screensaver editor + multi-slot manager (src/web/screensavers.cpp).
@@ -456,6 +453,7 @@
 #define D_WEB_SS_SLOT_EMPTY         "empty"
 #define D_WEB_SS_CONFIRM_DEL_SLOT   "Delete this slot?"
 #define D_WEB_SS_DOWNLOAD_ARIA      "Download screensaver"
+#define D_WEB_SS_UPLOAD_ARIA        "Upload screensaver .bin"
 #define D_WEB_SS_DELETE_ARIA        "Delete screensaver"
 #define D_WEB_SS_ROTATE             "Rotate 90\u00b0"
 #define D_WEB_SS_SINGLE_HEADING     "Single screensaver"
