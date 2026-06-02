@@ -73,6 +73,30 @@
 #define D_APPS_NONE                 "Sin apps"
 
 // ----------------------------------------------------------------------------
+//  Update screen
+// ----------------------------------------------------------------------------
+#define D_MENU_UPDATE               "Actualización FW"
+#define D_UPDATE_HEADER             "Actualización"
+#define D_UPDATE_VERSION_PREFIX     "Versión actual: "
+#define D_UPDATE_CHANNEL_LABEL      "Seleccionar canal:"
+#define D_UPDATE_CHAN_STABLE        "Estable"
+#define D_UPDATE_CHAN_DEV           "Dev"
+#define D_UPDATE_BTN_CHECK          "[ Buscar actualización ]"
+#define D_UPDATE_NO_CREDS_L1        "Sin credenciales Wi-Fi."
+#define D_UPDATE_NO_CREDS_L2        "Configura via instalador."
+#define D_UPDATE_CONNECTING         "Conectando..."
+#define D_UPDATE_CONN_FAILED        "Conexión Wi-Fi fallida"
+#define D_UPDATE_CHECKING           "Verificando..."
+#define D_UPDATE_SERVER_FAIL        "No se puede alcanzar el servidor"
+#define D_UPDATE_UP_TO_DATE         "Ya está actualizado"
+#define D_UPDATE_AVAILABLE_PREFIX   "Disponible: "
+#define D_UPDATE_BTN_INSTALL        "[ Instalar actualización ]"
+#define D_UPDATE_INSTALLING         "Instalando..."
+#define D_UPDATE_DOWNLOAD_FAILED    "Descarga fallida"
+#define D_UPDATE_REBOOT_MSG         "Actualización instalada"
+#define D_UPDATE_REBOOT_HINT        "2x para reiniciar"
+
+// ----------------------------------------------------------------------------
 //  Bookmarks screens
 // ----------------------------------------------------------------------------
 #define D_BOOKMARKS_HEADER          "Marcapáginas"

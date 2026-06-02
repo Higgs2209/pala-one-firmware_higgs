@@ -70,6 +70,44 @@ Locking is a remappable button action. In the web UI under **Settings → Button
 
 So by default you lock with a very-long press. Unlocking is intentionally **permissive**: *any* long, very-long, or click-hold press unlocks the device and shows an "Unlocked" toast — after a deep-sleep wake the firmware can't reconstruct a specific chord, so it accepts any hold gesture rather than risk locking you out. While locked, the sleep screen shows a small padlock badge in the top-right corner.
 
+## OTA firmware updates
+
+Once the device has Wi-Fi credentials stored (see [Wi-Fi provisioning](#wi-fi-provisioning-improv)), firmware updates can be installed wirelessly — no USB cable, no computer required.
+
+### How to update
+
+1. Navigate to **Firmware Update** at the bottom of the library menu.
+2. The device connects to your home network automatically.
+3. Select a channel with **1×** press:
+   - `[x] Stable` — latest tagged release. 
+   - `[ ] Dev` — latest development build; may contain new features or instabilities.
+4. Navigate to **[ Check for update ]** with **1×** and confirm with **2×**.
+   The device probes the update server, fetches the manifest, and compares the remote version against the installed one.
+5. If an update is available, **[ Install update ]** appears. Navigate to it with **1×** and confirm with **2×**.
+   The binary streams directly into the idle OTA partition (~5–30 s depending on your network).
+6. When flashing is complete, press **2×** to reboot into the new firmware.
+
+### Requirements
+
+- Wi-Fi credentials must be provisioned first (see below). If none are stored the screen shows *"No Wi-Fi credentials — setup via web installer"*.
+- The device must be able to reach `paullagier.github.io` over HTTPS. A local network without internet access will be reported as *"Cannot reach update server"*.
+- OTA requires the dual-bank partition table introduced alongside this feature. Devices still on the older single-bank layout need **one** USB reflash via the web installer to migrate; all subsequent updates can be wireless.
+
+### Channels
+
+| Channel | URL | Version format | Stability |
+|---------|-----|----------------|-----------|
+| `stable` | `/stable/` | `vX.Y.Z` | Tagged releases only |
+| `dev` | `/dev/` | `dev-<sha>` | Latest build from `dev` |
+
+The selected channel is saved to NVS and survives reboots. It can be changed at any time from the Firmware Update screen.
+
+### Security
+
+All requests are made over HTTPS. The TLS connection is validated against the IDF's embedded Mozilla root bundle — no certificate files to manage. The download URL is baked into the firmware at compile time and cannot be overridden at runtime.
+
+---
+
 ## Wi-Fi provisioning (Improv)
 
 Besides the SoftAP captive portal, the firmware supports **Improv Serial** Wi-Fi provisioning ([improv-wifi.com](https://www.improv-wifi.com)) over the USB-CDC port, using the [`jnthas/Improv-WiFi-Library`](https://github.com/jnthas/Improv-WiFi-Library). When the board is plugged into a computer, a browser can hand it Wi-Fi credentials directly — the [web installer](https://paullagier.github.io/pala-one-firmware/) does this right after flashing and then redirects to `connected.html`. Provisioning runs only while a USB host is actually present, so there's no battery cost otherwise.
@@ -290,6 +328,7 @@ Return from `app_main` to exit back to the Apps menu. Apps decide their own exit
 - Custom screensaver image
 - Adjustable idle sleep timeout
 - Wi-Fi provisioning (Improv) + captive-portal web UI
+- OTA firmware updates over Wi-Fi (see [OTA firmware updates](#ota-firmware-updates))
 - User-installable apps (see [Apps](#apps))
 - Deep sleep mode
 - USB-C charging

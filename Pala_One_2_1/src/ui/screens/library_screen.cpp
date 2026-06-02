@@ -10,6 +10,7 @@
 #include "src/ui/reader.h"
 #include "src/ui/screens/about_screen.h"
 #include "src/ui/screens/apps_screen.h"
+#include "src/ui/screens/update_screen.h"
 #include "src/ui/screens/bookmarks/book_select_screen.h"
 #include "src/ui/screens/bookmarks/session.h"
 #include "src/ui/screens/list_screen.h"
@@ -106,7 +107,8 @@ static void toggleExpanded(const char* name) {
 static bool isSystemEntryType(LibraryEntryType t) {
   return t == LIB_ENTRY_BOOKMARKS || t == LIB_ENTRY_LIST
       || t == LIB_ENTRY_APPS || t == LIB_ENTRY_STATISTICS
-      || t == LIB_ENTRY_ABOUT || t == LIB_ENTRY_UPLOAD;
+      || t == LIB_ENTRY_ABOUT || t == LIB_ENTRY_UPDATE
+      || t == LIB_ENTRY_UPLOAD;
 }
 
 static int rowIndent(const LibEntry& e) {
@@ -127,6 +129,7 @@ static String entryLabel(const LibEntry& e) {
     case LIB_ENTRY_APPS:       return D_MENU_APPS;
     case LIB_ENTRY_STATISTICS: return D_MENU_STATISTICS;
     case LIB_ENTRY_ABOUT:      return D_MENU_DEVICE;
+    case LIB_ENTRY_UPDATE:     return D_MENU_UPDATE;
     case LIB_ENTRY_UPLOAD:     return D_MENU_UPLOAD;
   }
   return "";
@@ -156,7 +159,7 @@ void LibraryScreen::draw() {
 
   // Decide which system entries to show. "List" only appears when the
   // todo list has visible items; the rest are always present.
-  LibraryEntryType systemEntries[6];
+  LibraryEntryType systemEntries[7];
   int systemCount = 0;
   systemEntries[systemCount++] = LIB_ENTRY_BOOKMARKS;
   if (listHasVisibleItems()) systemEntries[systemCount++] = LIB_ENTRY_LIST;
@@ -164,6 +167,7 @@ void LibraryScreen::draw() {
   systemEntries[systemCount++] = LIB_ENTRY_STATISTICS;
   systemEntries[systemCount++] = LIB_ENTRY_ABOUT;
   systemEntries[systemCount++] = LIB_ENTRY_UPLOAD;
+  systemEntries[systemCount++] = LIB_ENTRY_UPDATE;
 
   // Build the bool[] view that the assembler wants from our name-keyed
   // expansion set, against the current folder ordering.
@@ -249,6 +253,11 @@ void LibraryScreen::onButton(const ButtonEvent& e) {
 
   if (sel.type == LIB_ENTRY_ABOUT) {
     nextScreen = &g_aboutScreen;
+    return;
+  }
+
+  if (sel.type == LIB_ENTRY_UPDATE) {
+    nextScreen = &g_updateScreen;
     return;
   }
 
