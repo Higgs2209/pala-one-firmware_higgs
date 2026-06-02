@@ -87,7 +87,9 @@ jobs:
             # workflow_dispatch republish without a tag — label by sha.
             VERSION="manual-${GITHUB_SHA::7}"
           else
-            VERSION="dev-${GITHUB_SHA::7}"
+            # Match build_info.py: both the manifest and the firmware derive
+            # their version from `git describe` so the OTA equality check works.
+            VERSION=$(git describe --tags --always)
           fi
 
           echo "channel=$CHANNEL" >> "$GITHUB_OUTPUT"
