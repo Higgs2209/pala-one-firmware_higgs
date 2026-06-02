@@ -298,8 +298,10 @@ void loop() {
         // Full refresh to clear screensaver ghosting on unlock.
         // forceNextRenderFull() overrides the reader's per-page fast-mode
         // decision so renderCurrentPage() uses fastmodeOff regardless of
-        // pageTurnsSinceFull. display.fastmodeOff() covers non-reader screens.
+        // pageTurnsSinceFull. forceNextMenuFrameFull() does the same for menu
+        // screens whose prepareMenuFrame() would otherwise override fastmodeOff.
         forceNextRenderFull();
+        forceNextMenuFrameFull();
         display.fastmodeOff();
         g_currentScreen->draw();
         return;
