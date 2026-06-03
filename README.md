@@ -5,6 +5,20 @@ Pala One — A tiny E-Ink reader project by Paul Lagier
 
 The goal of the project was to create a simple, distraction-free reading device that feels minimal, portable and easy to build while still looking and behaving more like a real product than a typical DIY electronics project.
 
+This repository contains the firmware source code for the project.
+
+Additional files such as:
+- STL files
+- STEP files
+- assembly guides
+- printable files
+- project downloads
+
+are available separately via Ko-fi:
+
+https://ko-fi.com/s/e14ed892ea
+
+
 ## Install (no toolchain needed)
 
 [Web Installer](https://paullagier.github.io/pala-one-firmware/)
@@ -16,14 +30,6 @@ The easiest way to flash a board is via the web installer. Plug your Heltec Wire
 
 Each channel page lists both display revisions (V1.1 / V1.2) and both languages (English / Spanish-LA) — four install buttons total. Pick the one that matches your board + language and click **Install**. The installer keeps existing reading progress, bookmarks, and uploaded books across re-flashes.
 
-## Contributing
-
-If you improve the firmware, add features or fix bugs, feel free to open a pull request.
-Please clearly mention:
-- which board version(s) you tested on (V1.1, V1.2, or both)
-- what was changed
-- how it was tested
-
 ## Board Versions
 
 There are currently two supported Heltec Wireless Paper versions:
@@ -33,6 +39,35 @@ There are currently two supported Heltec Wireless Paper versions:
 The board version is usually printed on the back of the PCB.
 
 Pick your board's revision in the build step below — either by uncommenting the matching `#define` at the top of `Pala_One_2_1/Pala_One_2_1.ino` (Arduino IDE), or by selecting the matching env (PlatformIO).
+
+## Wi-Fi provisioning (Improv)
+
+Besides the SoftAP captive portal, the firmware supports **Improv Serial** Wi-Fi provisioning ([improv-wifi.com](https://www.improv-wifi.com)) over the USB-CDC port, using the [`jnthas/Improv-WiFi-Library`](https://github.com/jnthas/Improv-WiFi-Library). When the board is plugged into a computer, a browser can hand it Wi-Fi credentials directly — the [web installer](https://paullagier.github.io/pala-one-firmware/) does this right after flashing and then redirects to `connected.html`.
+
+Saved credentials let the device join your network in **Station mode** the next time it enters the web UI / upload mode; if none are saved (or the join fails) it falls back to the open SoftAP at `192.168.4.1`.
+
+## OTA firmware updates
+
+Once the device has Wi-Fi credentials stored (see [Wi-Fi provisioning](#wi-fi-provisioning-improv)), firmware updates can be installed wirelessly — no USB cable, no computer required.
+
+### How to update
+
+1. Navigate to **Firmware Update** at the bottom of the library menu.
+2. The device connects to your home network automatically.
+3. Select a channel with **1×** press:
+   - `[x] Stable` — latest tagged release. 
+   - `[ ] Dev` — latest development build; may contain new features or instabilities.
+4. Navigate to **[ Check for update ]** with **1×** and confirm with **2×**.
+   The device probes the update server, fetches the manifest, and compares the remote version against the installed one.
+5. If an update is available, **[ Install update ]** appears. Navigate to it with **1×** and confirm with **2×**.
+   The binary streams directly into the idle OTA partition (~5–30 s depending on your network).
+6. When flashing is complete, press **2×** to reboot into the new firmware.
+
+### Requirements
+
+- Wi-Fi credentials must be provisioned first (see below). If none are stored the screen shows *"No Wi-Fi credentials — setup via web installer"*.
+- The device must be able to reach `paullagier.github.io` over HTTPS. A local network without internet access will be reported as *"Cannot reach update server"*.
+
 
 ## Language
 
@@ -70,67 +105,53 @@ Locking is a remappable button action. In the web UI under **Settings → Button
 
 So by default you lock with a very-long press. Unlocking is intentionally **permissive**: *any* long, very-long, or click-hold press unlocks the device and shows an "Unlocked" toast — after a deep-sleep wake the firmware can't reconstruct a specific chord, so it accepts any hold gesture rather than risk locking you out. While locked, the sleep screen shows a small padlock badge in the top-right corner.
 
-## OTA firmware updates
+## Apps
 
-Once the device has Wi-Fi credentials stored (see [Wi-Fi provisioning](#wi-fi-provisioning-improv)), firmware updates can be installed wirelessly — no USB cable, no computer required.
+Pala One supports user-installable apps — self-contained position-independent C binaries that run on top of the firmware and have access to the display, button, RTC, and a per-app key-value store. Apps are uploaded over Wi-Fi through the same web UI used for books, and they appear under the **Apps** entry of the library menu. No firmware rebuild is needed to install one.
 
-### How to update
+See [examples/GETTING_STARTED.md](examples/GETTING_STARTED.md) for the full app-author guide — binary format, the `PalaAPI` (v3), required compiler flags, and upload steps.
 
-1. Navigate to **Firmware Update** at the bottom of the library menu.
-2. The device connects to your home network automatically.
-3. Select a channel with **1×** press:
-   - `[x] Stable` — latest tagged release. 
-   - `[ ] Dev` — latest development build; may contain new features or instabilities.
-4. Navigate to **[ Check for update ]** with **1×** and confirm with **2×**.
-   The device probes the update server, fetches the manifest, and compares the remote version against the installed one.
-5. If an update is available, **[ Install update ]** appears. Navigate to it with **1×** and confirm with **2×**.
-   The binary streams directly into the idle OTA partition (~5–30 s depending on your network).
-6. When flashing is complete, press **2×** to reboot into the new firmware.
+### Building an app
 
-### Requirements
+You need:
+- The `xtensa-esp32s3-elf-gcc` cross-compiler, which ships with the Arduino ESP32 board package. On Linux it is found under `~/.arduino15/packages/esp32/tools/esp-x32/<version>/bin/`; the `Makefile` locates it automatically.
+- `python3` (for the post-build step that patches the entry point offset into the binary).
 
-- Wi-Fi credentials must be provisioned first (see below). If none are stored the screen shows *"No Wi-Fi credentials — setup via web installer"*.
-- The device must be able to reach `paullagier.github.io` over HTTPS. A local network without internet access will be reported as *"Cannot reach update server"*.
-- OTA requires the dual-bank partition table introduced alongside this feature. Devices still on the older single-bank layout need **one** USB reflash via the web installer to migrate; all subsequent updates can be wireless.
+An app is a single C file that includes `pala_app.h` and `pala_api.h` from the firmware source and exports a `void app_main(const PalaAPI* api)` entry point. The header struct at the start of the binary carries the display name and API version check.
 
-### Channels
+See `examples/click_counter/` for a complete working example with a `Makefile`.
 
-| Channel | URL | Version format | Stability |
-|---------|-----|----------------|-----------|
-| `stable` | `/stable/` | `vX.Y.Z` | Tagged releases only |
-| `dev` | `/dev/` | `dev-<sha>` | Latest build from `dev` |
+```bash
+cd examples/click_counter
+make
+# produces click_counter.bin
+```
 
-The selected channel is saved to NVS and survives reboots. It can be changed at any time from the Firmware Update screen.
+### Uploading an app
 
-### Security
+1. Select **Upload** from the library menu on the device.
+2. Connect to the `PALA-XXXXXX` WiFi network (password: `palaread`).
+3. Open `http://192.168.4.1` in a browser.
+4. Use the **Upload app (.bin)** card to upload your `.bin` file.
+5. Triple-click to exit upload mode — the app will appear in the Apps menu immediately.
 
-All requests are made over HTTPS. The TLS connection is validated against the IDF's embedded Mozilla root bundle — no certificate files to manage. The download URL is baked into the firmware at compile time and cannot be overridden at runtime.
 
 ---
 
-## Wi-Fi provisioning (Improv)
+## Contributing
 
-Besides the SoftAP captive portal, the firmware supports **Improv Serial** Wi-Fi provisioning ([improv-wifi.com](https://www.improv-wifi.com)) over the USB-CDC port, using the [`jnthas/Improv-WiFi-Library`](https://github.com/jnthas/Improv-WiFi-Library). When the board is plugged into a computer, a browser can hand it Wi-Fi credentials directly — the [web installer](https://paullagier.github.io/pala-one-firmware/) does this right after flashing and then redirects to `connected.html`. Provisioning runs only while a USB host is actually present, so there's no battery cost otherwise.
+If you improve the firmware, add features or fix bugs, feel free to open a pull request.
+Please clearly mention:
+- which board version(s) you tested on (V1.1, V1.2, or both)
+- what was changed
+- how it was tested
 
-Saved credentials let the device join your network in **Station mode** the next time it enters the web UI / upload mode; if none are saved (or the join fails) it falls back to the open SoftAP at `192.168.4.1`. See `Pala_One_2_1/src/hal/wifi_provisioning.{h,cpp}` and `src/hal/wifi.cpp`.
 
 ## Building the firmware
 
 The same sources build under either toolchain.
 
-### Arduino IDE 2
-
-1. Install the **esp32 by Espressif Systems** board package (Boards Manager) and select the **Heltec WiFi LoRa 32 V3** board.
-2. Install these libraries via Library Manager (or by URL):
-   - [`heltec-eink-modules`](https://github.com/todd-herbert/heltec-eink-modules) (todd-herbert fork)
-   - **Adafruit GFX Library** (Adafruit)
-   - **U8g2_for_Adafruit_GFX** (olikraus)
-   - [`Improv-WiFi-Library`](https://github.com/jnthas/Improv-WiFi-Library) (jnthas) — serial Wi-Fi provisioning; PlatformIO installs it automatically, Arduino IDE users add it by URL
-3. Open `Pala_One_2_1/Pala_One_2_1.ino`. Uncomment exactly one of `BOARD_V1_1` / `BOARD_V1_2` at the top.
-4. Tools → Partition Scheme → **Custom** (the sketch ships its own `partitions.csv`).
-5. Verify / Upload.
-
-### PlatformIO
+### PlatformIO (recommended)
 
 1. Install [PlatformIO Core](https://platformio.org/install/cli) (CLI) or the PlatformIO IDE extension for VS Code.
 2. From the repo root:
@@ -150,9 +171,22 @@ Both envs share libraries and partition table via `platformio.ini`. The PIO buil
 - `FW_VERSION` from `git describe --tags --always --dirty` (e.g. `v2.1`, `v2.1-3-gabc1234`, `…-dirty`)
 - `BUILD_GIT_HASH` from the current short SHA
 
+### Arduino IDE 2 (outdated)
+
+1. Install the **esp32 by Espressif Systems** board package (Boards Manager) and select the **Heltec WiFi LoRa 32 V3** board.
+2. Install these libraries via Library Manager (or by URL):
+   - [`heltec-eink-modules`](https://github.com/todd-herbert/heltec-eink-modules) (todd-herbert fork)
+   - **Adafruit GFX Library** (Adafruit)
+   - **U8g2_for_Adafruit_GFX** (olikraus)
+   - [`Improv-WiFi-Library`](https://github.com/jnthas/Improv-WiFi-Library) (jnthas) — serial Wi-Fi provisioning; PlatformIO installs it automatically, Arduino IDE users add it by URL
+3. Open `Pala_One_2_1/Pala_One_2_1.ino`. Uncomment exactly one of `BOARD_V1_1` / `BOARD_V1_2` at the top.
+4. Tools → Partition Scheme → **Custom** (the sketch ships its own `partitions.csv`).
+5. Verify / Upload.
+
 Arduino IDE / host-test builds skip the script and fall back to `"dev"` and `"unknown"` respectively — those toolchains are for developer iteration; releases go through the PIO + tagged-CI flow where the real values get injected.
 
-### Installer site (channels & CI)
+
+### Web Installer site (channels & CI)
 
 The [web installer](https://paullagier.github.io/pala-one-firmware/) is published to the `gh-pages` branch by [`.github/workflows/deploy-installer.yml`](.github/workflows/deploy-installer.yml). Two channels live side-by-side and never overwrite each other:
 
@@ -167,6 +201,7 @@ Merges to `main` do **not** auto-publish. Tagging is the explicit release event,
 Every run rebuilds the channel it owns and publishes only the corresponding `gh-pages/<channel>/` subdirectory (the workflow uses `keep_files: true`, so the other channel's directory is preserved). A small landing page at the gh-pages root links to both — it is republished on every run with identical content, so the cross-write is safe. The Improv post-provisioning `connected.html` also lives at the gh-pages root (its content is channel-agnostic and the URL is baked into the firmware).
 
 Source HTML/manifests live in `install/` on the normal branches. The `gh-pages` branch is fully generated; do not edit it by hand.
+
 
 #### Local development
 
@@ -231,37 +266,8 @@ Pure modules and KV-backed storage have host-side unit tests under [`test/`](tes
 
 See [test/README.md](test/README.md) for prerequisites (CMake + a C++17 compiler) and per-platform setup / run instructions for Windows, Linux, and macOS.
 
-## Apps
 
-Pala One supports user-installable apps — self-contained position-independent C binaries that run on top of the firmware and have access to the display, button, RTC, and a per-app key-value store. Apps are uploaded over Wi-Fi through the same web UI used for books, and they appear under the **Apps** entry of the library menu. No firmware rebuild is needed to install one.
-
-See [examples/GETTING_STARTED.md](examples/GETTING_STARTED.md) for the full app-author guide — binary format, the `PalaAPI` (v3), required compiler flags, and upload steps.
-
-### Building an app
-
-You need:
-- The `xtensa-esp32s3-elf-gcc` cross-compiler, which ships with the Arduino ESP32 board package. On Linux it is found under `~/.arduino15/packages/esp32/tools/esp-x32/<version>/bin/`; the `Makefile` locates it automatically.
-- `python3` (for the post-build step that patches the entry point offset into the binary).
-
-An app is a single C file that includes `pala_app.h` and `pala_api.h` from the firmware source and exports a `void app_main(const PalaAPI* api)` entry point. The header struct at the start of the binary carries the display name and API version check.
-
-See `examples/click_counter/` for a complete working example with a `Makefile`.
-
-```bash
-cd examples/click_counter
-make
-# produces click_counter.bin
-```
-
-### Uploading an app
-
-1. Select **Upload** from the library menu on the device.
-2. Connect to the `PALA-XXXXXX` WiFi network (password: `palaread`).
-3. Open `http://192.168.4.1` in a browser.
-4. Use the **Upload app (.bin)** card to upload your `.bin` file.
-5. Triple-click to exit upload mode — the app will appear in the Apps menu immediately.
-
-### App API
+## App API
 
 Apps communicate with the firmware through the `PalaAPI` function pointer table passed to `app_main`. The current API version is **v3** (`PALA_API_VERSION 3` in `pala_app.h`).
 
@@ -335,27 +341,6 @@ Return from `app_main` to exit back to the Apps menu. Apps decide their own exit
 - Lightweight portable design
 - Open-source firmware
 
-## Hardware
-
-Pala One is based on:
-- Heltec Wireless Paper
-- 3D printed housing
-- LiPo battery
-
-## Downloads
-
-This repository contains the firmware source code for the project.
-
-Additional files such as:
-- STL files
-- STEP files
-- assembly guides
-- printable files
-- project downloads
-
-are available separately via Ko-fi:
-
-https://ko-fi.com/s/e14ed892ea
 
 ## Community & Modifications
 
