@@ -304,7 +304,13 @@ void drawBatteryTopRight()
     drawBolt(xIcon, yIcon, iconH, 2);
     drawChargingFill(xIcon, yIcon, iconH, iconW);
   }
-
+  Font::useUiSmall();
+  char buf[8];
+  snprintf(buf, sizeof(buf), "%f%%", readBatteryVoltageRaw());
+  int wTxt = u8g2.getUTF8Width(buf);
+  u8g2.setCursor(xIcon - 12 - wTxt, yIcon + 8);
+  u8g2.print(buf);
+  Font::useBody();
 }
 
 // void drawBatteryTopRight()
