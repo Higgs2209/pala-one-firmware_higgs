@@ -129,6 +129,13 @@ BookmarkPreviewScreen      g_bmPreviewScreen;
 
 Screen* g_currentScreen = &g_libraryScreen;
 
+#if HAS_BATTERY
+static bool batteryIndicatorVisible()
+{
+  return g_currentScreen == &g_libraryScreen || g_currentScreen == &g_uploadScreen || g_currentScreen == &g_aboutScreen || g_currentScreen == &g_updateScreen || g_currentScreen == &g_appsScreen || g_currentScreen == &g_listScreen || g_currentScreen == &g_statsScreen || g_currentScreen == &g_bmBookSelectScreen || g_currentScreen == &g_bmListScreen || (g_currentScreen == &g_readerScreen && ReaderMenu::isActive());
+}
+#endif
+
 // ============================================================================
 //  Setup
 // ============================================================================
@@ -258,6 +265,10 @@ void loop() {
   g_btns.poll();
   maybeRecoverFromIsrOverflow();
 
+#if HAS_BATTERY
+  updateBatteryCached();
+#endif
+
   ButtonEvent ev = ButtonEvent::fromButtonState(g_btns);
 
   // Lifetime button-press counter. peekPressCount is monotonic-up except
@@ -328,6 +339,16 @@ void loop() {
   }
 
   if (ev.any()) markUserActivity();
+
+#if HAS_BATTERY
+  if (batteryChargingChanged() && batteryIndicatorVisible())
+  {
+    if (ReaderMenu::isActive())
+      ReaderMenu::draw();
+    else
+      g_currentScreen->draw();
+  }
+#endif
 
   if (ENABLE_DEEP_SLEEP && g_currentScreen->allowSleep() && !WifiProvisioning::isActive()) {
     if (userIdleMs() > Sleep::idleTimeoutMs()) {

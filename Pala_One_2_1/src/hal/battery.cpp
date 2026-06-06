@@ -15,7 +15,10 @@ struct BatteryState {
   int pctShown = 0;
   bool valid = false;
   bool low = false;
+  bool charging = false;
+  bool chargingChanged = false;
   uint32_t lastMs = 0;
+  uint32_t lastChargingCheckMs = 0;
   float calibrationFactor = 1.00f;
 };
 static BatteryState s_battery;
@@ -105,10 +108,24 @@ static int batteryPercentFromOCV(float v) {
 
 void updateBatteryCached(bool force) {
   uint32_t now = millis();
-  if (!force && (now - s_battery.lastMs) < BAT_CACHE_MS) return;
-  s_battery.lastMs = now;
+  bool needFull = force || (now - s_battery.lastMs) >= BAT_CACHE_MS;
+  bool chargingCheckDue = force || (now - s_battery.lastChargingCheckMs) >= BAT_CHARGING_CHECK_MS;
+  if (!needFull && !chargingCheckDue)
+    return;
 
   float raw = readBatteryVoltageRaw();
+  if (chargingCheckDue)
+  {
+    bool chargingNow = (raw > BAT_CHARGING_VOLTAGE);
+    s_battery.lastChargingCheckMs = now;
+    s_battery.chargingChanged = !force && (chargingNow != s_battery.charging);
+    s_battery.charging = chargingNow;
+  }
+
+  if (!needFull)
+    return;
+
+  s_battery.lastMs = now;
   bool valid = (raw > 2.8f && raw < 4.5f);
   s_battery.valid = valid;
   if (!valid) return;
@@ -140,7 +157,16 @@ void updateBatteryCached(bool force) {
   else if (s_battery.low && s_battery.pctShown >= 12) s_battery.low = false;
 }
 
-void drawBatteryTopRight() {
+bool batteryChargingChanged()
+{
+  bool changed = s_battery.chargingChanged;
+  s_battery.chargingChanged = false;
+  return changed;
+}
+
+
+void drawBatteryTopRight()
+{
   updateBatteryCached(false);
 
   int pct = s_battery.valid ? s_battery.pctShown : 0;
