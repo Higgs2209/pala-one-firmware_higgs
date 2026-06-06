@@ -135,7 +135,7 @@ void updateBatteryCached(bool force)
   float raw = readBatteryVoltageRaw();
   if (chargingCheckDue)
   {
-    bool chargingNow = (raw > BAT_CHARGING_VOLTAGE);
+    bool chargingNow = (raw >= BAT_CHARGING_VOLTAGE);
     s_battery.lastChargingCheckMs = now;
     s_battery.chargingChanged = !force && (chargingNow != s_battery.charging);
     s_battery.charging = chargingNow;
@@ -294,7 +294,7 @@ void drawBatteryTopRight()
   else
   {
     displayedCharge = 0;
-    drawExclamation(xIcon, yIcon, iconW, iconH);
+    drawExclamation(xIcon, yIcon, iconH, 2);
   }
 
   if (!s_battery.charging) {
