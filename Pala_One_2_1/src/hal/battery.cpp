@@ -197,6 +197,70 @@ bool batteryChargingChanged()
   return changed;
 }
 
+// Draws the outline of a battery with top-left corner at (x, y), width `w` and height `h`
+void drawBatteryOutline(int x, int y, int w, int h)
+{
+  gfx.drawRect(x, y, w, h, 1);             // main body
+  gfx.fillRect(x + w, y + 2, 2, h - 4, 1); // positive terminal on the right
+}
+
+// Draws a solid bar indicating `perc` percentage of the battery charge. 0<= perc <= 100.
+// The coordinates refer to the top-left corner of the battery
+// `w` and `h` are the width and height of the battery
+void drawBatteryCharge(int battX, int battY, int battW, int battH, int perc)
+{
+  if (perc == 0)
+  {
+    return;
+  }
+
+  int fillW = perc * (battW - 2) / 100;
+  gfx.fillRect(battX + 1, battY + 1, fillW, battH - 2, 1);
+}
+
+// Draws an exclamation mark leaving `spacing` pixels between it and the LEFT of the battery.
+void drawExclamation(int battX, int battY, int battH, int spacing)
+{
+  int exMarkX1 = battX - spacing - 2;
+  int exMarkX2 = battX - spacing - 1;
+  gfx.fillRect(exMarkX1, battY, 2, battH - 4, 1);     // "pipe" part of the exclamation mark
+  gfx.fillRect(exMarkX1, battY + battH - 2, 2, 2, 1); // "dot"
+}
+
+void drawChargingFill(int battX, int battY, int battH, int battW)
+{
+  gfx.fillTriangle(battX, battY, battX, battY + battH - 1, battX + battH, battY, 1);                                             // left triangle
+  gfx.fillTriangle(battX + battW - 1, battY, battX + battW - 1, battY + battH - 1, battX + battW - battH, battY + battH - 1, 1); // right triangle
+}
+
+// Draws a bolt symbol leaving `spacing` pixels between it and the LEFT of the battery.
+//    a
+//   /
+// b -- c
+//    /
+//   d
+
+void drawBolt(int battX, int battY, int battH, int spacing)
+{
+  int a_x = battX - spacing;
+  int a_y = battY;
+  int b_x = battX - spacing - battH / 2;
+  int b_y = battY + battH / 2;
+  int c_x = a_x - 1;
+  int c_y = b_y;
+  int d_x = b_x - 1;
+  int d_y = battY + battH - 1;
+
+  int thickness = 2;
+
+  for (int i = 0; i < thickness; i++)
+  {
+    gfx.drawLine(a_x - i, a_y, b_x - i, b_y, 1);
+    gfx.drawLine(b_x - i, b_y, c_x - i, c_y, 1);
+    gfx.drawLine(c_x - i, c_y, d_x - i, d_y, 1);
+  }
+}
+
 void drawBatteryTopRight()
 {
   updateBatteryCached(false);
@@ -212,31 +276,77 @@ void drawBatteryTopRight()
   int xIcon = SCREEN_W - MARGIN_X - iconW - 2;
   int yIcon = 2;
 
-  gfx.drawRect(xIcon, yIcon, iconW, iconH, 1);
-  gfx.fillRect(xIcon + iconW, yIcon + 2, 2, iconH - 4, 1);
+  drawBatteryOutline(xIcon, yIcon, iconW, iconH);
+  int displayedCharge = 0;
 
-  int innerW = iconW - 2;
-  int fillW = (innerW * pct) / 100;
-  if (fillW > 0)
-    gfx.fillRect(xIcon + 1, yIcon + 1, fillW, iconH - 2, 1);
-  if (s_battery.low && pct > 0)
-    gfx.drawLine(xIcon + 3, yIcon + 2, xIcon + 3, yIcon + iconH - 3, 0);
-
-  Font::useUiSmall();
-  char buf[8];
-  if (s_battery.valid) {
-    if (s_battery.charging) {
-      snprintf(buf, sizeof(buf), "USB");
-    } else {
-      snprintf(buf, sizeof(buf), "%d%%", pct);
-    }
-  } else {
-    snprintf(buf, sizeof(buf), "--");
+  if (pct > 75)
+  {
+    displayedCharge = 100;
   }
-  int wTxt = u8g2.getUTF8Width(buf);
-  u8g2.setCursor(xIcon - 4 - wTxt, yIcon + 8);
-  u8g2.print(buf);
-  Font::useBody();
+  else if (pct > 50)
+  {
+    displayedCharge = 50;
+  }
+  else if (pct > 25)
+  {
+    displayedCharge = 25;
+  }
+  else
+  {
+    displayedCharge = 0;
+    drawExclamation(xIcon, yIcon, iconW, iconH);
+  }
+
+  if (!s_battery.charging) {
+    drawBatteryCharge(xIcon, yIcon, iconW, iconH, displayedCharge);
+  }
+  else {
+    drawBolt(xIcon, yIcon, iconH, 2);
+    drawChargingFill(xIcon, yIcon, iconH, iconW);
+  }
+
 }
+
+// void drawBatteryTopRight()
+// {
+//   updateBatteryCached(false);
+
+//   int pct = s_battery.valid ? s_battery.pctShown : 0;
+//   if (pct < 0)
+//     pct = 0;
+//   if (pct > 100)
+//     pct = 100;
+
+//   const int iconW = 18;
+//   const int iconH = 9;
+//   int xIcon = SCREEN_W - MARGIN_X - iconW - 2;
+//   int yIcon = 2;
+
+//   gfx.drawRect(xIcon, yIcon, iconW, iconH, 1);
+//   gfx.fillRect(xIcon + iconW, yIcon + 2, 2, iconH - 4, 1);
+
+//   int innerW = iconW - 2;
+//   int fillW = (innerW * pct) / 100;
+//   if (fillW > 0)
+//     gfx.fillRect(xIcon + 1, yIcon + 1, fillW, iconH - 2, 1);
+//   if (s_battery.low && pct > 0)
+//     gfx.drawLine(xIcon + 3, yIcon + 2, xIcon + 3, yIcon + iconH - 3, 0);
+
+//   Font::useUiSmall();
+//   char buf[8];
+//   if (s_battery.valid) {
+//     if (s_battery.charging) {
+//       snprintf(buf, sizeof(buf), "USB");
+//     } else {
+//       snprintf(buf, sizeof(buf), "%d%%", pct);
+//     }
+//   } else {
+//     snprintf(buf, sizeof(buf), "--");
+//   }
+//   int wTxt = u8g2.getUTF8Width(buf);
+//   u8g2.setCursor(xIcon - 4 - wTxt, yIcon + 8);
+//   u8g2.print(buf);
+//   Font::useBody();
+// }
 
 #endif
