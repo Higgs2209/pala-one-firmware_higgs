@@ -335,6 +335,7 @@
 #define D_WEB_BUTTONS_ACTION_BOOKMARK "Bookmark page"
 #define D_WEB_BUTTONS_ACTION_LOCK     "Lock device"
 #define D_WEB_BUTTONS_ACTION_MENU     "Open menu"
+#define D_WEB_BUTTONS_ACTION_ROTATE     "Flip screen orientation"
 
 // Device personalization card (src/web/settings.cpp).
 #define D_WEB_DEVICE_HEADING        "Device"
@@ -342,6 +343,7 @@
 #define D_WEB_HEADER_TITLE_LABEL    "Header title"
 #define D_WEB_HEADER_TITLE_HINT     "Shown at the top of the library screen. Leave empty for no title."
 #define D_WEB_HEADER_TITLE_RESET    "Reset to default"
+#define D_WEB_FLIP_SCREEN           "Flip screen orientation"
 
 // ----------------------------------------------------------------------------
 //  Upload (book + sleep image) routes (src/web/upload.cpp)

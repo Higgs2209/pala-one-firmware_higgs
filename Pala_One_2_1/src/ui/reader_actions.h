@@ -25,6 +25,7 @@ enum ButtonAction {
   ACTION_BOOKMARK = 1,
   ACTION_LOCK     = 2,
   ACTION_MENU     = 3,
+  ACTION_ROTATE   = 4,
 };
 
 namespace Gestures {

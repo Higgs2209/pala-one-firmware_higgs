@@ -10,6 +10,8 @@
 #include "src/ui/sleep.h"                    // Sleep::enter on ACTION_LOCK
 #include "src/ui/text.h"
 #include "src/ui/toast.h"                    // Toast::show for bookmark-saved feedback
+#include "src/config.h"
+#include "src/ui/screen_settings.h"
 
 // Carry out one of the bindable reader actions. No-op for ACTION_NONE.
 // Lives at the screen layer because the actions are reader-context things
@@ -33,6 +35,9 @@ static void performReaderAction(ButtonAction action) {
       break;
     case ACTION_MENU:
       ReaderMenu::open();
+      break;
+    case ACTION_ROTATE:
+      ScreenSettings::toggleScreenRotation();
       break;
     case ACTION_NONE:
     default:
