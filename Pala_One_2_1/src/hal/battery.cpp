@@ -222,7 +222,6 @@ void drawBatteryCharge(int battX, int battY, int battW, int battH, int perc)
 void drawExclamation(int battX, int battY, int battH, int spacing)
 {
   int exMarkX1 = battX - spacing - 2;
-  int exMarkX2 = battX - spacing - 1;
   gfx.fillRect(exMarkX1, battY, 2, battH - 4, 1);     // "pipe" part of the exclamation mark
   gfx.fillRect(exMarkX1, battY + battH - 2, 2, 2, 1); // "dot"
 }
