@@ -8,6 +8,7 @@
 void adcSetupOnce();
 void updateBatteryCached(bool force = false);
 void drawBatteryTopRight();
+bool batteryChargingChanged();
 #endif
 
 #endif  // PALA_HAL_BATTERY_H

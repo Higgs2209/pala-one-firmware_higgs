@@ -68,6 +68,10 @@ Once the device has Wi-Fi credentials stored (see [Wi-Fi provisioning](#wi-fi-pr
 - Wi-Fi credentials must be provisioned first (see below). If none are stored the screen shows *"No Wi-Fi credentials — setup via web installer"*.
 - The device must be able to reach `paullagier.github.io` over HTTPS. A local network without internet access will be reported as *"Cannot reach update server"*.
 
+## Notes
+
+> [!WARNING]
+> Charging status and battery level are estimated using an unreliable method due to hardware limitations. The battery icon and related indicators are only a guideline and may be inaccurate.
 
 ## Language
 
