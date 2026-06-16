@@ -17,7 +17,7 @@ static ButtonAction s_extraLong = ACTION_LOCK;
 static ButtonAction s_clickHold = ACTION_MENU;
 
 static ButtonAction clamp(int v) {
-  if (v < ACTION_NONE || v > ACTION_MENU) return ACTION_NONE;
+  if (v < ACTION_NONE || v > ACTION_ROTATE) return ACTION_NONE;
   return (ButtonAction)v;
 }
 

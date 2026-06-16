@@ -112,6 +112,7 @@
 #include "src/ui/text.h"
 #include "src/ui/toast.h"
 #include "src/web/web.h"
+#include "src/ui/screen_settings.h"
 
 // ============================================================================
 //  Screen instances + current-screen pointer
@@ -214,6 +215,8 @@ void setup() {
   Statusbar::loadSettings();
   Gestures::loadSettings();
   HeaderTitle::loadSettings();
+  ScreenSettings::loadSettings();
+
   // Sleep::loadSettings() and Lock::loadSettings() already ran earlier in
   // setup() so both flags were available for the boot-clear gate above —
   // don't reload them here.

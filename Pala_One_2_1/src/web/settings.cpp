@@ -14,6 +14,7 @@
 #include "src/ui/lock.h"
 #include "src/ui/sleep.h"
 #include "src/web/chrome.h"
+#include "src/ui/screen_settings.h"
 
 // ----------------------------------------------------------------------------
 //  HTML escaping for user-supplied text rendered in attributes
@@ -62,6 +63,7 @@ static void appendActionSelect(String& out, const char* nameId, const char* labe
   appendActionOption(out, ACTION_BOOKMARK, D_WEB_BUTTONS_ACTION_BOOKMARK, current);
   appendActionOption(out, ACTION_LOCK,     D_WEB_BUTTONS_ACTION_LOCK,     current);
   appendActionOption(out, ACTION_MENU,     D_WEB_BUTTONS_ACTION_MENU,     current);
+  appendActionOption(out, ACTION_ROTATE,   D_WEB_BUTTONS_ACTION_ROTATE,   current);
   out += "</select></div>";
 }
 
@@ -113,6 +115,13 @@ static void handleSettings() {
   out += "<label style='display:flex;gap:8px;align-items:center;margin-top:10px;cursor:pointer'>";
   out += "<input type='checkbox' name='hdr_rst' value='1' style='width:auto'>";
   out += "<span>" D_WEB_HEADER_TITLE_RESET "</span></label>";
+
+  // Toggle for setting the inversed screen orientation
+  out += "<label style='display:flex;gap:8px;align-items:center;margin-top:10px;cursor:pointer'>";
+  out += "<input type='checkbox' name='flip_rot' value='1' style='width:auto'>";
+  out += "<span>" D_WEB_FLIP_SCREEN "</span></label>";
+  out += "<span class='muted' style='display:inline'>" D_WEB_SETTINGS_APPLY_HINT "</span>";
+
   out += "<div class='actions' style='margin-top:14px'><button type='submit'>" D_WEB_SAVE_SETTINGS_BUTTON "</button></div>";
   out += "</form></div>";
 
@@ -275,6 +284,16 @@ static void handleSettingsPost() {
       String hdr = server.arg("hdr");
       hdr.trim();
       HeaderTitle::set(hdr.c_str());
+    }
+  }
+  if (server.hasArg("hdr")) {
+    if (server.hasArg("flip_rot"))
+    {
+      ScreenSettings::setScreenRotation(true);
+    }
+    else
+    {
+      ScreenSettings::setScreenRotation(false);
     }
   }
 
