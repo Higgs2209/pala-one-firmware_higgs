@@ -109,7 +109,7 @@ static const int FULL_REFRESH_EVERY_N_PAGES = 100;
 static const int MENU_FULL_REFRESH_EVERY = 60;
 
 static const int MARGIN_X = 6;
-static const int TOP_PAD = 0;
+static const int TOP_PAD = 3;
 static const int BOT_PAD = 0;
 static const int STATUS_H = 8;
 
