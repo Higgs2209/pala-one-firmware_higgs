@@ -5,6 +5,7 @@
 #include "src/ui/screens/library_screen.h"
 #include "src/ui/widgets.h"
 #include "src/ui/reader_actions.h"
+#include "src/hal/battery.h"
 
 void AboutScreen::onEnter() {
   draw();
@@ -33,7 +34,8 @@ void AboutScreen::draw() {
   Font::useUiSmall();
   int ascent = u8g2.getFontAscent();
   int lineH = (ascent - u8g2.getFontDescent()) + Font::currentLineGap() + 3;
-  int y = drawSectionHeader(D_ABOUT_HEADER);
+  int y = drawSectionHeader(D_ABOUT_HEADER, false);
+  drawBatteryTopRight(true);
   const int rowNumber = 7;
   String rows[rowNumber][2] = {
       {D_ABOUT_FIRMWARE_PREFIX, FW_VERSION},
