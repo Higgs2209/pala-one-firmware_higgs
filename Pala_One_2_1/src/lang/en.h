@@ -367,6 +367,19 @@
 #define D_WEB_HEADER_TITLE_RESET    "Reset to default"
 #define D_WEB_FLIP_SCREEN           "Flip screen orientation"
 
+// Wi-Fi card (src/web/settings.cpp) — the saved network the upload screen
+// joins.
+#define D_WEB_WIFI_HEADING            "Wi-Fi"
+#define D_WEB_WIFI_INTRO              "The network the device joins for file upload. For security reasons, saved passwords will never be shown."
+#define D_WEB_WIFI_SSID_LABEL         "SSID"
+#define D_WEB_WIFI_PASSWORD_LABEL     "Password"
+#define D_WEB_WIFI_SSID_PLACEHOLDER   "Network name"
+#define D_WEB_WIFI_PASSWORD_PLACEHOLDER "Password"
+#define D_WEB_WIFI_PASSWORD_SAVED_PLACEHOLDER "<saved>"
+#define D_WEB_WIFI_SHOW_PASSWORD      "Show password"
+#define D_WEB_WIFI_SAVE_BUTTON        "Save network"
+#define D_WEB_WIFI_HINT               "Stored on device. Leave the SSID blank to forget it."
+
 // ----------------------------------------------------------------------------
 //  Upload (book + sleep image) routes (src/web/upload.cpp)
 // ----------------------------------------------------------------------------

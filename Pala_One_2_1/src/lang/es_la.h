@@ -353,6 +353,19 @@
 #define D_WEB_BUTTONS_ACTION_PREV "Elemento/página anterior" // AI translated
 #define D_WEB_BUTTONS_ACTION_HOME "Ir al menú principal" // AI translated
 #define D_WEB_BUTTONS_LEGACY_HINT "Si está habilitado, el mapeo de los clics único, doble y triple no tiene efecto." //AI translated
+ 
+// Wi-Fi card (src/web/settings.cpp) — the saved network the upload screen
+// joins.
+#define D_WEB_WIFI_HEADING            "Wi-Fi"
+#define D_WEB_WIFI_INTRO              "La red a la que el dispositivo se une para subir archivos. Por motivos de seguridad, las contraseñas guardadas nunca se mostrarán." // Translated by Claude
+#define D_WEB_WIFI_SSID_LABEL         "SSID"
+#define D_WEB_WIFI_PASSWORD_LABEL     "Contraseña" // Translated by Claude
+#define D_WEB_WIFI_SSID_PLACEHOLDER   "Nombre de la red" // Translated by Claude
+#define D_WEB_WIFI_PASSWORD_PLACEHOLDER "Contraseña" // Translated by Claude
+#define D_WEB_WIFI_PASSWORD_SAVED_PLACEHOLDER "<guardada>" // Translated by Claude
+#define D_WEB_WIFI_SHOW_PASSWORD      "Mostrar contraseña" // Translated by Claude
+#define D_WEB_WIFI_SAVE_BUTTON        "Guardar red" // Translated by Claude
+#define D_WEB_WIFI_HINT               "Se almacena en el dispositivo. Deja el SSID en blanco para olvidarla." // Translated by Claude
 
 // Device personalization card (src/web/settings.cpp).
 #define D_WEB_DEVICE_HEADING        "Dispositivo"
