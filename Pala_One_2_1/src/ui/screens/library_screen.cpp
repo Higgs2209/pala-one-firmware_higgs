@@ -5,7 +5,8 @@
 #include "src/pure/library_nav.h"         // buildLibraryEntries
 #include "src/pure/paths.h"               // folderLeafLabel, bookLeafLabel
 #include "src/storage/library.h"
-#include "src/storage/list_items.h"       // listHasVisibleItems
+#include "src/storage/library_menu_order.h"
+#include "src/storage/list_items.h"       // g_list
 #include "src/ui/font.h"
 #include "src/ui/reader.h"
 #include "src/ui/screens/about_screen.h"
@@ -106,16 +107,9 @@ static void toggleExpanded(const char* name) {
 // ----------------------------------------------------------------------------
 //  Per-entry helpers
 // ----------------------------------------------------------------------------
-static bool isSystemEntryType(LibraryEntryType t) {
-  return t == LIB_ENTRY_BOOKMARKS || t == LIB_ENTRY_LIST
-      || t == LIB_ENTRY_APPS || t == LIB_ENTRY_STATISTICS
-      || t == LIB_ENTRY_ABOUT || t == LIB_ENTRY_UPDATE
-      || t == LIB_ENTRY_UPLOAD;
-}
-
 static int rowIndent(const LibEntry& e) {
   int indent = e.depth * LIBRARY_DEPTH_INDENT;
-  if (isSystemEntryType(e.type)) indent += LIBRARY_SYSTEM_NUDGE;
+  if (isValidLibEntry(e.type)) indent += LIBRARY_SYSTEM_NUDGE;
   return indent;
 }
 
@@ -159,17 +153,11 @@ void LibraryScreen::draw() {
   prepareMenuFrame();
   Font::useBody();
 
-  // Decide which system entries to show. "List" only appears when the
-  // todo list has visible items; the rest are always present.
-  LibraryEntryType systemEntries[7];
-  int systemCount = 0;
-  systemEntries[systemCount++] = LIB_ENTRY_BOOKMARKS;
-  if (listHasVisibleItems()) systemEntries[systemCount++] = LIB_ENTRY_LIST;
-  systemEntries[systemCount++] = LIB_ENTRY_APPS;
-  systemEntries[systemCount++] = LIB_ENTRY_STATISTICS;
-  systemEntries[systemCount++] = LIB_ENTRY_ABOUT;
-  systemEntries[systemCount++] = LIB_ENTRY_UPLOAD;
-  systemEntries[systemCount++] = LIB_ENTRY_UPDATE;
+  // Pull the current order from persistent settings. The settings page can
+  // later edit this list directly without changing the screen logic again.
+  LibraryEntryType systemEntries[LibraryMenuOrder::kMaxSystemEntries];
+  int systemCount = LibraryMenuOrder::copyEntries(
+      systemEntries, LibraryMenuOrder::kMaxSystemEntries);
 
   // Build the bool[] view that the assembler wants from our name-keyed
   // expansion set, against the current folder ordering.
