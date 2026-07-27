@@ -13,10 +13,10 @@ static constexpr const char* kKeyLong = "cfg_cLong";
 static constexpr const char* kKeyVeryLong = "cfg_cVLng";
 static constexpr const char* kKeyDebounce = "cfg_cDbnc";
 
-static constexpr uint32_t kGapMin = 0;
+static constexpr uint32_t kGapMin = 75;
 static constexpr uint32_t kGapMax = 5000;
 static constexpr uint32_t kSequenceMax = 10000;
-static constexpr uint32_t kLongMin = 1;
+static constexpr uint32_t kLongMin = 50;
 static constexpr uint32_t kLongMax = 10000;
 static constexpr uint32_t kVeryLongMax = 20000;
 static constexpr uint32_t kDebounceMin = 0;
