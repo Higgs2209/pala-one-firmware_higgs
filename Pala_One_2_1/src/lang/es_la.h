@@ -371,10 +371,10 @@
 #define D_WEB_TIMINGS_GAP_HINT       "Cuánto puede durar la pausa entre pulsaciones antes de confirmar la secuencia actual."
 #define D_WEB_TIMINGS_SEQUENCE_LABEL "Secuencia de clics"
 #define D_WEB_TIMINGS_SEQUENCE_HINT  "Tiempo total máximo permitido para una secuencia de varios clics, medido desde la primera liberación."
-#define D_WEB_TIMINGS_LONG_LABEL     "Umbral de pulsación larga"
-#define D_WEB_TIMINGS_LONG_HINT      "Duración de la pulsación que convierte una pulsación en Long en lugar de otro clic."
-#define D_WEB_TIMINGS_VLONG_LABEL    "Umbral de pulsación muy larga"
-#define D_WEB_TIMINGS_VLONG_HINT     "Duración de la pulsación que convierte una pulsación sola de Long a VeryLong."
+#define D_WEB_TIMINGS_LONG_LABEL     "Umbral de " D_WEB_BUTTONS_LONG
+#define D_WEB_TIMINGS_LONG_HINT      "Duración de la pulsación que convierte una pulsación en " D_WEB_BUTTONS_LONG " en lugar de otro " D_WEB_BUTTONS_SHORT "."
+#define D_WEB_TIMINGS_VLONG_LABEL    "Umbral de " D_WEB_BUTTONS_EXTRA_LONG
+#define D_WEB_TIMINGS_VLONG_HINT "Duración de la pulsación que convierte una pulsación sola de " D_WEB_BUTTONS_LONG " a " D_WEB_BUTTONS_EXTRA_LONG "."
 #define D_WEB_TIMINGS_DEBOUNCE_LABEL "Debounce"
 #define D_WEB_TIMINGS_DEBOUNCE_HINT  "Los cambios de borde más cercanos que esto se tratan como rebote del botón y se ignoran."
 #define D_WEB_TIMINGS_RESET          "Restablecer"
