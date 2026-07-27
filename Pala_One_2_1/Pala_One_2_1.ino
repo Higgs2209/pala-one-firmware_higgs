@@ -93,6 +93,7 @@
 #include "src/ui/reader_menu.h"
 #include "src/ui/reader_actions.h"  // Gestures::loadSettings
 #include "src/ui/screen.h"
+#include "src/storage/click_timings.h"
 #include "src/ui/widgets.h"  // drawCenter
 #include "src/ui/screens/about_screen.h"
 #include "src/ui/screens/apps_screen.h"
@@ -214,6 +215,7 @@ void setup() {
   Font::loadSettings();
   Screensavers::loadSettings();
   Statusbar::loadSettings();
+  ClickTimings::loadSettings();
   Gestures::loadSettings();
   HeaderTitle::loadSettings();
   ScreenSettings::loadSettings();

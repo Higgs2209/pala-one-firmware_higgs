@@ -3,6 +3,7 @@
 #include <esp_timer.h>
 
 #include "src/pure/hold_gesture.h"  // classifyHoldRelease / classifyHoldInProgress
+#include "src/storage/click_timings.h"
 
 // Local helper: map a HoldGestureKind decision into the matching output
 // flag. Used at both classification sites (release path + in-progress).
@@ -291,7 +292,7 @@ void ButtonState::poll() {
     s_btnQ.tail = (uint8_t)((s_btnQ.tail + 1) % BTN_Q);
     interrupts();
 
-    if ((uint32_t)(edgeTime - lastStableChange_) <= DEBOUNCE_MS) continue;
+    if ((uint32_t)(edgeTime - lastStableChange_) <= ClickTimings::debounceMs()) continue;
     if (edgePressed == stablePressed_) continue;
 
     bool prevPressed = stablePressed_;
@@ -316,7 +317,7 @@ void ButtonState::poll() {
         HoldGestureKind k = classifyHoldRelease(dur, clickCount_);
         if (applyHoldKindTo(*this, k)) {
           clickCount_ = 0;
-        } else if (dur < LONG_MS) {
+        } else if (dur < ClickTimings::longMs()) {
           // Short release — accumulate into the click sequence. Bump the
           // apps-API raw counter *before* the multi-click accumulator so
           // apps see every short release even when the classifier later
@@ -373,8 +374,8 @@ void ButtonState::poll() {
   // human speeds in practice.
   if (clickCount_ > 0) {
     uint32_t now = millis();
-    bool gapElapsed      = (uint32_t)(now - lastRelease_)       > MAX_CLICK_GAP_MS;
-    bool sequenceTimeout = (uint32_t)(now - firstClickRelease_) > MAX_CLICK_SEQUENCE_MS;
+    bool gapElapsed      = (uint32_t)(now - lastRelease_)       > ClickTimings::maxClickGapMs();
+    bool sequenceTimeout = (uint32_t)(now - firstClickRelease_) > ClickTimings::maxClickSequenceMs();
     bool quadReady       = clickCount_ >= 4;
     bool readyByTime     = (gapElapsed || sequenceTimeout) && !stablePressed_;
 
@@ -416,7 +417,7 @@ void resetInputFrontend() {
   // release are intentional and should be processed normally.
   uint32_t start = millis();
   while (digitalRead(BTN) == LOW && (uint32_t)(millis() - start) < 600) delay(1);
-  delay(DEBOUNCE_MS + 2); // minimal debounce after release
+  delay(ClickTimings::debounceMs() + 2); // minimal debounce after release
 
   // Discard only events that happened BEFORE this moment (the transition press).
   // Events queued after the release are kept.

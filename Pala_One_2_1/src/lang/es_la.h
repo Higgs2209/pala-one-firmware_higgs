@@ -363,6 +363,23 @@
 #define D_WEB_BUTTONS_ACTION_PREV "Elemento/página anterior" // AI translated
 #define D_WEB_BUTTONS_ACTION_HOME "Ir al menú principal" // AI translated
 #define D_WEB_BUTTONS_LEGACY_HINT "Si está habilitado, el mapeo de los clics único, doble y triple no tiene efecto." //AI translated
+
+// Click timing section.
+#define D_WEB_TIMINGS_HEADING        "Tiempos de clic"
+#define D_WEB_TIMINGS_INTRO          "Ajusta cómo el clasificador separa los clics rápidos de las pulsaciones largas."
+#define D_WEB_TIMINGS_GAP_LABEL      "Intervalo entre clics"
+#define D_WEB_TIMINGS_GAP_HINT       "Cuánto puede durar la pausa entre pulsaciones antes de confirmar la secuencia actual."
+#define D_WEB_TIMINGS_SEQUENCE_LABEL "Secuencia de clics"
+#define D_WEB_TIMINGS_SEQUENCE_HINT  "Tiempo total máximo permitido para una secuencia de varios clics, medido desde la primera liberación."
+#define D_WEB_TIMINGS_LONG_LABEL     "Umbral de pulsación larga"
+#define D_WEB_TIMINGS_LONG_HINT      "Duración de la pulsación que convierte una pulsación en Long en lugar de otro clic."
+#define D_WEB_TIMINGS_VLONG_LABEL    "Umbral de pulsación muy larga"
+#define D_WEB_TIMINGS_VLONG_HINT     "Duración de la pulsación que convierte una pulsación sola de Long a VeryLong."
+#define D_WEB_TIMINGS_DEBOUNCE_LABEL "Debounce"
+#define D_WEB_TIMINGS_DEBOUNCE_HINT  "Los cambios de borde más cercanos que esto se tratan como rebote del botón y se ignoran."
+#define D_WEB_TIMINGS_RESET          "Restablecer"
+#define D_WEB_TIMINGS_SAVE           "Guardar tiempos"
+#define D_WEB_TIMINGS_DEFAULT_PREFIX "Predeterminado: "
  
 // Wi-Fi card (src/web/settings.cpp) — the saved network the upload screen
 // joins.

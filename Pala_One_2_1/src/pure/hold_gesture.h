@@ -3,10 +3,8 @@
 
 #include "src/pure/arduino_compat.h"  // uint32_t, uint8_t
 
-#include "src/config.h"  // LONG_MS, VERY_LONG_MS — the thresholds the
-                         // classifier uses. Same values are also visible to
-                         // input.cpp (the only on-device caller) via the
-                         // same header.
+#include "src/config.h"  // LONG_MS, VERY_LONG_MS — compile-time defaults.
+#include "src/storage/click_timings.h"  // runtime thresholds used by the classifier.
 
 // ============================================================================
 //  Pure hold-gesture classifier.

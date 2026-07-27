@@ -12,6 +12,7 @@
 #include "src/ui/reader.h"                // g_bookview, findPageForOffset, renderCurrentPage
 #include "src/ui/reader_actions.h"        // ButtonAction + Gestures
 #include "src/ui/screens/reader_screen.h" // g_readerScreen — active-reader check
+#include "src/storage/click_timings.h"
 #include "src/storage/wifi_creds.h"
 #include "src/ui/lock.h"
 #include "src/ui/sleep.h"
@@ -72,6 +73,17 @@ static void appendActionSelect(String& out, const char* nameId, const char* labe
   appendActionOption(out, ACTION_ROTATE,   D_WEB_BUTTONS_ACTION_ROTATE,   current);
   out += "</select></div>";
 }
+
+static void appendTimingField(
+    String& out,
+    const char* nameId,
+    const char* label,
+    const char* hint,
+    uint32_t current,
+    uint32_t defaultValue,
+    uint32_t minValue,
+    const char* resetName,
+    uint32_t defaultFieldValue);
 
 static constexpr int kLibraryMenuHidden = -1;
 
@@ -336,6 +348,27 @@ static void handleSettings() {
   out += "</div><div class='actions' style='margin-top:24px'><button type='submit'>" D_WEB_BUTTONS_SAVE "</button>";
   out += "<span class='muted'>" D_WEB_BUTTONS_LOCK_HINT "</span>";
   out += "</div></form></div>";
+
+  out +=
+    "<div class='card'><h2>" D_WEB_TIMINGS_HEADING "</h2>"
+    "<p class='muted'>" D_WEB_TIMINGS_INTRO "</p>"
+    "<form method='POST' action='/settings' accept-charset='UTF-8' style='margin-top:12px'>"
+    "<div class='grid cols-2'>";
+  appendTimingField(out, "tim_gap", D_WEB_TIMINGS_GAP_LABEL, D_WEB_TIMINGS_GAP_HINT,
+                    ClickTimings::maxClickGapMs(), MAX_CLICK_GAP_MS, 0, "tim_gap_rst", MAX_CLICK_GAP_MS);
+  appendTimingField(out, "tim_seq", D_WEB_TIMINGS_SEQUENCE_LABEL, D_WEB_TIMINGS_SEQUENCE_HINT,
+                    ClickTimings::maxClickSequenceMs(), MAX_CLICK_SEQUENCE_MS, MAX_CLICK_GAP_MS, "tim_seq_rst", MAX_CLICK_SEQUENCE_MS);
+  appendTimingField(out, "tim_long", D_WEB_TIMINGS_LONG_LABEL, D_WEB_TIMINGS_LONG_HINT,
+                    ClickTimings::longMs(), LONG_MS, 1, "tim_long_rst", LONG_MS);
+  appendTimingField(out, "tim_vlong", D_WEB_TIMINGS_VLONG_LABEL, D_WEB_TIMINGS_VLONG_HINT,
+                    ClickTimings::veryLongMs(), VERY_LONG_MS, 2, "tim_vlong_rst", VERY_LONG_MS);
+  appendTimingField(out, "tim_dbnc", D_WEB_TIMINGS_DEBOUNCE_LABEL, D_WEB_TIMINGS_DEBOUNCE_HINT,
+                    ClickTimings::debounceMs(), DEBOUNCE_MS, 0, "tim_dbnc_rst", DEBOUNCE_MS);
+  out +=
+    "</div><input type='hidden' name='timings_form' value='1'>"
+    "<div class='actions' style='margin-top:24px'><button type='submit'>" D_WEB_TIMINGS_SAVE "</button>"
+    "<span class='muted'>" D_WEB_SETTINGS_APPLY_HINT "</span></div>"
+    "</form></div>";
  
   // Wi-Fi card — own form (wifi_form sentinel), posts back to the same
   // /settings endpoint as the other cards. Edits the single stored network
@@ -373,6 +406,44 @@ static void handleSettings() {
 
   out += webPageEnd();
   server.send(200, "text/html; charset=utf-8", out);
+}
+
+static void appendTimingField(
+    String& out,
+    const char* nameId,
+    const char* label,
+    const char* hint,
+    uint32_t current,
+    uint32_t defaultValue,
+    uint32_t minValue,
+    const char* resetName,
+    uint32_t defaultFieldValue) {
+  out += "<div><label for='";
+  out += nameId;
+  out += "'>";
+  out += label;
+  out += "</label>";
+  out += "<div style='display:flex;gap:8px;align-items:end;margin-top:6px'>";
+  out += "<input type='number' id='";
+  out += nameId;
+  out += "' name='";
+  out += nameId;
+  out += "' min='";
+  out += minValue;
+  out += "' max='60000' step='1' value='";
+  out += current;
+  out += "' style='max-width:120px'>";
+  out += "<button type='submit' name='";
+  out += resetName;
+  out += "' value='1' class='secondary' formnovalidate>";
+  out += D_WEB_TIMINGS_RESET;
+  out += "</button></div>";
+  out += "<div class='hint'>";
+  out += hint;
+  out += " <span class='muted'>" D_WEB_TIMINGS_DEFAULT_PREFIX;
+  out += defaultValue;
+  out += " ms</span></div></div>";
+  (void)defaultFieldValue;
 }
 
 static bool validateRequiredActionsOnPost() {
@@ -440,6 +511,40 @@ static bool applySettingsForm() {
   return layoutChanged;
 }
 
+static void applyTimingSettingsForm() {
+  if (!server.hasArg("timings_form")) return;
+
+  if (server.hasArg("tim_gap_rst")) {
+    ClickTimings::resetMaxClickGapMs();
+  } else if (server.hasArg("tim_gap")) {
+    ClickTimings::setMaxClickGapMs((uint32_t)server.arg("tim_gap").toInt());
+  }
+
+  if (server.hasArg("tim_seq_rst")) {
+    ClickTimings::resetMaxClickSequenceMs();
+  } else if (server.hasArg("tim_seq")) {
+    ClickTimings::setMaxClickSequenceMs((uint32_t)server.arg("tim_seq").toInt());
+  }
+
+  if (server.hasArg("tim_long_rst")) {
+    ClickTimings::resetLongMs();
+  } else if (server.hasArg("tim_long")) {
+    ClickTimings::setLongMs((uint32_t)server.arg("tim_long").toInt());
+  }
+
+  if (server.hasArg("tim_vlong_rst")) {
+    ClickTimings::resetVeryLongMs();
+  } else if (server.hasArg("tim_vlong")) {
+    ClickTimings::setVeryLongMs((uint32_t)server.arg("tim_vlong").toInt());
+  }
+
+  if (server.hasArg("tim_dbnc_rst")) {
+    ClickTimings::resetDebounceMs();
+  } else if (server.hasArg("tim_dbnc")) {
+    ClickTimings::setDebounceMs((uint32_t)server.arg("tim_dbnc").toInt());
+  }
+}
+
 static void handleSettingsPost() {
 
   // Snapshot the reader's current byte offset before applying changes, so
@@ -457,6 +562,7 @@ static void handleSettingsPost() {
   }
 
   bool layoutChanged = applySettingsForm();
+  applyTimingSettingsForm();
 
   // Layout shifted under our feet — the in-memory page table no longer
   // matches the active layout. Reset it (the on-disk cache, if any, will
