@@ -435,7 +435,7 @@ static void appendTimingField(
   out += "' style='max-width:120px'>";
   out += "<button type='submit' name='";
   out += resetName;
-  out += "' value='1' class='secondary' formnovalidate>";
+  out += "' value='1' class='btn secondary' formnovalidate>";
   out += D_WEB_TIMINGS_RESET;
   out += "</button></div>";
   out += "<div class='hint'>";
