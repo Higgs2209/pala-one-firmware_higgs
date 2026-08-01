@@ -441,6 +441,10 @@ static void appendTimingField(
   out += uiField.hint;
   out += " <span class='muted'>" D_WEB_TIMINGS_DEFAULT_PREFIX;
   out += timing.defaultValue;
+  out += " ms, min ";
+  out += timing.minValue();
+  out += " ms, max ";
+  out += timing.maxValue();
   out += " ms</span></div></div>";
 }
 
