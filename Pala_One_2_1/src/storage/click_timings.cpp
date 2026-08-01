@@ -220,7 +220,7 @@ void resetDebounceMs() {
 }
 
 void resetToDefaults() {
-  for (TimingSetting* setting : kAllSettings) {
+  for (const TimingSetting* setting : kAllSettings) {
     resetSetting(*setting);
   }
   normalize();
