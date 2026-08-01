@@ -16,6 +16,7 @@ static constexpr uint32_t kGapMax = 5000;
 static constexpr uint32_t kSequenceMax = 10000;
 static constexpr uint32_t kLongMin = 50;
 static constexpr uint32_t kLongMax = 10000;
+static constexpr uint32_t kVeryLongMin = kLongMin + 1;
 static constexpr uint32_t kVeryLongMax = 20000;
 static constexpr uint32_t kDebounceMin = 0;
 static constexpr uint32_t kDebounceMax = 100;
@@ -26,37 +27,119 @@ static uint32_t s_longMs = LONG_MS;
 static uint32_t s_veryLongMs = VERY_LONG_MS;
 static uint32_t s_debounceMs = DEBOUNCE_MS;
 
+enum class MinKind : uint8_t {
+  Fixed,
+  Gap,
+  LongPlusOne,
+};
+
+struct TimingSetting {
+  const char* key;
+  uint32_t defaultValue;
+  uint32_t minValue;
+  uint32_t maxValue;
+  uint32_t* value;
+  MinKind minKind;
+};
+
+static TimingSetting& gapSetting() {
+  static TimingSetting setting = {kKeyGap, MAX_CLICK_GAP_MS, kGapMin, kGapMax, &s_gapMs, MinKind::Fixed};
+  return setting;
+}
+
+static TimingSetting& sequenceSetting() {
+  static TimingSetting setting = {kKeySequence, MAX_CLICK_SEQUENCE_MS, kGapMin, kSequenceMax, &s_sequenceMs, MinKind::Gap};
+  return setting;
+}
+
+static TimingSetting& longSetting() {
+  static TimingSetting setting = {kKeyLong, LONG_MS, kLongMin, kLongMax, &s_longMs, MinKind::Fixed};
+  return setting;
+}
+
+static TimingSetting& veryLongSetting() {
+  static TimingSetting setting = {kKeyVeryLong, VERY_LONG_MS, kVeryLongMin, kVeryLongMax, &s_veryLongMs, MinKind::LongPlusOne};
+  return setting;
+}
+
+static TimingSetting& debounceSetting() {
+  static TimingSetting setting = {kKeyDebounce, DEBOUNCE_MS, kDebounceMin, kDebounceMax, &s_debounceMs, MinKind::Fixed};
+  return setting;
+}
+
+static TimingSetting* const kAllSettings[] = {
+  &gapSetting(),
+  &sequenceSetting(),
+  &longSetting(),
+  &veryLongSetting(),
+  &debounceSetting(),
+};
+
 static uint32_t clampU32(uint32_t value, uint32_t minValue, uint32_t maxValue) {
   if (value < minValue) return minValue;
   if (value > maxValue) return maxValue;
   return value;
 }
 
+static uint32_t minValueFor(const TimingSetting& setting) {
+  switch (setting.minKind) {
+    case MinKind::Gap: return s_gapMs;
+    case MinKind::LongPlusOne: return s_longMs + 1;
+    case MinKind::Fixed:
+    default: return setting.minValue;
+  }
+}
+
+static void clampSetting(const TimingSetting* setting) {
+  *setting->value = clampU32(*setting->value, minValueFor(*setting), setting->maxValue);
+}
+
+static void loadSetting(KeyValueStore& kv, const TimingSetting* setting) {
+  *setting->value = (uint32_t)kv.getInt(setting->key, (int)setting->defaultValue);
+}
+
+static void saveSetting(KeyValueStore& kv, const TimingSetting* setting) {
+  kv.putInt(setting->key, (int)*setting->value);
+}
+
 static void normalize() {
-  s_gapMs = clampU32(s_gapMs, kGapMin, kGapMax);
-  s_sequenceMs = clampU32(s_sequenceMs, s_gapMs, kSequenceMax);
-  s_longMs = clampU32(s_longMs, kLongMin, kLongMax);
-  s_veryLongMs = clampU32(s_veryLongMs, s_longMs + 1, kVeryLongMax);
-  s_debounceMs = clampU32(s_debounceMs, kDebounceMin, kDebounceMax);
+  for (const TimingSetting* setting : kAllSettings) {
+    clampSetting(setting);
+  }
 }
 
 static void loadFromStore(KeyValueStore& kv) {
-  s_gapMs = (uint32_t)kv.getInt(kKeyGap, (int)MAX_CLICK_GAP_MS);
-  s_sequenceMs = (uint32_t)kv.getInt(kKeySequence, (int)MAX_CLICK_SEQUENCE_MS);
-  s_longMs = (uint32_t)kv.getInt(kKeyLong, (int)LONG_MS);
-  s_veryLongMs = (uint32_t)kv.getInt(kKeyVeryLong, (int)VERY_LONG_MS);
-  s_debounceMs = (uint32_t)kv.getInt(kKeyDebounce, (int)DEBOUNCE_MS);
+  for (const TimingSetting* setting : kAllSettings) {
+    loadSetting(kv, setting);
+  }
   normalize();
 }
 
 static void saveToStore(KeyValueStore& kv) {
   normalize();
-  kv.putInt(kKeyGap, (int)s_gapMs);
-  kv.putInt(kKeySequence, (int)s_sequenceMs);
-  kv.putInt(kKeyLong, (int)s_longMs);
-  kv.putInt(kKeyVeryLong, (int)s_veryLongMs);
-  kv.putInt(kKeyDebounce, (int)s_debounceMs);
+  for (const TimingSetting* setting : kAllSettings) {
+    saveSetting(kv, setting);
+  }
 }
+
+static void setSetting(const TimingSetting& setting, uint32_t value) {
+  *setting.value = clampU32(value, minValueFor(setting), setting.maxValue);
+}
+
+static void resetSetting(const TimingSetting& setting) {
+  *setting.value = setting.defaultValue;
+}
+
+static uint32_t gapMinMs() { return gapSetting().minValue; }
+static uint32_t gapMaxMs() { return gapSetting().maxValue; }
+static uint32_t sequenceMinMs() { return minValueFor(sequenceSetting()); }
+static uint32_t sequenceMaxMs() { return sequenceSetting().maxValue; }
+static uint32_t longMinMs() { return longSetting().minValue; }
+static uint32_t longMaxMs() { return longSetting().maxValue; }
+static uint32_t veryLongMinMs() { return minValueFor(veryLongSetting()); }
+static uint32_t veryLongMaxMs() { return veryLongSetting().maxValue; }
+static uint32_t debounceMinMs() { return debounceSetting().minValue; }
+static uint32_t debounceMaxMs() { return debounceSetting().maxValue; }
 
 void loadSettings(KeyValueStore& kv) {
   loadFromStore(kv);
@@ -87,69 +170,76 @@ uint32_t veryLongMs() { return s_veryLongMs; }
 uint32_t debounceMs() { return s_debounceMs; }
 
 void setMaxClickGapMs(uint32_t value) {
-  s_gapMs = clampU32(value, kGapMin, kGapMax);
-  if (s_sequenceMs < s_gapMs) s_sequenceMs = s_gapMs;
+  setSetting(gapSetting(), value);
   saveSettings();
 }
 
 void setMaxClickSequenceMs(uint32_t value) {
-  s_sequenceMs = clampU32(value, s_gapMs, kSequenceMax);
+  setSetting(sequenceSetting(), value);
   saveSettings();
 }
 
 void setLongMs(uint32_t value) {
-  s_longMs = clampU32(value, kLongMin, kLongMax);
-  if (s_veryLongMs <= s_longMs) s_veryLongMs = s_longMs + 1;
+  setSetting(longSetting(), value);
   saveSettings();
 }
 
 void setVeryLongMs(uint32_t value) {
-  s_veryLongMs = clampU32(value, s_longMs + 1, kVeryLongMax);
+  setSetting(veryLongSetting(), value);
   saveSettings();
 }
 
 void setDebounceMs(uint32_t value) {
-  s_debounceMs = clampU32(value, kDebounceMin, kDebounceMax);
+  setSetting(debounceSetting(), value);
   saveSettings();
 }
 
 void resetMaxClickGapMs() {
-  s_gapMs = MAX_CLICK_GAP_MS;
-  if (s_sequenceMs < s_gapMs) s_sequenceMs = s_gapMs;
+  resetSetting(gapSetting());
   saveSettings();
 }
 
 void resetMaxClickSequenceMs() {
-  s_sequenceMs = MAX_CLICK_SEQUENCE_MS;
-  if (s_sequenceMs < s_gapMs) s_sequenceMs = s_gapMs;
+  resetSetting(sequenceSetting());
   saveSettings();
 }
 
 void resetLongMs() {
-  s_longMs = LONG_MS;
-  if (s_veryLongMs <= s_longMs) s_veryLongMs = s_longMs + 1;
+  resetSetting(longSetting());
   saveSettings();
 }
 
 void resetVeryLongMs() {
-  s_veryLongMs = VERY_LONG_MS;
-  if (s_veryLongMs <= s_longMs) s_veryLongMs = s_longMs + 1;
+  resetSetting(veryLongSetting());
   saveSettings();
 }
 
 void resetDebounceMs() {
-  s_debounceMs = DEBOUNCE_MS;
+  resetSetting(debounceSetting());
   saveSettings();
 }
 
 void resetToDefaults() {
-  s_gapMs = MAX_CLICK_GAP_MS;
-  s_sequenceMs = MAX_CLICK_SEQUENCE_MS;
-  s_longMs = LONG_MS;
-  s_veryLongMs = VERY_LONG_MS;
-  s_debounceMs = DEBOUNCE_MS;
+  for (TimingSetting* setting : kAllSettings) {
+    resetSetting(*setting);
+  }
   normalize();
   saveSettings();
+}
+
+const TimingSettingSpec* timingSettings() {
+  static const TimingSettingSpec kTimingSpecs[] = {
+    {kKeyGap, MAX_CLICK_GAP_MS, maxClickGapMs, gapMinMs, gapMaxMs, resetMaxClickGapMs, setMaxClickGapMs},
+    {kKeySequence, MAX_CLICK_SEQUENCE_MS, maxClickSequenceMs, sequenceMinMs, sequenceMaxMs, resetMaxClickSequenceMs, setMaxClickSequenceMs},
+    {kKeyLong, LONG_MS, longMs, longMinMs, longMaxMs, resetLongMs, setLongMs},
+    {kKeyVeryLong, VERY_LONG_MS, veryLongMs, veryLongMinMs, veryLongMaxMs, resetVeryLongMs, setVeryLongMs},
+    {kKeyDebounce, DEBOUNCE_MS, debounceMs, debounceMinMs, debounceMaxMs, resetDebounceMs, setDebounceMs},
+  };
+  return kTimingSpecs;
+}
+
+uint8_t timingSettingsCount() {
+  return (uint8_t)(sizeof(kAllSettings) / sizeof(kAllSettings[0]));
 }
 
 }  // namespace ClickTimings

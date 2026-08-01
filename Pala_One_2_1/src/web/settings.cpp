@@ -74,16 +74,25 @@ static void appendActionSelect(String& out, const char* nameId, const char* labe
   out += "</select></div>";
 }
 
+struct TimingUiField {
+  const char* nameId;
+  const char* label;
+  const char* hint;
+  const char* resetName;
+};
+
+static const TimingUiField kTimingFields[] = {
+  {"tim_gap", D_WEB_TIMINGS_GAP_LABEL, D_WEB_TIMINGS_GAP_HINT, "tim_gap_rst"},
+  {"tim_seq", D_WEB_TIMINGS_SEQUENCE_LABEL, D_WEB_TIMINGS_SEQUENCE_HINT, "tim_seq_rst"},
+  {"tim_long", D_WEB_TIMINGS_LONG_LABEL, D_WEB_TIMINGS_LONG_HINT, "tim_long_rst"},
+  {"tim_vlong", D_WEB_TIMINGS_VLONG_LABEL, D_WEB_TIMINGS_VLONG_HINT, "tim_vlong_rst"},
+  {"tim_dbnc", D_WEB_TIMINGS_DEBOUNCE_LABEL, D_WEB_TIMINGS_DEBOUNCE_HINT, "tim_dbnc_rst"},
+};
+
 static void appendTimingField(
     String& out,
-    const char* nameId,
-    const char* label,
-    const char* hint,
-    uint32_t current,
-    uint32_t defaultValue,
-    uint32_t minValue,
-    const char* resetName,
-    uint32_t defaultFieldValue);
+    const TimingUiField& uiField,
+    const ClickTimings::TimingSettingSpec& timing);
 
 static constexpr int kLibraryMenuHidden = -1;
 
@@ -354,16 +363,10 @@ static void handleSettings() {
     "<p class='muted'>" D_WEB_TIMINGS_INTRO "</p>"
     "<form method='POST' action='/settings' accept-charset='UTF-8' style='margin-top:12px'>"
     "<div class='grid cols-2'>";
-  appendTimingField(out, "tim_gap", D_WEB_TIMINGS_GAP_LABEL, D_WEB_TIMINGS_GAP_HINT,
-                    ClickTimings::maxClickGapMs(), MAX_CLICK_GAP_MS, 0, "tim_gap_rst", MAX_CLICK_GAP_MS);
-  appendTimingField(out, "tim_seq", D_WEB_TIMINGS_SEQUENCE_LABEL, D_WEB_TIMINGS_SEQUENCE_HINT,
-                    ClickTimings::maxClickSequenceMs(), MAX_CLICK_SEQUENCE_MS, MAX_CLICK_GAP_MS, "tim_seq_rst", MAX_CLICK_SEQUENCE_MS);
-  appendTimingField(out, "tim_long", D_WEB_TIMINGS_LONG_LABEL, D_WEB_TIMINGS_LONG_HINT,
-                    ClickTimings::longMs(), LONG_MS, 1, "tim_long_rst", LONG_MS);
-  appendTimingField(out, "tim_vlong", D_WEB_TIMINGS_VLONG_LABEL, D_WEB_TIMINGS_VLONG_HINT,
-                    ClickTimings::veryLongMs(), VERY_LONG_MS, 2, "tim_vlong_rst", VERY_LONG_MS);
-  appendTimingField(out, "tim_dbnc", D_WEB_TIMINGS_DEBOUNCE_LABEL, D_WEB_TIMINGS_DEBOUNCE_HINT,
-                    ClickTimings::debounceMs(), DEBOUNCE_MS, 0, "tim_dbnc_rst", DEBOUNCE_MS);
+  const ClickTimings::TimingSettingSpec* timingSettings = ClickTimings::timingSettings();
+  for (uint8_t i = 0; i < ClickTimings::timingSettingsCount(); i++) {
+    appendTimingField(out, kTimingFields[i], timingSettings[i]);
+  }
   out +=
     "</div><input type='hidden' name='timings_form' value='1'>"
     "<div class='actions' style='margin-top:24px'><button type='submit'>" D_WEB_TIMINGS_SAVE "</button>"
@@ -410,40 +413,35 @@ static void handleSettings() {
 
 static void appendTimingField(
     String& out,
-    const char* nameId,
-    const char* label,
-    const char* hint,
-    uint32_t current,
-    uint32_t defaultValue,
-    uint32_t minValue,
-    const char* resetName,
-    uint32_t defaultFieldValue) {
+    const TimingUiField& uiField,
+    const ClickTimings::TimingSettingSpec& timing) {
   out += "<div><label for='";
-  out += nameId;
+  out += uiField.nameId;
   out += "'>";
-  out += label;
+  out += uiField.label;
   out += "</label>";
   out += "<div style='display:flex;gap:8px;align-items:end;margin-top:6px'>";
   out += "<input type='number' id='";
-  out += nameId;
+  out += uiField.nameId;
   out += "' name='";
-  out += nameId;
+  out += uiField.nameId;
   out += "' min='";
-  out += minValue;
-  out += "' max='60000' step='1' value='";
-  out += current;
+  out += timing.minValue();
+  out += "' max='";
+  out += timing.maxValue();
+  out += "' step='1' value='";
+  out += timing.current();
   out += "' style='max-width:120px'>";
   out += "<button type='submit' name='";
-  out += resetName;
+  out += uiField.resetName;
   out += "' value='1' class='btn secondary' formnovalidate>";
   out += D_WEB_TIMINGS_RESET;
   out += "</button></div>";
   out += "<div class='hint'>";
-  out += hint;
+  out += uiField.hint;
   out += " <span class='muted'>" D_WEB_TIMINGS_DEFAULT_PREFIX;
-  out += defaultValue;
+  out += timing.defaultValue;
   out += " ms</span></div></div>";
-  (void)defaultFieldValue;
 }
 
 static bool validateRequiredActionsOnPost() {
@@ -513,35 +511,15 @@ static bool applySettingsForm() {
 
 static void applyTimingSettingsForm() {
   if (!server.hasArg("timings_form")) return;
-
-  if (server.hasArg("tim_gap_rst")) {
-    ClickTimings::resetMaxClickGapMs();
-  } else if (server.hasArg("tim_gap")) {
-    ClickTimings::setMaxClickGapMs((uint32_t)server.arg("tim_gap").toInt());
-  }
-
-  if (server.hasArg("tim_seq_rst")) {
-    ClickTimings::resetMaxClickSequenceMs();
-  } else if (server.hasArg("tim_seq")) {
-    ClickTimings::setMaxClickSequenceMs((uint32_t)server.arg("tim_seq").toInt());
-  }
-
-  if (server.hasArg("tim_long_rst")) {
-    ClickTimings::resetLongMs();
-  } else if (server.hasArg("tim_long")) {
-    ClickTimings::setLongMs((uint32_t)server.arg("tim_long").toInt());
-  }
-
-  if (server.hasArg("tim_vlong_rst")) {
-    ClickTimings::resetVeryLongMs();
-  } else if (server.hasArg("tim_vlong")) {
-    ClickTimings::setVeryLongMs((uint32_t)server.arg("tim_vlong").toInt());
-  }
-
-  if (server.hasArg("tim_dbnc_rst")) {
-    ClickTimings::resetDebounceMs();
-  } else if (server.hasArg("tim_dbnc")) {
-    ClickTimings::setDebounceMs((uint32_t)server.arg("tim_dbnc").toInt());
+  const ClickTimings::TimingSettingSpec* timingSettings = ClickTimings::timingSettings();
+  for (uint8_t i = 0; i < ClickTimings::timingSettingsCount(); i++) {
+    const TimingUiField& uiField = kTimingFields[i];
+    const ClickTimings::TimingSettingSpec& timing = timingSettings[i];
+    if (server.hasArg(uiField.resetName)) {
+      timing.reset();
+    } else if (server.hasArg(uiField.nameId)) {
+      timing.set((uint32_t)server.arg(uiField.nameId).toInt());
+    }
   }
 }
 

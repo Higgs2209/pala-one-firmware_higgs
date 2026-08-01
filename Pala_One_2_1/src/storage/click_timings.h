@@ -8,10 +8,23 @@
 
 namespace ClickTimings {
 
+struct TimingSettingSpec {
+  const char* key;
+  uint32_t defaultValue;
+  uint32_t (*current)();
+  uint32_t (*minValue)();
+  uint32_t (*maxValue)();
+  void (*reset)();
+  void (*set)(uint32_t value);
+};
+
 void loadSettings(KeyValueStore& kv);
 void saveSettings(KeyValueStore& kv);
 void loadSettings();
 void saveSettings();
+
+const TimingSettingSpec* timingSettings();
+uint8_t timingSettingsCount();
 
 uint32_t maxClickGapMs();
 uint32_t maxClickSequenceMs();
