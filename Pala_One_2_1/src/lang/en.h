@@ -127,6 +127,27 @@
 #define D_READER_INDEXING_TITLE     "Preparing book..."
 #define D_READER_INDEXING_DETAIL    "Rebuilding page index"
 
+// ----------------------------------------------------------------------------
+//  Reader menu overlay (src/ui/reader_menu.cpp). Both *_FMT strings are
+//  snprintf templates rendered into a char[64]; keep the argument order —
+//  PAGE_OF_FMT takes (page, total, percent), PAGE_PCT_FMT takes (page,
+//  percent). STATUSBAR_FMT's %s is one of the D_STATUSBAR_MODE_* labels.
+// ----------------------------------------------------------------------------
+#define D_READER_MENU_HEADING       "Reading"
+#define D_READER_MENU_PAGE_OF_FMT   "Page %d of %d  (%d%%)"
+#define D_READER_MENU_PAGE_PCT_FMT  "Page %d  (%d%% of book)"
+#define D_READER_MENU_STATUSBAR_FMT "Statusbar: %s"
+#define D_READER_MENU_HINT          "click: cycle  2x: close"
+#define D_STATUSBAR_MODE_FULL       "Full"
+#define D_STATUSBAR_MODE_MINIMAL    "Minimal"
+#define D_STATUSBAR_MODE_HIDDEN     "Hidden"
+
+// ----------------------------------------------------------------------------
+//  Toasts (src/ui/screen_settings.cpp, src/storage/statistics.cpp)
+// ----------------------------------------------------------------------------
+#define D_TOAST_SCREEN_FLIPPED      "Flipped"
+#define D_TOAST_STREAK_DAY_FMT      "Reading streak: day %u"
+
 
 // ----------------------------------------------------------------------------
 //  App loader error overlay (src/ui/pala_api_impl.cpp paintLoadError)

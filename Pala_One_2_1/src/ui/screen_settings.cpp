@@ -12,7 +12,7 @@ namespace ScreenSettings {
 
     void toggleScreenRotation() {
         s_screenFlipped = !s_screenFlipped;
-        Toast::show("Flipped");
+        Toast::show(D_TOAST_SCREEN_FLIPPED);
         prefs.putBool(kKeyScreenFlipped, s_screenFlipped);
     }
     

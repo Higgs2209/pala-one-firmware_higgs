@@ -127,6 +127,24 @@
 #define D_READER_INDEXING_TITLE     "Preparando libro..."
 #define D_READER_INDEXING_DETAIL    "Reconstruyendo índice de páginas"
 
+// ----------------------------------------------------------------------------
+//  Reader menu overlay
+// ----------------------------------------------------------------------------
+#define D_READER_MENU_HEADING       "Lectura"
+#define D_READER_MENU_PAGE_OF_FMT   "Página %d de %d  (%d%%)"
+#define D_READER_MENU_PAGE_PCT_FMT  "Página %d  (%d%% del libro)"
+#define D_READER_MENU_STATUSBAR_FMT "Barra de estado: %s"
+#define D_READER_MENU_HINT          "clic: cambiar  2x: cerrar"
+#define D_STATUSBAR_MODE_FULL       "Completa"
+#define D_STATUSBAR_MODE_MINIMAL    "Mínima"
+#define D_STATUSBAR_MODE_HIDDEN     "Oculta"
+
+// ----------------------------------------------------------------------------
+//  Toasts
+// ----------------------------------------------------------------------------
+#define D_TOAST_SCREEN_FLIPPED      "Pantalla volteada"
+#define D_TOAST_STREAK_DAY_FMT      "Racha de lectura: día %u"
+
 
 // ----------------------------------------------------------------------------
 //  App loader error overlay
