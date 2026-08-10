@@ -383,7 +383,7 @@
 #define D_WEB_ICON_WIFI_LABEL       "Show Wi-Fi icon"
 #define D_WEB_ICON_WIFI_HINT        "Appears while the Wi-Fi radio is on, which happens during file upload and firmware updates."
 #define D_WEB_ICON_SLEEP_LABEL      "Show sleep-blocked icon"
-#define D_WEB_ICON_SLEEP_HINT       "Shown while something is keeping the device awake - a connected computer, or an upload in progress."
+#define D_WEB_ICON_SLEEP_HINT       "A crossed-out moon, shown while something is keeping the device awake - a connected computer, or an upload in progress."
 
 // Wi-Fi card (src/web/settings.cpp) — the saved network the upload screen
 // joins.

@@ -391,7 +391,7 @@
 #define D_WEB_ICON_WIFI_LABEL       "Mostrar icono de Wi-Fi"
 #define D_WEB_ICON_WIFI_HINT        "Aparece mientras la radio Wi-Fi está encendida, lo que ocurre durante la subida de archivos y las actualizaciones de firmware."
 #define D_WEB_ICON_SLEEP_LABEL      "Mostrar icono de suspensión bloqueada"
-#define D_WEB_ICON_SLEEP_HINT       "Se muestra mientras algo mantiene despierto al dispositivo: una computadora conectada o una subida en curso."
+#define D_WEB_ICON_SLEEP_HINT       "Una luna tachada, que se muestra mientras algo mantiene despierto al dispositivo: una computadora conectada o una subida en curso."
 // ----------------------------------------------------------------------------
 //  Upload routes
 // ----------------------------------------------------------------------------
