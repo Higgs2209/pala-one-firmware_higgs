@@ -40,23 +40,29 @@ void setSleepIconEnabled(bool val) {
 // ============================================================================
 
 static const int kIconH   = 9;   // matches the battery so the band is uniform
-static const int kIconGap = 3;
 static const int kTrayY   = 2;   // matches drawBatteryTopRight's yIcon
 static const int kMaxIcons = 4;
 
-// 11x9. Three arcs of decreasing width separated by blank rows — the gaps
+// Two separate gaps on purpose. The tray sits closer to the battery than its
+// own icons sit to each other: the battery is a different kind of indicator
+// and reads as its own group, whereas two adjacent status glyphs need more
+// air between them or they run together at this size.
+static const int kTrayEdgeGap = 3;   // battery -> first icon
+static const int kIconGap     = 6;   // icon -> icon
+
+// 13x9. Three arcs of decreasing width separated by blank rows — the gaps
 // are what make it legible at this size — over a 3x2 base dot.
-static const int kWifiW = 11;
+static const int kWifiW = 13;
 static const unsigned char kWifiBits[] PROGMEM = {
-  0xFC, 0x01,   // ..#######..
-  0x02, 0x02,   // .#.......#.
-  0x01, 0x04,   // #.........#
-  0x00, 0x00,
-  0xF8, 0x00,   // ...#####...
-  0x04, 0x01,   // ..#.....#..
-  0x00, 0x00,
-  0x70, 0x00,   // ....###....
-  0x70, 0x00,   // ....###....
+  0xFC, 0x07,   // ..#########..
+  0x02, 0x08,   // .#.........#.
+  0x01, 0x10,   // #...........#
+  0x00, 0x00,   // .............
+  0xF8, 0x03,   // ...#######...
+  0x04, 0x04,   // ..#.......#..
+  0x00, 0x00,   // .............
+  0xE0, 0x00,   // .....###.....
+  0xE0, 0x00,   // .....###.....
 };
 
 // 9x9. Crossed-out moon: a crescent opening to the right, struck through by
@@ -104,7 +110,7 @@ static int activeMask() {
 }
 
 int trayRightEdge(bool batteryDrawn) {
-  return batteryDrawn ? batteryTopRightLeftEdge() - kIconGap
+  return batteryDrawn ? batteryTopRightLeftEdge() - kTrayEdgeGap
                       : SCREEN_W - MARGIN_X;
 }
 
