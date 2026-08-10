@@ -70,7 +70,7 @@ static void handleSleepThumb() {
   }
 
   if (!gotBytes) {
-    server.send(404, "text/plain; charset=utf-8", "Thumbnail not found");
+    server.send(404, "text/plain; charset=utf-8", D_WEB_SS_ERR_THUMB_NOT_FOUND);
     return;
   }
 
@@ -147,7 +147,7 @@ static void handleSleepDownload() {
   }
 
   if (!gotBytes) {
-    server.send(404, "text/plain; charset=utf-8", "Screensaver not found");
+    server.send(404, "text/plain; charset=utf-8", D_WEB_SS_ERR_NOT_FOUND);
     return;
   }
 
@@ -197,7 +197,7 @@ static void handleSleepModePost() {
 static void handleScreensaverUploadDone() {
   if (!s_up.ok) {
     server.send(400, "text/plain; charset=utf-8",
-                s_up.error.length() ? s_up.error : "Upload failed");
+                s_up.error.length() ? s_up.error : D_WEB_SS_ERR_UPLOAD_FAILED);
     return;
   }
   server.sendHeader("Location", "/screensavers");
@@ -218,7 +218,7 @@ static void handleScreensaverUploadStream() {
         requested = Screensavers::firstFreeSlot();
       }
       if (requested < 0) {
-        s_up.error = "All rotation slots are full";
+        s_up.error = D_WEB_SS_ERR_SLOTS_FULL;
         return;
       }
       s_up.slotTarget = requested;
@@ -228,7 +228,7 @@ static void handleScreensaverUploadStream() {
     }
     if (FS.exists(s_up.tmpPath)) FS.remove(s_up.tmpPath);
     s_up.tmpFile = FS.open(s_up.tmpPath, "w");
-    if (!s_up.tmpFile) s_up.error = "Cannot create temp file";
+    if (!s_up.tmpFile) s_up.error = D_WEB_SS_ERR_CANT_CREATE_TMP;
   }
   else if (up.status == UPLOAD_FILE_WRITE) {
     if (s_up.error.length() > 0) return;
@@ -236,14 +236,14 @@ static void handleScreensaverUploadStream() {
       if (s_up.tmpFile.size() + up.currentSize > 8192) {
         s_up.tmpFile.close();
         if (FS.exists(s_up.tmpPath)) FS.remove(s_up.tmpPath);
-        s_up.error = "Image file is too large";
+        s_up.error = D_WEB_SS_ERR_IMAGE_TOO_LARGE;
         return;
       }
       size_t wrote = s_up.tmpFile.write(up.buf, up.currentSize);
       if (wrote != up.currentSize) {
         s_up.tmpFile.close();
         if (FS.exists(s_up.tmpPath)) FS.remove(s_up.tmpPath);
-        s_up.error = "Write failed (disk full?)";
+        s_up.error = D_WEB_ERR_WRITE_FAILED;
         return;
       }
     }
@@ -256,9 +256,14 @@ static void handleScreensaverUploadStream() {
 
     if (sz != (size_t)Screensavers::SCREENSAVER_BYTES) {
       if (FS.exists(s_up.tmpPath)) FS.remove(s_up.tmpPath);
-      s_up.error = (sz == 0)
-        ? "Please choose an image first."
-        : "Image must be exactly 3904 bytes";
+      if (sz == 0) {
+        s_up.error = D_WEB_SS_ERR_CHOOSE_IMAGE;
+      } else {
+        char msg[80];
+        snprintf(msg, sizeof(msg), D_WEB_SS_ERR_EXACT_BYTES_FMT,
+                 Screensavers::SCREENSAVER_BYTES);
+        s_up.error = msg;
+      }
       s_up.ok = false;
     } else if (s_up.legacy) {
       if (FS.exists("/sleep.bin")) FS.remove("/sleep.bin");
@@ -266,13 +271,13 @@ static void handleScreensaverUploadStream() {
         s_up.ok = true;
       } else {
         if (FS.exists(s_up.tmpPath)) FS.remove(s_up.tmpPath);
-        s_up.error = "Failed to save sleep image";
+        s_up.error = D_WEB_SS_ERR_SAVE_SLEEP;
       }
     } else {
       if (Screensavers::installFromTemp(s_up.slotTarget, s_up.tmpPath)) {
         s_up.ok = true;
       } else {
-        s_up.error = "Failed to save rotation slot";
+        s_up.error = D_WEB_SS_ERR_SAVE_SLOT;
       }
     }
     s_up.tmpPath = "";
@@ -282,7 +287,7 @@ static void handleScreensaverUploadStream() {
     if (s_up.tmpPath.length() > 0 && FS.exists(s_up.tmpPath)) FS.remove(s_up.tmpPath);
     s_up.tmpPath = "";
     s_up.ok = false;
-    s_up.error = "Upload aborted";
+    s_up.error = D_WEB_ERR_UPLOAD_ABORTED;
   }
 }
 

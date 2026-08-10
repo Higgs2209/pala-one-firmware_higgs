@@ -267,8 +267,10 @@
 
 // ----------------------------------------------------------------------------
 //  Plain-text 4xx/5xx error bodies (src/web/files.cpp, bookmarks.cpp,
-//  apps_upload.cpp). These reach the browser on misformed requests; they
-//  surface as page content if the user navigates a bad URL.
+//  apps_upload.cpp, find.cpp, screensavers.cpp). These reach the browser on
+//  misformed requests; they surface as page content if the user navigates a
+//  bad URL. The lowercase ones are argument-validation failures, the
+//  capitalized ones are operation failures — keep that split in translation.
 // ----------------------------------------------------------------------------
 #define D_WEB_ERR_MISSING_ID            "missing id"
 #define D_WEB_ERR_BAD_ID                "bad id"
@@ -289,6 +291,10 @@
 #define D_WEB_ERR_MISSING_BOOK          "missing book"
 #define D_WEB_ERR_MISSING_NAME          "missing name"
 #define D_WEB_ERR_INVALID_NAME          "invalid name"
+#define D_WEB_ERR_MISSING_OFFSET        "missing offset"
+#define D_WEB_ERR_OPEN_FAILED           "Open failed"
+#define D_WEB_ERR_NOT_FOUND             "Not found"
+#define D_WEB_ERR_APP_NOT_FOUND         "App not found"
 
 // ----------------------------------------------------------------------------
 //  List page (src/web/list.cpp)
@@ -577,5 +583,19 @@
 #define D_WEB_SS_DST_SLOT_PREFIX    "Rotation slot "
 #define D_WEB_SS_DST_OVERWRITE      " (overwrite)"
 #define D_WEB_SS_UPLOAD_EDITED      "Upload edited image"
+
+// Screensaver upload failures. These are set on the upload handler's error
+// slot and returned as the 400 body by handleScreensaverUploadDone.
+// EXACT_BYTES_FMT's %d is Screensavers::SCREENSAVER_BYTES.
+#define D_WEB_SS_ERR_THUMB_NOT_FOUND "Thumbnail not found"
+#define D_WEB_SS_ERR_NOT_FOUND       "Screensaver not found"
+#define D_WEB_SS_ERR_UPLOAD_FAILED   "Upload failed"
+#define D_WEB_SS_ERR_SLOTS_FULL      "All rotation slots are full"
+#define D_WEB_SS_ERR_CANT_CREATE_TMP "Cannot create temp file"
+#define D_WEB_SS_ERR_IMAGE_TOO_LARGE "Image file is too large"
+#define D_WEB_SS_ERR_CHOOSE_IMAGE    "Please choose an image first."
+#define D_WEB_SS_ERR_EXACT_BYTES_FMT "Image must be exactly %d bytes"
+#define D_WEB_SS_ERR_SAVE_SLEEP      "Failed to save sleep image"
+#define D_WEB_SS_ERR_SAVE_SLOT       "Failed to save rotation slot"
 
 #endif  // PALA_LANG_EN_H

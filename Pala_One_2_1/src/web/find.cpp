@@ -18,12 +18,12 @@ namespace {
 // Validate ?id and return the book index, or -1 with an error response sent.
 int requireBookId(const char* arg = "id") {
   if (!server.hasArg(arg)) {
-    server.send(400, "text/plain; charset=utf-8", "missing id");
+    server.send(400, "text/plain; charset=utf-8", D_WEB_ERR_MISSING_ID);
     return -1;
   }
   int id = server.arg(arg).toInt();
   if (id < 0 || id >= g_library.bookCount) {
-    server.send(400, "text/plain; charset=utf-8", "bad id");
+    server.send(400, "text/plain; charset=utf-8", D_WEB_ERR_BAD_ID);
     return -1;
   }
   return id;
@@ -45,7 +45,7 @@ static void handleReadbookText() {
   String path = String(g_library.books[id].path);
   File f = FS.open(path, "r");
   if (!f) {
-    server.send(404, "text/plain; charset=utf-8", "Open failed");
+    server.send(404, "text/plain; charset=utf-8", D_WEB_ERR_OPEN_FAILED);
     return;
   }
 
@@ -76,7 +76,7 @@ static void handleJumpOffset() {
   int id = requireBookId();
   if (id < 0) return;
   if (!server.hasArg("offset")) {
-    server.send(400, "text/plain; charset=utf-8", "missing offset");
+    server.send(400, "text/plain; charset=utf-8", D_WEB_ERR_MISSING_OFFSET);
     return;
   }
 
@@ -85,7 +85,7 @@ static void handleJumpOffset() {
 
   File f = FS.open(path, "r");
   if (!f) {
-    server.send(500, "text/plain; charset=utf-8", "Open failed");
+    server.send(500, "text/plain; charset=utf-8", D_WEB_ERR_OPEN_FAILED);
     return;
   }
   size_t fileSize = f.size();

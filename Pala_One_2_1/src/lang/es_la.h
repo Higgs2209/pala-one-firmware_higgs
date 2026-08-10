@@ -280,6 +280,10 @@
 #define D_WEB_ERR_MISSING_BOOK          "libro faltante"
 #define D_WEB_ERR_MISSING_NAME          "nombre faltante"
 #define D_WEB_ERR_INVALID_NAME          "nombre inválido"
+#define D_WEB_ERR_MISSING_OFFSET        "offset faltante"
+#define D_WEB_ERR_OPEN_FAILED           "Error al abrir"
+#define D_WEB_ERR_NOT_FOUND             "No encontrado"
+#define D_WEB_ERR_APP_NOT_FOUND         "App no encontrada"
 
 // ----------------------------------------------------------------------------
 //  List page
@@ -564,5 +568,17 @@
 #define D_WEB_SS_DST_SLOT_PREFIX    "Ranura de rotación "
 #define D_WEB_SS_DST_OVERWRITE      " (sobrescribir)"
 #define D_WEB_SS_UPLOAD_EDITED      "Subir imagen editada"
+
+// Fallos de subida de protector de pantalla
+#define D_WEB_SS_ERR_THUMB_NOT_FOUND "Miniatura no encontrada"
+#define D_WEB_SS_ERR_NOT_FOUND       "Protector de pantalla no encontrado"
+#define D_WEB_SS_ERR_UPLOAD_FAILED   "Fallo en la subida"
+#define D_WEB_SS_ERR_SLOTS_FULL      "Todas las ranuras de rotación están llenas"
+#define D_WEB_SS_ERR_CANT_CREATE_TMP "No se pudo crear el archivo temporal"
+#define D_WEB_SS_ERR_IMAGE_TOO_LARGE "El archivo de imagen es demasiado grande"
+#define D_WEB_SS_ERR_CHOOSE_IMAGE    "Elige una imagen primero."
+#define D_WEB_SS_ERR_EXACT_BYTES_FMT "La imagen debe tener exactamente %d bytes"
+#define D_WEB_SS_ERR_SAVE_SLEEP      "Fallo al guardar la imagen de reposo"
+#define D_WEB_SS_ERR_SAVE_SLOT       "Fallo al guardar la ranura de rotación"
 
 #endif  // PALA_LANG_ES_LA_H
