@@ -88,6 +88,7 @@
 #include "src/storage/page_cache.h"
 #include "src/storage/statistics.h"
 #include "src/ui/font.h"
+#include "src/ui/icons.h"
 #include "src/ui/pala_api_impl.h"
 #include "src/ui/reader.h"
 #include "src/ui/reader_menu.h"
@@ -132,8 +133,11 @@ BookmarkPreviewScreen      g_bmPreviewScreen;
 
 Screen* g_currentScreen = &g_libraryScreen;
 
-#if HAS_BATTERY
-static bool batteryIndicatorVisible() {
+// Screens whose header carries an indicator (battery and/or the status icon
+// tray). Used to decide whether a state change that nobody pressed a button
+// for still warrants a repaint. Not guarded by HAS_BATTERY — the icon tray
+// exists regardless.
+static bool headerIndicatorVisible() {
   return g_currentScreen == &g_libraryScreen
       || g_currentScreen == &g_uploadScreen
       || g_currentScreen == &g_aboutScreen
@@ -145,7 +149,6 @@ static bool batteryIndicatorVisible() {
       || g_currentScreen == &g_bmListScreen
       || (g_currentScreen == &g_readerScreen && ReaderMenu::isActive());
 }
-#endif
 
 // ============================================================================
 //  Setup
@@ -214,6 +217,7 @@ void setup() {
   Font::loadSettings();
   Screensavers::loadSettings();
   Statusbar::loadSettings();
+  Icons::loadSettings();
   Gestures::loadSettings();
   HeaderTitle::loadSettings();
   ScreenSettings::loadSettings();
@@ -342,6 +346,10 @@ void loop() {
       // Short locked-idle: re-sleep after 1500ms with no input.
       // Don't sleep while the button is held — a Long-press unlock gesture
       // fires on release, so sleeping mid-hold would swallow the gesture.
+      //
+      // Deliberately `allowSleep()` and not `Sleep::inhibited()`, unlike the
+      // two gates further down: a locked device must still return to its
+      // screensaver while a USB host is attached.
       if (ENABLE_DEEP_SLEEP && g_currentScreen->allowSleep()
           && userIdleMs() > 1500 && !g_btns.isPressed()) {
         Sleep::enter();
@@ -354,14 +362,16 @@ void loop() {
 
   if (ev.any()) markUserActivity();
 
+  bool indicatorChanged = Icons::trayStateChanged();
 #if HAS_BATTERY
-  if (batteryChargingChanged() && batteryIndicatorVisible()) {
+  if (batteryChargingChanged()) indicatorChanged = true;
+#endif
+  if (indicatorChanged && headerIndicatorVisible()) {
     if (ReaderMenu::isActive()) ReaderMenu::draw();
     else g_currentScreen->draw();
   }
-#endif
 
-  if (ENABLE_DEEP_SLEEP && g_currentScreen->allowSleep() && !WifiProvisioning::isActive()) {
+  if (ENABLE_DEEP_SLEEP && !Sleep::inhibited()) {
     if (userIdleMs() > Sleep::idleTimeoutMs()) {
       Sleep::enter();
       return;
@@ -399,10 +409,9 @@ void loop() {
   // sleep through it; ext0 (level-low) doesn't fire on a release, so we'd
   // only re-process the edge on the next timer wake (~150ms later in the
   // worst case under the bound below).
-  if (g_currentScreen->allowSleep()
+  if (!Sleep::inhibited()
       && !g_btns.hasPendingClicks()
-      && !buttonQueueNonEmpty()
-      && !WifiProvisioning::isActive()) {
+      && !buttonQueueNonEmpty()) {
     Sleep::idleLightSleep(Toast::isActive());
   }
 }

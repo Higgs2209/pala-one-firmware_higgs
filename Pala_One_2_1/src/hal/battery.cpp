@@ -272,6 +272,16 @@ void drawBolt(int battX, int battY, int battH, int spacing)
 const int iconW = 18;
 const int iconH = 9;
 
+// Widest adornment drawn to the LEFT of the battery body. The charging bolt
+// (drawBolt) reaches battX - spacing(2) - iconH/2(4) - 1 = battX - 7; the
+// low-battery exclamation (drawExclamation) only reaches battX - 4. Anything
+// laid out beside the battery has to clear the larger of the two.
+static const int kTopRightAdornW = 7;
+
+int batteryTopRightLeftEdge() {
+  return SCREEN_W - MARGIN_X - iconW - 2 - kTopRightAdornW;
+}
+
 void drawBattery(int xIcon, int yIcon)
 {
   updateBatteryCached(false);

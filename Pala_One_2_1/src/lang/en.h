@@ -377,6 +377,14 @@
 #define D_WEB_HEADER_TITLE_RESET    "Reset to default"
 #define D_WEB_FLIP_SCREEN           "Flip screen orientation"
 
+// Header status icons card (src/web/settings.cpp) — see src/ui/icons.h.
+#define D_WEB_ICONS_HEADING         "Status icons"
+#define D_WEB_ICONS_INTRO           "Small indicators shown in the menu header for states that use extra battery."
+#define D_WEB_ICON_WIFI_LABEL       "Show Wi-Fi icon"
+#define D_WEB_ICON_WIFI_HINT        "Appears while the Wi-Fi radio is on, which happens during file upload and firmware updates."
+#define D_WEB_ICON_SLEEP_LABEL      "Show sleep-blocked icon"
+#define D_WEB_ICON_SLEEP_HINT       "Shown while something is keeping the device awake - a connected computer, or an upload in progress."
+
 // Wi-Fi card (src/web/settings.cpp) — the saved network the upload screen
 // joins.
 #define D_WEB_WIFI_HEADING            "Wi-Fi"

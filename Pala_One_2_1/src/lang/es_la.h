@@ -384,6 +384,14 @@
 #define D_WEB_HEADER_TITLE_HINT     "Se muestra arriba de la pantalla de biblioteca. Deja vacío para ocultarlo."
 #define D_WEB_HEADER_TITLE_RESET    "Restaurar predeterminado"
 #define D_WEB_FLIP_SCREEN           "Voltear orientación de la pantalla" // Translate by ChatGPT
+
+// Header status icons card (src/web/settings.cpp) — see src/ui/icons.h.
+#define D_WEB_ICONS_HEADING         "Iconos de estado"
+#define D_WEB_ICONS_INTRO           "Indicadores pequeños que aparecen en el encabezado del menú para estados que consumen más batería."
+#define D_WEB_ICON_WIFI_LABEL       "Mostrar icono de Wi-Fi"
+#define D_WEB_ICON_WIFI_HINT        "Aparece mientras la radio Wi-Fi está encendida, lo que ocurre durante la subida de archivos y las actualizaciones de firmware."
+#define D_WEB_ICON_SLEEP_LABEL      "Mostrar icono de suspensión bloqueada"
+#define D_WEB_ICON_SLEEP_HINT       "Se muestra mientras algo mantiene despierto al dispositivo: una computadora conectada o una subida en curso."
 // ----------------------------------------------------------------------------
 //  Upload routes
 // ----------------------------------------------------------------------------
