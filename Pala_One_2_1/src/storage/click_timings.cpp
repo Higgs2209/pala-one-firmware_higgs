@@ -1,7 +1,9 @@
 #include "src/storage/click_timings.h"
 
+#ifdef ARDUINO
 #include "src/state.h"
 #include "src/storage/preferences_store.h"
+#endif
 
 namespace ClickTimings {
 
