@@ -14,6 +14,7 @@
 #include "src/ui/screens/reader_screen.h" // g_readerScreen — active-reader check
 #include "src/storage/click_timings.h"
 #include "src/storage/wifi_creds.h"
+#include "src/ui/icons.h"
 #include "src/ui/lock.h"
 #include "src/ui/sleep.h"
 #include "src/web/chrome.h"
@@ -233,7 +234,7 @@ static void handleSettings() {
     out += "'";
     out += ");};</script>";
   }
-  out.reserve(out.length() + 6200);
+  out.reserve(out.length() + 7200);
 
   // Device personalization card — separate form, no layout-remap interaction.
   out += "<div class='card'><h2>" D_WEB_DEVICE_HEADING "</h2>";
@@ -256,6 +257,20 @@ static void handleSettings() {
   out += "<span>" D_WEB_FLIP_SCREEN "</span></label>";
   out += "<span class='muted' style='display:inline'>" D_WEB_SETTINGS_APPLY_HINT "</span>";
 
+  out += "<div class='actions' style='margin-top:14px'><button type='submit'>" D_WEB_SAVE_SETTINGS_BUTTON "</button></div>";
+  out += "</form></div>";
+
+  // Header status icons — own form (icons_form sentinel) so an unchecked box
+  // here is never confused with a POST from one of the other cards.
+  out += "<div class='card'><h2>" D_WEB_ICONS_HEADING "</h2>";
+  out += "<p class='muted'>" D_WEB_ICONS_INTRO "</p>";
+  out += "<form method='POST' action='/settings' accept-charset='UTF-8' style='margin-top:12px'>";
+  out += "<label style='display:flex;gap:8px;align-items:center;margin-top:10px;cursor:pointer'>";
+  out += "<input type='checkbox' name='ico_sleep' value='1' style='width:auto'";
+  out += Icons::sleepIconEnabled() ? " checked" : "";
+  out += "><span>" D_WEB_ICON_SLEEP_LABEL "</span></label>";
+  out += "<div class='hint'>" D_WEB_ICON_SLEEP_HINT "</div>";
+  out += "<input type='hidden' name='icons_form' value='1'>";
   out += "<div class='actions' style='margin-top:14px'><button type='submit'>" D_WEB_SAVE_SETTINGS_BUTTON "</button></div>";
   out += "</form></div>";
 
@@ -576,6 +591,13 @@ static void handleSettingsPost() {
     if (ns != Sleep::noScreensaver()) Sleep::setNoScreensaver(ns);
     bool ls = server.hasArg("lckslp");
     if (ls != Sleep::lockOnSleep()) Sleep::setLockOnSleep(ls);
+  }
+
+  // Same sentinel pattern as noscr_form above — without it, any other card's
+  // POST would read the checkbox as absent and switch the icon off.
+  if (server.hasArg("icons_form")) {
+    bool si = server.hasArg("ico_sleep");
+    if (si != Icons::sleepIconEnabled()) Icons::setSleepIconEnabled(si);
   }
 
   // Header title — its own form card.
