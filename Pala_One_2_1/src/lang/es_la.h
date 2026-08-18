@@ -127,6 +127,24 @@
 #define D_READER_INDEXING_TITLE     "Preparando libro..."
 #define D_READER_INDEXING_DETAIL    "Reconstruyendo índice de páginas"
 
+// ----------------------------------------------------------------------------
+//  Reader menu overlay
+// ----------------------------------------------------------------------------
+#define D_READER_MENU_HEADING       "Lectura"
+#define D_READER_MENU_PAGE_OF_FMT   "Página %d de %d  (%d%%)"
+#define D_READER_MENU_PAGE_PCT_FMT  "Página %d  (%d%% del libro)"
+#define D_READER_MENU_STATUSBAR_FMT "Barra de estado: %s"
+#define D_READER_MENU_HINT          "clic: cambiar  2x: cerrar"
+#define D_STATUSBAR_MODE_FULL       "Completa"
+#define D_STATUSBAR_MODE_MINIMAL    "Mínima"
+#define D_STATUSBAR_MODE_HIDDEN     "Oculta"
+
+// ----------------------------------------------------------------------------
+//  Toasts
+// ----------------------------------------------------------------------------
+#define D_TOAST_SCREEN_FLIPPED      "Pantalla volteada"
+#define D_TOAST_STREAK_DAY_FMT      "Racha de lectura: día %u"
+
 
 // ----------------------------------------------------------------------------
 //  App loader error overlay
@@ -186,6 +204,13 @@
 #define D_WEB_NAV_SETTINGS          "Ajustes"
 #define D_WEB_NAV_FACTORY_RESET     "Reinicio de fábrica"
 #define D_WEB_NAV_BACK              "Atrás"
+
+// ----------------------------------------------------------------------------
+//  Selector de tema en el encabezado
+// ----------------------------------------------------------------------------
+#define D_WEB_THEME_TOGGLE_TITLE    "Apariencia clara u oscura"
+#define D_WEB_THEME_DARK_MODE       "Modo oscuro"
+#define D_WEB_THEME_LIGHT_MODE      "Modo claro"
 
 // ----------------------------------------------------------------------------
 //  Home page
@@ -262,6 +287,10 @@
 #define D_WEB_ERR_MISSING_BOOK          "libro faltante"
 #define D_WEB_ERR_MISSING_NAME          "nombre faltante"
 #define D_WEB_ERR_INVALID_NAME          "nombre inválido"
+#define D_WEB_ERR_MISSING_OFFSET        "offset faltante"
+#define D_WEB_ERR_OPEN_FAILED           "Error al abrir"
+#define D_WEB_ERR_NOT_FOUND             "No encontrado"
+#define D_WEB_ERR_APP_NOT_FOUND         "App no encontrada"
 
 // ----------------------------------------------------------------------------
 //  List page
@@ -490,6 +519,20 @@
 #define D_WEB_READ_JUMP_HINT        "Guarda directamente la próxima página de apertura."
 #define D_WEB_READ_AND_FIND_LINK    "Leer y buscar"
 
+// Estados del JS de buscar/saltar. Sin apóstrofos ni barras invertidas: se
+// insertan dentro de literales JS entre comillas simples.
+#define D_WEB_READ_JS_NO_MATCHES    "Sin coincidencias"
+#define D_WEB_READ_JS_MATCH_FMT     "Coincidencia %1 de %2  (byte %3)"
+#define D_WEB_READ_JS_ENTER_PHRASE  "Escribe una frase para buscar."
+#define D_WEB_READ_JS_FIND_FIRST    "Busca algo primero."
+#define D_WEB_READ_JS_SAVING        "Guardando..."
+#define D_WEB_READ_JS_SAVED_FMT     "Guardado. Abre el libro en el dispositivo para saltar al byte %1."
+#define D_WEB_READ_JS_SAVE_HTTP_FMT "Fallo al guardar: HTTP %1"
+#define D_WEB_READ_JS_SAVE_FAIL_FMT "Fallo al guardar: %1"
+#define D_WEB_READ_JS_ERROR         "error"
+#define D_WEB_READ_JS_LOADED_FMT    "Cargados %1 bytes. Escribe una frase para buscar."
+#define D_WEB_READ_JS_LOAD_FAILED   "No se pudo cargar el texto del libro."
+
 // ----------------------------------------------------------------------------
 //  Familia de fuente + lectura biónica + retención de posición
 //  (src/web/settings.cpp).
@@ -554,5 +597,29 @@
 #define D_WEB_SS_DST_SLOT_PREFIX    "Ranura de rotación "
 #define D_WEB_SS_DST_OVERWRITE      " (sobrescribir)"
 #define D_WEB_SS_UPLOAD_EDITED      "Subir imagen editada"
+
+// Fallos de subida de protector de pantalla
+#define D_WEB_SS_ERR_THUMB_NOT_FOUND "Miniatura no encontrada"
+#define D_WEB_SS_ERR_NOT_FOUND       "Protector de pantalla no encontrado"
+#define D_WEB_SS_ERR_UPLOAD_FAILED   "Fallo en la subida"
+#define D_WEB_SS_ERR_SLOTS_FULL      "Todas las ranuras de rotación están llenas"
+#define D_WEB_SS_ERR_CANT_CREATE_TMP "No se pudo crear el archivo temporal"
+#define D_WEB_SS_ERR_IMAGE_TOO_LARGE "El archivo de imagen es demasiado grande"
+#define D_WEB_SS_ERR_CHOOSE_IMAGE    "Elige una imagen primero."
+#define D_WEB_SS_ERR_EXACT_BYTES_FMT "La imagen debe tener exactamente %d bytes"
+#define D_WEB_SS_ERR_SAVE_SLEEP      "Fallo al guardar la imagen de reposo"
+#define D_WEB_SS_ERR_SAVE_SLOT       "Fallo al guardar la ranura de rotación"
+
+// Estados del JS del editor
+#define D_WEB_SS_JS_PX_SUFFIX        " px"
+#define D_WEB_SS_JS_PREVIEW_FMT      "Vista previa: %1x%2  umbral %3  bytes %4"
+#define D_WEB_SS_JS_DECODE_FAILED    "No se pudo decodificar la imagen."
+#define D_WEB_SS_JS_READ_FAILED      "No se pudo leer la imagen."
+#define D_WEB_SS_JS_PREVIEW_NOT_READY "La vista previa aún no está lista."
+#define D_WEB_SS_JS_UPLOADING        "Subiendo..."
+#define D_WEB_SS_JS_HTTP_FMT         "HTTP %1"
+#define D_WEB_SS_JS_UPLOAD_COMPLETE  "Subida completa. Actualizando..."
+#define D_WEB_SS_JS_UPLOAD_FAIL_FMT  "Fallo en la subida: %1"
+#define D_WEB_SS_JS_ERROR            "error"
 
 #endif  // PALA_LANG_ES_LA_H
