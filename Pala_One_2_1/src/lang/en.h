@@ -416,8 +416,6 @@
 // Header status icons card (src/web/settings.cpp) — see src/ui/icons.h.
 #define D_WEB_ICONS_HEADING         "Status icons"
 #define D_WEB_ICONS_INTRO           "Small indicators shown in the menu header for states that use extra battery."
-#define D_WEB_ICON_WIFI_LABEL       "Show Wi-Fi icon"
-#define D_WEB_ICON_WIFI_HINT        "Appears while the Wi-Fi radio is on, which happens during file upload and firmware updates."
 #define D_WEB_ICON_SLEEP_LABEL      "Show sleep-blocked icon"
 #define D_WEB_ICON_SLEEP_HINT       "A crossed-out moon, shown while something is keeping the device awake - a connected computer, or an upload in progress."
 

@@ -93,6 +93,9 @@ int drawSectionHeader(const char* title, bool drawBattery, bool drawIcons) {
     right = Icons::drawStatusTray(Icons::trayRightEdge(drawBattery));
   }
 
+  // Re-select bold: the indicators above leave the face set to whatever they
+  // last needed, and yTitle was computed from bold's ascent.
+  Font::useBold();
   u8g2.setCursor(MARGIN_X, yTitle);
   u8g2.print(fitLabelWithEllipsis(String(title), right - MARGIN_X - 4).c_str());
 

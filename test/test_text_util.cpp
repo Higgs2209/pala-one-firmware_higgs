@@ -157,9 +157,12 @@ static int measure6PerCodepoint(const char* s) {
 }
 
 TEST_CASE("truncateWithEllipsis leaves a string that already fits untouched") {
+  CHECK_EQ(truncateWithEllipsis("abc", 60, measure6PerCodepoint), String("abc"));
+  // "abc" measures 18. Exactly at the limit is still a fit.
   CHECK_EQ(truncateWithEllipsis("abc", 18, measure6PerCodepoint), String("abc"));
-  // Exactly at the limit is still a fit.
-  CHECK_EQ(truncateWithEllipsis("abc", 18, measure6PerCodepoint), String("abc"));
+  // One pixel under and it no longer fits — and "..." costs 18 itself, so
+  // there is no truncation that helps. Empty, not a partial ellipsis.
+  CHECK_EQ(truncateWithEllipsis("abc", 17, measure6PerCodepoint), String(""));
   CHECK_EQ(truncateWithEllipsis("", 6, measure6PerCodepoint), String(""));
 }
 

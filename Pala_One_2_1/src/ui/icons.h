@@ -5,9 +5,9 @@
 //  Icons — the header status tray.
 //
 //  Reports device states that quietly cost battery and are otherwise
-//  invisible while browsing menus: the Wi-Fi radio being up, and something
-//  holding deep sleep off. Each is individually toggleable from the Web UI
-//  (NVS keys `cfg_ico_wifi` / `cfg_ico_sleep`, both default on).
+//  invisible while browsing menus — currently just something holding deep
+//  sleep off. Each icon is individually toggleable from the Web UI (NVS key
+//  `cfg_ico_sleep`, default on).
 //
 //  Layout. The tray is right-anchored and packs leftward from whatever edge
 //  `trayRightEdge` hands back — immediately left of the battery indicator on
@@ -21,16 +21,13 @@
 //  `void drawXxxGlyph(int x, int y)`, paints only inside
 //  [x, x+w) x [y, y+kIconH) using colour 1, assumes nothing about what is
 //  underneath, and does NOT clear — the tray clears each icon's box first.
-//  Procedural drawing or an XBM blit are both fine; the two glyphs here are
-//  XBM because hand-placed pixels beat anything Bresenham produces at 9px.
+//  Procedural drawing or an XBM blit are both fine; the glyph here is XBM
+//  because hand-placed pixels beat anything Bresenham produces at 9px.
 // ============================================================================
 namespace Icons {
 
 // NVS load on boot — call once from setup() after `prefs.begin`.
 void loadSettings();
-
-bool wifiIconEnabled();
-void setWifiIconEnabled(bool val);
 
 bool sleepIconEnabled();
 void setSleepIconEnabled(bool val);

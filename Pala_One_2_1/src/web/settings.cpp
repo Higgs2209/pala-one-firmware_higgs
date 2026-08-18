@@ -245,11 +245,6 @@ static void handleSettings() {
   out += "<p class='muted'>" D_WEB_ICONS_INTRO "</p>";
   out += "<form method='POST' action='/settings' accept-charset='UTF-8' style='margin-top:12px'>";
   out += "<label style='display:flex;gap:8px;align-items:center;margin-top:10px;cursor:pointer'>";
-  out += "<input type='checkbox' name='ico_wifi' value='1' style='width:auto'";
-  out += Icons::wifiIconEnabled() ? " checked" : "";
-  out += "><span>" D_WEB_ICON_WIFI_LABEL "</span></label>";
-  out += "<div class='hint'>" D_WEB_ICON_WIFI_HINT "</div>";
-  out += "<label style='display:flex;gap:8px;align-items:center;margin-top:10px;cursor:pointer'>";
   out += "<input type='checkbox' name='ico_sleep' value='1' style='width:auto'";
   out += Icons::sleepIconEnabled() ? " checked" : "";
   out += "><span>" D_WEB_ICON_SLEEP_LABEL "</span></label>";
@@ -511,10 +506,8 @@ static void handleSettingsPost() {
   }
 
   // Same sentinel pattern as noscr_form above — without it, any other card's
-  // POST would read both checkboxes as absent and switch the icons off.
+  // POST would read the checkbox as absent and switch the icon off.
   if (server.hasArg("icons_form")) {
-    bool wi = server.hasArg("ico_wifi");
-    if (wi != Icons::wifiIconEnabled()) Icons::setWifiIconEnabled(wi);
     bool si = server.hasArg("ico_sleep");
     if (si != Icons::sleepIconEnabled()) Icons::setSleepIconEnabled(si);
   }
