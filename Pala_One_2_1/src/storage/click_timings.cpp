@@ -126,10 +126,12 @@ static void saveToStore(KeyValueStore& kv) {
 
 static void setSetting(const TimingSetting& setting, uint32_t value) {
   *setting.value = clampU32(value, minValueFor(setting), setting.maxValue);
+  normalize();
 }
 
 static void resetSetting(const TimingSetting& setting) {
   *setting.value = setting.defaultValue;
+  normalize();
 }
 
 static uint32_t gapMinMs() { return gapSetting().minValue; }
