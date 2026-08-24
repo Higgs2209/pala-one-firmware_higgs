@@ -7,11 +7,11 @@
 TEST_CASE("ClickTimings — defaults match firmware constants") {
   ClickTimings::resetToDefaults();
 
-  CHECK_EQ(ClickTimings::maxClickGapMs(), MAX_CLICK_GAP_MS);
-  CHECK_EQ(ClickTimings::maxClickSequenceMs(), MAX_CLICK_SEQUENCE_MS);
-  CHECK_EQ(ClickTimings::longMs(), LONG_MS);
-  CHECK_EQ(ClickTimings::veryLongMs(), VERY_LONG_MS);
-  CHECK_EQ(ClickTimings::debounceMs(), DEBOUNCE_MS);
+  CHECK_EQ(ClickTimings::maxClickGapMs(), kDefaultGapMs);
+  CHECK_EQ(ClickTimings::maxClickSequenceMs(), kDefaultSequenceMs);
+  CHECK_EQ(ClickTimings::longMs(), kDefaultLongMs);
+  CHECK_EQ(ClickTimings::veryLongMs(), kDefaultVeryLongMs);
+  CHECK_EQ(ClickTimings::debounceMs(), kDefaultDebounceMs);
 }
 
 TEST_CASE("ClickTimings — round-trips through a KeyValueStore") {
