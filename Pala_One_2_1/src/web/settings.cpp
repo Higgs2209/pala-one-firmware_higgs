@@ -537,7 +537,13 @@ static void applyTimingSettingsForm() {
     if (server.hasArg(uiField.resetName)) {
       timing.reset();
     } else if (server.hasArg(uiField.nameId)) {
-      timing.set((uint32_t)server.arg(uiField.nameId).toInt());
+} else if (server.hasArg(uiField.nameId)) {
+      // toInt() is signed; casting a negative straight to uint32_t wraps to
+      // ~4.29e9, which clampU32 then pins to the field's max instead of its
+      // min. Floor it first so bad input lands on the minimum.
+      long raw = server.arg(uiField.nameId).toInt();
+      timing.set(raw < 0 ? 0u : (uint32_t)raw);
+    }
     }
   }
 }
