@@ -546,7 +546,7 @@ static void applyTimingSettingsForm() {
     }
     }
   }
-}
+
 
 static void handleSettingsPost() {
 

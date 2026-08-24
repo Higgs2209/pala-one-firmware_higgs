@@ -15,11 +15,11 @@ static constexpr const char* kKeyDebounce = "cfg_cDbnc";
 
 
 
-static uint32_t s_gapMs = MAX_CLICK_GAP_MS;
-static uint32_t s_sequenceMs = MAX_CLICK_SEQUENCE_MS;
-static uint32_t s_longMs = LONG_MS;
-static uint32_t s_veryLongMs = VERY_LONG_MS;
-static uint32_t s_debounceMs = DEBOUNCE_MS;
+static uint32_t s_gapMs = kDefaultGapMs;
+static uint32_t s_sequenceMs = kDefaultSequenceMs;
+static uint32_t s_longMs = kDefaultLongMs;
+static uint32_t s_veryLongMs = kDefaultVeryLongMs;
+static uint32_t s_debounceMs = kDefaultDebounceMs;
 
 enum class MinKind : uint8_t {
   Fixed,
@@ -37,27 +37,27 @@ struct TimingSetting {
 };
 
 static TimingSetting& gapSetting() {
-  static TimingSetting setting = {kKeyGap, MAX_CLICK_GAP_MS, kGapMin, kGapMax, &s_gapMs, MinKind::Fixed};
+  static TimingSetting setting = {kKeyGap, kDefaultGapMs, kGapMin, kGapMax, &s_gapMs, MinKind::Fixed};
   return setting;
 }
 
 static TimingSetting& sequenceSetting() {
-  static TimingSetting setting = {kKeySequence, MAX_CLICK_SEQUENCE_MS, kGapMin, kSequenceMax, &s_sequenceMs, MinKind::Gap};
+  static TimingSetting setting = {kKeySequence, kDefaultSequenceMs, kGapMin, kSequenceMax, &s_sequenceMs, MinKind::Gap};
   return setting;
 }
 
 static TimingSetting& longSetting() {
-  static TimingSetting setting = {kKeyLong, LONG_MS, kLongMin, kLongMax, &s_longMs, MinKind::Fixed};
+  static TimingSetting setting = {kKeyLong, kDefaultLongMs, kLongMin, kLongMax, &s_longMs, MinKind::Fixed};
   return setting;
 }
 
 static TimingSetting& veryLongSetting() {
-  static TimingSetting setting = {kKeyVeryLong, VERY_LONG_MS, kVeryLongMin, kVeryLongMax, &s_veryLongMs, MinKind::LongPlusOne};
+  static TimingSetting setting = {kKeyVeryLong, kDefaultVeryLongMs, kVeryLongMin, kVeryLongMax, &s_veryLongMs, MinKind::LongPlusOne};
   return setting;
 }
 
 static TimingSetting& debounceSetting() {
-  static TimingSetting setting = {kKeyDebounce, DEBOUNCE_MS, kDebounceMin, kDebounceMax, &s_debounceMs, MinKind::Fixed};
+  static TimingSetting setting = {kKeyDebounce, kDefaultDebounceMs, kDebounceMin, kDebounceMax, &s_debounceMs, MinKind::Fixed};
   return setting;
 }
 
@@ -225,11 +225,11 @@ void resetToDefaults() {
 
 const TimingSettingSpec* timingSettings() {
   static const TimingSettingSpec kTimingSpecs[] = {
-    {kKeyGap, MAX_CLICK_GAP_MS, maxClickGapMs, gapMinMs, gapMaxMs, resetMaxClickGapMs, setMaxClickGapMs},
-    {kKeySequence, MAX_CLICK_SEQUENCE_MS, maxClickSequenceMs, sequenceMinMs, sequenceMaxMs, resetMaxClickSequenceMs, setMaxClickSequenceMs},
-    {kKeyLong, LONG_MS, longMs, longMinMs, longMaxMs, resetLongMs, setLongMs},
-    {kKeyVeryLong, VERY_LONG_MS, veryLongMs, veryLongMinMs, veryLongMaxMs, resetVeryLongMs, setVeryLongMs},
-    {kKeyDebounce, DEBOUNCE_MS, debounceMs, debounceMinMs, debounceMaxMs, resetDebounceMs, setDebounceMs},
+    {kKeyGap, kDefaultGapMs, maxClickGapMs, gapMinMs, gapMaxMs, resetMaxClickGapMs, setMaxClickGapMs},
+    {kKeySequence, kDefaultSequenceMs, maxClickSequenceMs, sequenceMinMs, sequenceMaxMs, resetMaxClickSequenceMs, setMaxClickSequenceMs},
+    {kKeyLong, kDefaultLongMs, longMs, longMinMs, longMaxMs, resetLongMs, setLongMs},
+    {kKeyVeryLong, kDefaultVeryLongMs, veryLongMs, veryLongMinMs, veryLongMaxMs, resetVeryLongMs, setVeryLongMs},
+    {kKeyDebounce, kDefaultDebounceMs, debounceMs, debounceMinMs, debounceMaxMs, resetDebounceMs, setDebounceMs},
   };
   return kTimingSpecs;
 }
