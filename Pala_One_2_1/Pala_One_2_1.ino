@@ -94,6 +94,7 @@
 #include "src/ui/reader_menu.h"
 #include "src/ui/reader_actions.h"  // Gestures::loadSettings
 #include "src/ui/screen.h"
+#include "src/storage/click_timings.h"
 #include "src/ui/widgets.h"  // drawCenter
 #include "src/ui/screens/about_screen.h"
 #include "src/ui/screens/apps_screen.h"
@@ -217,6 +218,7 @@ void setup() {
   Font::loadSettings();
   Screensavers::loadSettings();
   Statusbar::loadSettings();
+  ClickTimings::loadSettings();
   Icons::loadSettings();
   Gestures::loadSettings();
   HeaderTitle::loadSettings();
@@ -399,7 +401,7 @@ void loop() {
   // mid-click-sequence — the classifier's trailing-silence wait runs against
   // millis(), and sleeping through it would add up to one tick interval of
   // latency per emit. Cost of staying awake during a click sequence is at
-  // most ~550ms (MAX_CLICK_SEQUENCE_MS); the long quiet gaps between page
+  // most ~550ms (kDefaultSequenceMs); the long quiet gaps between page
   // turns are where the battery savings actually come from.
   //
   // The `buttonQueueNonEmpty()` check closes a race: the ISR can queue a
