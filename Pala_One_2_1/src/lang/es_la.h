@@ -299,7 +299,7 @@
 #define D_WEB_ERR_FOLDER_CREATE_FAILED  "fallo al crear carpeta"
 #define D_WEB_ERR_DEST_EXISTS           "destino ya existe"
 #define D_WEB_ERR_MOVE_FAILED           "fallo al mover"
-#define D_WEB_ERR_FILE_NAME_TOO_LONG    "fallo al mover: nuevo nombre de archivo supera los %d caracteres: %s"
+#define D_WEB_ERR_FILE_NAME_TOO_LONG    "fallo al mover: nuevo ruta del fichero de archivo supera los %d caracteres: %s"
 #define D_WEB_ERR_MISSING_ID_PAGE       "id/página faltante"
 #define D_WEB_ERR_MISSING_BOOK_IDX      "libro/idx faltante"
 #define D_WEB_ERR_BAD_BOOK              "libro inválido"
