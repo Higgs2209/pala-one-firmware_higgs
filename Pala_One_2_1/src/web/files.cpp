@@ -312,13 +312,21 @@ static void handleMoveBook() {
   String oldPath = String(g_library.books[id].path);
   String folder = sanitizeFolderInput(server.arg("folder"));
   String destDir = (folder.length() == 0) ? String("/books") : String("/books/") + folder;
+  String newPath = destDir + "/" + lastPathComponent(oldPath);
+
+  // New filepath exceeds the max filename length from `/books/`
+  if (newPath.length() >= MAX_FILE_NAME) {
+    char msg[192];
+    snprintf(msg, sizeof(msg), D_WEB_ERR_FILE_NAME_TOO_LONG, MAX_FILE_NAME - 1, newPath.c_str());
+    server.send(400, "text/plain; charset=utf-8", msg);
+    return;
+  }
 
   if (!ensureDirRecursive(destDir)) {
     server.send(500, "text/plain; charset=utf-8", D_WEB_ERR_FOLDER_CREATE_FAILED);
     return;
   }
 
-  String newPath = destDir + "/" + lastPathComponent(oldPath);
   if (newPath == oldPath) {
     server.sendHeader("Location", "/files");
     server.send(302, "text/plain", "");

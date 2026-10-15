@@ -298,6 +298,7 @@
 //  misformed requests; they surface as page content if the user navigates a
 //  bad URL. The lowercase ones are argument-validation failures, the
 //  capitalized ones are operation failures — keep that split in translation.
+//  FILE_NAME_TOO_LONG's %d is MAX_FILE_NAME; %s is file name.
 // ----------------------------------------------------------------------------
 #define D_WEB_ERR_MISSING_ID            "missing id"
 #define D_WEB_ERR_BAD_ID                "bad id"
@@ -311,6 +312,7 @@
 #define D_WEB_ERR_FOLDER_CREATE_FAILED  "folder create failed"
 #define D_WEB_ERR_DEST_EXISTS           "destination exists"
 #define D_WEB_ERR_MOVE_FAILED           "move failed"
+#define D_WEB_ERR_FILE_NAME_TOO_LONG    "move failed: new path exceeds %d characters: %s"
 #define D_WEB_ERR_MISSING_ID_PAGE       "missing id/page"
 #define D_WEB_ERR_MISSING_BOOK_IDX      "missing book/idx"
 #define D_WEB_ERR_BAD_BOOK              "bad book"
